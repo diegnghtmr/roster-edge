@@ -1,0 +1,19 @@
+# # Archivos de Sistema Operativo
+# Ignora los archivos de metadatos de macOS y Windows
+.DS_Store
+Thumbs.db
+
+# # Archivos de IDEs
+# Ignora la configuración de IntelliJ IDEA
+.idea/
+*.iml
+
+# Ignora la configuración de Visual Studio Code
+.vscode/
+
+# # Archivos de Log y Dependencias
+# Ignora archivos de log que puedan generarse en la raíz
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

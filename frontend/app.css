@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Aquí puedes agregar tus estilos personalizados */
+@layer base {
+  /* Estilos base personalizados */
+}
+
+@layer components {
+  /* Componentes personalizados */
+}
+
+@layer utilities {
+  /* Utilidades personalizadas */
+}
