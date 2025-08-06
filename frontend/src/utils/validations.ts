@@ -1,7 +1,7 @@
 /**
- * Valida si un email es válido
- * @param email - El email a validar
- * @returns true si el email es válido, false en caso contrario
+ * Validates if an email is valid
+ * @param email - The email to validate
+ * @returns true if the email is valid, false otherwise
  */
 export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -9,9 +9,9 @@ export const isValidEmail = (email: string): boolean => {
 };
 
 /**
- * Valida si una contraseña es segura
- * @param password - La contraseña a validar
- * @returns Un objeto con la validez y los errores encontrados
+ * Validates if a password is secure
+ * @param password - The password to validate
+ * @returns An object with validity and found errors
  */
 export const validatePassword = (password: string): {
   isValid: boolean;
@@ -20,23 +20,23 @@ export const validatePassword = (password: string): {
   const errors: string[] = [];
   
   if (password.length < 8) {
-    errors.push('La contraseña debe tener al menos 8 caracteres');
+    errors.push('Password must be at least 8 characters long');
   }
   
   if (!/[A-Z]/.test(password)) {
-    errors.push('La contraseña debe contener al menos una letra mayúscula');
+    errors.push('Password must contain at least one uppercase letter');
   }
   
   if (!/[a-z]/.test(password)) {
-    errors.push('La contraseña debe contener al menos una letra minúscula');
+    errors.push('Password must contain at least one lowercase letter');
   }
   
   if (!/[0-9]/.test(password)) {
-    errors.push('La contraseña debe contener al menos un número');
+    errors.push('Password must contain at least one number');
   }
   
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('La contraseña debe contener al menos un carácter especial');
+    errors.push('Password must contain at least one special character');
   }
   
   return {
@@ -46,31 +46,31 @@ export const validatePassword = (password: string): {
 };
 
 /**
- * Valida si un número de teléfono es válido (formato español)
- * @param phone - El número de teléfono a validar
- * @returns true si el teléfono es válido, false en caso contrario
+ * Validates if a phone number is valid (international format)
+ * @param phone - The phone number to validate
+ * @returns true if the phone is valid, false otherwise
  */
 export const isValidPhone = (phone: string): boolean => {
-  const phoneRegex = /^(\+34|0034|34)?[6789]\d{8}$/;
+  const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,5}[-\s\.]?[0-9]{1,5}$/;
   const cleanPhone = phone.replace(/[\s-]/g, '');
   return phoneRegex.test(cleanPhone);
 };
 
 /**
- * Valida si un campo está vacío
- * @param value - El valor a validar
- * @returns true si el campo está vacío, false en caso contrario
+ * Validates if a field is empty
+ * @param value - The value to validate
+ * @returns true if the field is empty, false otherwise
  */
 export const isEmpty = (value: string | null | undefined): boolean => {
   return !value || value.trim().length === 0;
 };
 
 /**
- * Valida la longitud de un campo
- * @param value - El valor a validar
- * @param min - Longitud mínima
- * @param max - Longitud máxima
- * @returns true si la longitud es válida, false en caso contrario
+ * Validates the length of a field
+ * @param value - The value to validate
+ * @param min - Minimum length
+ * @param max - Maximum length
+ * @returns true if the length is valid, false otherwise
  */
 export const isValidLength = (value: string, min: number, max: number): boolean => {
   const length = value.trim().length;
@@ -78,18 +78,18 @@ export const isValidLength = (value: string, min: number, max: number): boolean 
 };
 
 /**
- * Valida si un valor es un número
- * @param value - El valor a validar
- * @returns true si es un número, false en caso contrario
+ * Validates if a value is a number
+ * @param value - The value to validate
+ * @returns true if it's a number, false otherwise
  */
 export const isNumber = (value: any): boolean => {
   return !isNaN(value) && !isNaN(parseFloat(value));
 };
 
 /**
- * Valida si una URL es válida
- * @param url - La URL a validar
- * @returns true si la URL es válida, false en caso contrario
+ * Validates if a URL is valid
+ * @param url - The URL to validate
+ * @returns true if the URL is valid, false otherwise
  */
 export const isValidUrl = (url: string): boolean => {
   try {

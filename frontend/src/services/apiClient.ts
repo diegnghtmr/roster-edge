@@ -1,21 +1,32 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// Configuración base de la API
+// Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 10000;
+const ENV = import.meta.env.VITE_ENV || 'development';
 
-// Crear instancia de Axios
+// Log configuration in development
+if (ENV === 'development' && import.meta.env.VITE_ENABLE_DEBUG_LOGS === 'true') {
+  console.log('API Configuration:', {
+    baseURL: API_BASE_URL,
+    timeout: API_TIMEOUT,
+    environment: ENV
+  });
+}
+
+// Create Axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor de solicitud
+// Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Aquí puedes agregar tokens de autenticación si es necesario
+    // Here you can add authentication tokens if needed
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -27,15 +38,15 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Interceptor de respuesta
+// Response interceptor
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
   (error) => {
-    // Manejo de errores global
+    // Global error handling
     if (error.response?.status === 401) {
-      // Redirigir al login si el token expiró
+      // Redirect to login if token expired
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
@@ -43,7 +54,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Métodos genéricos para peticiones HTTP
+// Generic methods for HTTP requests
 export const api = {
   get: <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
     apiClient.get<T>(url, config),

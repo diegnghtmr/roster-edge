@@ -8,30 +8,30 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Mi App</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">RosterEdge</h3>
             <p className="text-sm text-gray-600">
-              Una aplicación moderna construida con React, TypeScript y Tailwind CSS.
+              A modern application built with React, TypeScript and Tailwind CSS.
             </p>
           </div>
           
           <div>
             <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-              Enlaces
+              Links
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-sm text-gray-600 hover:text-gray-900">
-                  Inicio
+                  Home
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="text-sm text-gray-600 hover:text-gray-900">
-                  Acerca de
+                  About
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-sm text-gray-600 hover:text-gray-900">
-                  Contacto
+                  Contact
                 </Link>
               </li>
             </ul>
@@ -44,12 +44,12 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li>
                 <Link to="/privacy" className="text-sm text-gray-600 hover:text-gray-900">
-                  Política de Privacidad
+                  Privacy Policy
                 </Link>
               </li>
               <li>
                 <Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900">
-                  Términos de Servicio
+                  Terms of Service
                 </Link>
               </li>
             </ul>
@@ -57,7 +57,7 @@ export const Footer: React.FC = () => {
           
           <div>
             <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-              Síguenos
+              Follow Us
             </h4>
             <div className="flex space-x-4">
               <a
@@ -90,7 +90,7 @@ export const Footer: React.FC = () => {
         
         <div className="mt-8 pt-8 border-t border-gray-200">
           <p className="text-center text-sm text-gray-600">
-            © {new Date().getFullYear()} Mi App. Todos los derechos reservados.
+            © {new Date().getFullYear()} RosterEdge. All rights reserved.
           </p>
         </div>
       </div>

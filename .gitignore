@@ -1,19 +1,151 @@
-# # Archivos de Sistema Operativo
-# Ignora los archivos de metadatos de macOS y Windows
-.DS_Store
-Thumbs.db
+# ==================== #
+# Operating System Files
+# ==================== #
 
-# # Archivos de IDEs
-# Ignora la configuración de IntelliJ IDEA
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ==================== #
+# IDE and Editor Files
+# ==================== #
+
+# IntelliJ IDEA
 .idea/
 *.iml
+*.iws
+*.ipr
+out/
 
-# Ignora la configuración de Visual Studio Code
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+tmp/
+
+# Visual Studio Code
 .vscode/
+*.code-workspace
 
-# # Archivos de Log y Dependencias
-# Ignora archivos de log que puedan generarse en la raíz
+# NetBeans
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ==================== #
+# Backend (Spring Boot / Maven)
+# ==================== #
+
+# Maven
+backend/target/
+backend/pom.xml.tag
+backend/pom.xml.releaseBackup
+backend/pom.xml.versionsBackup
+backend/pom.xml.next
+backend/release.properties
+backend/dependency-reduced-pom.xml
+backend/.mvn/
+
+# Spring Boot
+backend/*.jar
+backend/*.war
+backend/*.ear
+backend/*.class
+
+# SQLite Database
+*.db
+*.sqlite
+*.sqlite3
+roster.db
+
+# Logs
+backend/logs/
+backend/*.log
+backend/*.gz
+
+# ==================== #
+# Frontend (React / Vite)
+# ==================== #
+
+# Dependencies
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+
+# Production build
+frontend/dist/
+frontend/dist-ssr/
+frontend/build/
+
+# Environment variables
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/.env.production
+
+# Testing
+frontend/coverage/
+frontend/*.lcov
+frontend/.nyc_output/
+
+# Vite
+frontend/*.local
+
+# Debug logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# ==================== #
+# General
+# ==================== #
+
+# Logs
+logs/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.backup
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Certificates and keys (never commit these!)
+*.pem
+*.key
+*.crt
+*.p12
+
+# Package lock files (optional, depending on team preference)
+# Uncomment if you don't want to commit lock files
+# frontend/package-lock.json
+# frontend/yarn.lock
+# frontend/pnpm-lock.yaml

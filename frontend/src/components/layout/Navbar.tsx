@@ -13,7 +13,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Aquí iría la lógica de logout
+    // Here would go the logout logic
     localStorage.removeItem('token');
     navigate('/login');
   };
@@ -25,7 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="text-xl font-bold text-gray-900">
-                Mi App
+                RosterEdge
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -33,13 +33,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
                 to="/"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                Inicio
+                Home
               </Link>
               <Link
                 to="/about"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                Acerca de
+                About
               </Link>
               {isAuthenticated && (
                 <Link
@@ -65,16 +65,16 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
                   className="flex items-center space-x-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Cerrar sesión</span>
+                  <span>Sign Out</span>
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
                 <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
-                  Iniciar sesión
+                  Sign In
                 </Button>
                 <Button size="sm" onClick={() => navigate('/register')}>
-                  Registrarse
+                  Sign Up
                 </Button>
               </div>
             )}
@@ -98,13 +98,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
               to="/"
               className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
-              Inicio
+              Home
             </Link>
             <Link
               to="/about"
               className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
-              Acerca de
+              About
             </Link>
             {isAuthenticated && (
               <Link
@@ -126,7 +126,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
-                  Cerrar sesión
+                  Sign Out
                 </button>
               </div>
             ) : (
@@ -135,13 +135,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
                   to="/login"
                   className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
-                  Iniciar sesión
+                  Sign In
                 </Link>
                 <Link
                   to="/register"
                   className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
-                  Registrarse
+                  Sign Up
                 </Link>
               </div>
             )}

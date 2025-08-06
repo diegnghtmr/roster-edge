@@ -1,10 +1,10 @@
 /**
- * Formatea una fecha en formato legible
- * @param date - La fecha a formatear
- * @param locale - El locale a usar (por defecto 'es-ES')
- * @returns La fecha formateada
+ * Formats a date in readable format
+ * @param date - The date to format
+ * @param locale - The locale to use (default 'en-US')
+ * @returns The formatted date
  */
-export const formatDate = (date: Date | string, locale: string = 'es-ES'): string => {
+export const formatDate = (date: Date | string, locale: string = 'en-US'): string => {
   const dateObject = typeof date === 'string' ? new Date(date) : date;
   
   return dateObject.toLocaleDateString(locale, {
@@ -15,12 +15,12 @@ export const formatDate = (date: Date | string, locale: string = 'es-ES'): strin
 };
 
 /**
- * Formatea una fecha y hora en formato legible
- * @param date - La fecha a formatear
- * @param locale - El locale a usar (por defecto 'es-ES')
- * @returns La fecha y hora formateada
+ * Formats a date and time in readable format
+ * @param date - The date to format
+ * @param locale - The locale to use (default 'en-US')
+ * @returns The formatted date and time
  */
-export const formatDateTime = (date: Date | string, locale: string = 'es-ES'): string => {
+export const formatDateTime = (date: Date | string, locale: string = 'en-US'): string => {
   const dateObject = typeof date === 'string' ? new Date(date) : date;
   
   return dateObject.toLocaleString(locale, {
@@ -33,9 +33,9 @@ export const formatDateTime = (date: Date | string, locale: string = 'es-ES'): s
 };
 
 /**
- * Obtiene el tiempo relativo desde una fecha
- * @param date - La fecha desde la cual calcular
- * @returns El tiempo relativo (ej: "hace 2 horas")
+ * Gets relative time from a date
+ * @param date - The date to calculate from
+ * @returns The relative time (e.g., "2 hours ago")
  */
 export const getRelativeTime = (date: Date | string): string => {
   const dateObject = typeof date === 'string' ? new Date(date) : date;
@@ -43,34 +43,34 @@ export const getRelativeTime = (date: Date | string): string => {
   const diffInSeconds = Math.floor((now.getTime() - dateObject.getTime()) / 1000);
   
   if (diffInSeconds < 60) {
-    return 'hace unos segundos';
+    return 'a few seconds ago';
   }
   
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `hace ${diffInMinutes} ${diffInMinutes === 1 ? 'minuto' : 'minutos'}`;
+    return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
   }
   
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `hace ${diffInHours} ${diffInHours === 1 ? 'hora' : 'horas'}`;
+    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
   }
   
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 7) {
-    return `hace ${diffInDays} ${diffInDays === 1 ? 'día' : 'días'}`;
+    return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
   }
   
   if (diffInDays < 30) {
     const diffInWeeks = Math.floor(diffInDays / 7);
-    return `hace ${diffInWeeks} ${diffInWeeks === 1 ? 'semana' : 'semanas'}`;
+    return `${diffInWeeks} ${diffInWeeks === 1 ? 'week' : 'weeks'} ago`;
   }
   
   if (diffInDays < 365) {
     const diffInMonths = Math.floor(diffInDays / 30);
-    return `hace ${diffInMonths} ${diffInMonths === 1 ? 'mes' : 'meses'}`;
+    return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`;
   }
   
   const diffInYears = Math.floor(diffInDays / 365);
-  return `hace ${diffInYears} ${diffInYears === 1 ? 'año' : 'años'}`;
+  return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
 };

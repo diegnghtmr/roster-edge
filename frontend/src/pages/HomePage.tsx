@@ -10,18 +10,18 @@ export const HomePage: React.FC = () => {
   const features = [
     {
       icon: <Rocket className="h-8 w-8 text-blue-600" />,
-      title: 'Rápido y Moderno',
-      description: 'Construido con las últimas tecnologías para un rendimiento óptimo.',
+      title: 'Fast and Modern',
+      description: 'Built with the latest technologies for optimal performance.',
     },
     {
       icon: <Shield className="h-8 w-8 text-green-600" />,
-      title: 'Seguro',
-      description: 'Implementación de mejores prácticas de seguridad para proteger tus datos.',
+      title: 'Secure',
+      description: 'Implementation of security best practices to protect your data.',
     },
     {
       icon: <Zap className="h-8 w-8 text-purple-600" />,
-      title: 'Eficiente',
-      description: 'Optimizado para ofrecer la mejor experiencia de usuario posible.',
+      title: 'Efficient',
+      description: 'Optimized to deliver the best possible user experience.',
     },
   ];
 
@@ -32,11 +32,11 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900">
-              Bienvenido a <span className="text-blue-600">Mi App</span>
+              Welcome to <span className="text-blue-600">RosterEdge</span>
             </h1>
             <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              Una aplicación moderna construida con React, TypeScript, Tailwind CSS y Spring Boot.
-              Diseñada para ser rápida, segura y escalable.
+              A modern application built with React, TypeScript, Tailwind CSS and Spring Boot.
+              Designed to be fast, secure and scalable.
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
               <div className="rounded-md shadow">
@@ -45,7 +45,7 @@ export const HomePage: React.FC = () => {
                   onClick={() => navigate('/register')}
                   className="w-full flex items-center justify-center px-8 py-3"
                 >
-                  Comenzar ahora
+                  Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
@@ -56,7 +56,7 @@ export const HomePage: React.FC = () => {
                   onClick={() => navigate('/about')}
                   className="w-full flex items-center justify-center px-8 py-3"
                 >
-                  Saber más
+                  Learn More
                 </Button>
               </div>
             </div>
@@ -69,10 +69,10 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Características principales
+              Key Features
             </h2>
             <p className="mt-4 text-xl text-gray-600">
-              Todo lo que necesitas para tu aplicación
+              Everything you need for your application
             </p>
           </div>
 
@@ -101,10 +101,10 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-              ¿Listo para comenzar?
+              Ready to get started?
             </h2>
             <p className="mt-4 text-xl text-blue-100">
-              Únete a nosotros y descubre todo lo que podemos ofrecerte.
+              Join us and discover everything we can offer you.
             </p>
             <div className="mt-8">
               <Button
@@ -113,7 +113,7 @@ export const HomePage: React.FC = () => {
                 onClick={() => navigate('/register')}
                 className="inline-flex items-center px-6 py-3"
               >
-                Crear cuenta gratis
+                Create Free Account
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
