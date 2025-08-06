@@ -95,12 +95,6 @@ frontend/dist/
 frontend/dist-ssr/
 frontend/build/
 
-# Environment variables
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
-frontend/.env.production
-
 # Testing
 frontend/coverage/
 frontend/*.lcov
