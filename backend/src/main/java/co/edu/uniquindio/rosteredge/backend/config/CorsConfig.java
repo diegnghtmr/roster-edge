@@ -28,6 +28,7 @@ public class CorsConfig {
         config.setAllowedOrigins(Arrays.asList(
             "http://localhost:3000",  // React default
             "http://localhost:5173",  // Vite default
+            "http://127.0.0.1:5173",  // Vite default (alternative)
             "http://localhost:4200"   // Angular default
         ));
         

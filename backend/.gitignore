@@ -32,3 +32,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### HSQLDB Files ###
+roster.properties
+roster.script
+roster.log
+roster.data
+roster.lck
+roster.tmp
+*.db
+*.lck

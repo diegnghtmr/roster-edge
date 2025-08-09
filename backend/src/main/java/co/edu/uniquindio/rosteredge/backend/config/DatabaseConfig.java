@@ -2,14 +2,16 @@ package co.edu.uniquindio.rosteredge.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 /**
- * SQLite database configuration
+ * Database configuration for PostgreSQL
  * Defines beans and configurations related to data access
  */
 @Configuration
+@EnableJdbcAuditing
 public class DatabaseConfig {
     
     /**
