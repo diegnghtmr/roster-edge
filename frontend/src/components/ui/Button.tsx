@@ -31,15 +31,23 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   loading?: boolean;
+  'aria-label'?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, loading, children, disabled, ...props }, ref) => {
+  ({ className, variant, size, loading, children, disabled, 'aria-label': ariaLabel, ...props }, ref) => {
+    // Require aria-label for icon-only buttons
+    if (size === 'icon' && !ariaLabel && !props.title) {
+      console.warn('Button with size="icon" should have an aria-label or title for accessibility');
+    }
+    
     return (
       <button
         className={buttonVariants({ variant, size, className })}
         ref={ref}
         disabled={disabled || loading}
+        aria-label={ariaLabel}
+        aria-busy={loading}
         {...props}
       >
         {loading && (
@@ -72,4 +80,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+export { Button };

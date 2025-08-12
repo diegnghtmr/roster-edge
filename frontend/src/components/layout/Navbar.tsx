@@ -1,21 +1,24 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../hooks/useAuth';
 
-interface NavbarProps {
-  isAuthenticated?: boolean;
-  username?: string;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, username }) => {
+export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
+
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
-    // Here would go the logout logic
-    localStorage.removeItem('token');
+    logout();
     navigate('/login');
+    setIsMenuOpen(false);
   };
 
   return (
@@ -56,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-gray-500" />
-                  <span className="text-sm text-gray-700">{username}</span>
+                  <span className="text-sm text-gray-700">{user?.username}</span>
                 </div>
                 <Button
                   variant="ghost"
@@ -120,7 +123,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated = false, usernam
               <div className="space-y-1">
                 <div className="flex items-center px-4">
                   <User className="h-5 w-5 text-gray-500" />
-                  <span className="ml-2 text-sm text-gray-700">{username}</span>
+                  <span className="ml-2 text-sm text-gray-700">{user?.username}</span>
                 </div>
                 <button
                   onClick={handleLogout}

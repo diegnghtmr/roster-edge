@@ -1,5 +1,5 @@
 import { api } from './apiClient';
-import { User, CreateUserDto, UpdateUserDto } from '../types/user';
+import type { User, CreateUserDto, UpdateUserDto } from '../types/user';
 
 export const userService = {
   // Get all users

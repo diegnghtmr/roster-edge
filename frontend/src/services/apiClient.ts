@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
@@ -44,12 +44,34 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Global error handling
-    if (error.response?.status === 401) {
-      // Redirect to login if token expired
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+    // Enhanced error handling
+    if (error.code === 'ECONNABORTED') {
+      // Timeout error
+      error.message = 'Request timeout. Please try again.';
+    } else if (error.code === 'ERR_NETWORK') {
+      // Network error
+      error.message = 'Network error. Please check your internet connection.';
+    } else if (error.response) {
+      // Server responded with error status
+      if (error.response.status === 401) {
+        // Redirect to login if token expired
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
+    } else if (error.request) {
+      // Request was made but no response received
+      error.message = 'No response from server. Please check your connection.';
     }
+    
+    // Log errors in development
+    if (ENV === 'development') {
+      console.error('API Error:', error);
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -59,13 +81,13 @@ export const api = {
   get: <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
     apiClient.get<T>(url, config),
   
-  post: <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
+  post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
     apiClient.post<T>(url, data, config),
   
-  put: <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
+  put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
     apiClient.put<T>(url, data, config),
   
-  patch: <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
+  patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>
     apiClient.patch<T>(url, data, config),
   
   delete: <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> =>

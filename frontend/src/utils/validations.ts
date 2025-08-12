@@ -48,12 +48,47 @@ export const validatePassword = (password: string): {
 /**
  * Validates if a phone number is valid (international format)
  * @param phone - The phone number to validate
+ * @param countryCode - Optional country code for more accurate validation (e.g., 'US', 'GB')
  * @returns true if the phone is valid, false otherwise
  */
-export const isValidPhone = (phone: string): boolean => {
-  const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,5}[-\s\.]?[0-9]{1,5}$/;
-  const cleanPhone = phone.replace(/[\s-]/g, '');
-  return phoneRegex.test(cleanPhone);
+export const isValidPhone = (phone: string, countryCode?: string): boolean => {
+  // Remove all non-digit characters except + at the beginning
+  const cleanPhone = phone.replace(/[^\d+]/g, '');
+  
+  // Basic validation rules
+  if (cleanPhone.length < 7 || cleanPhone.length > 15) {
+    return false;
+  }
+  
+  // If starts with +, must be followed by country code (1-3 digits)
+  if (cleanPhone.startsWith('+')) {
+    const withoutPlus = cleanPhone.substring(1);
+    if (!/^\d{7,14}$/.test(withoutPlus)) {
+      return false;
+    }
+  }
+  
+  // Country-specific validation
+  if (countryCode) {
+    switch (countryCode.toUpperCase()) {
+      case 'US':
+      case 'CA':
+        // North American format: 10 digits or +1 followed by 10 digits
+        return /^(\+1)?\d{10}$/.test(cleanPhone);
+      case 'GB':
+        // UK format: 10-11 digits or +44 followed by 9-10 digits
+        return /^(\+44)?\d{10,11}$/.test(cleanPhone);
+      case 'MX':
+        // Mexican format: 10 digits or +52 followed by 10 digits
+        return /^(\+52)?\d{10}$/.test(cleanPhone);
+      default:
+        // Generic international format
+        return /^\+?\d{7,15}$/.test(cleanPhone);
+    }
+  }
+  
+  // Generic validation: 7-15 digits, optionally starting with +
+  return /^\+?\d{7,15}$/.test(cleanPhone);
 };
 
 /**
@@ -82,8 +117,8 @@ export const isValidLength = (value: string, min: number, max: number): boolean 
  * @param value - The value to validate
  * @returns true if it's a number, false otherwise
  */
-export const isNumber = (value: any): boolean => {
-  return !isNaN(value) && !isNaN(parseFloat(value));
+export const isNumber = (value: unknown): boolean => {
+  return typeof value === 'number' || (typeof value === 'string' && !isNaN(Number(value)) && !isNaN(parseFloat(value)));
 };
 
 /**
