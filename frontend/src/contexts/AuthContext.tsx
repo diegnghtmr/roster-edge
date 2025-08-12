@@ -6,7 +6,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
   error: string | null;
@@ -25,39 +25,62 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check for existing token on mount
+  // Validate token on mount by fetching user profile
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-      } catch (err) {
-        console.error('Error parsing stored user data:', err);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+    const validateToken = async () => {
+      const storedToken = localStorage.getItem('token');
+      
+      if (storedToken) {
+        try {
+          // Set token for API calls
+          setToken(storedToken);
+          
+          // Fetch user profile to validate token
+          const userProfile = await userService.getProfile();
+          setUser(userProfile);
+          setIsAuthenticated(true);
+          localStorage.setItem('user', JSON.stringify(userProfile));
+        } catch (err) {
+          console.error('Token validation failed:', err);
+          // Clear invalid token
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setToken(null);
+          setUser(null);
+          setIsAuthenticated(false);
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    
+    validateToken();
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (usernameOrEmail: string, password: string) => {
     setError(null);
     setLoading(true);
     try {
-      const response = await userService.login(email, password);
-      const { token: authToken, user: authUser } = response;
+      // Backend expects username, but we allow email input
+      // Check if it's an email and use it as username for now
+      const isEmail = usernameOrEmail.includes('@');
+      const username = isEmail ? usernameOrEmail.split('@')[0] : usernameOrEmail;
       
+      // Login and get token
+      const loginResponse = await userService.login(username, password);
+      const { token: authToken } = loginResponse;
+      
+      // Store token
       localStorage.setItem('token', authToken);
-      localStorage.setItem('user', JSON.stringify(authUser));
-      
       setToken(authToken);
-      setUser(authUser);
+      
+      // Fetch user profile after successful login
+      const userProfile = await userService.getProfile();
+      
+      // Store user data
+      localStorage.setItem('user', JSON.stringify(userProfile));
+      setUser(userProfile);
       setIsAuthenticated(true);
+      
     } catch (err) {
       const error = err as Error & {response?: {data?: {message?: string}}};
       const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please try again.';
@@ -68,14 +91,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
-    setUser(null);
-    setIsAuthenticated(false);
-    setError(null);
-  }, []);
+  const logout = useCallback(async () => {
+    try {
+      // Call logout endpoint if token exists
+      if (token) {
+        await userService.logout();
+      }
+    } catch (err) {
+      // Even if logout fails, clear local data
+      console.error('Logout error:', err);
+    } finally {
+      // Clear all auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setToken(null);
+      setUser(null);
+      setIsAuthenticated(false);
+      setError(null);
+    }
+  }, [token]);
 
   const contextValue = useMemo(() => ({
     isAuthenticated,

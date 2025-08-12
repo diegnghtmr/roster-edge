@@ -58,4 +58,24 @@ public abstract class BaseEntity {
         this.active = true;
         this.updatedAt = LocalDateTime.now();
     }
+    
+    /**
+     * Pre-persist callback to set timestamps
+     */
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        this.updatedAt = LocalDateTime.now();
+        if (this.active == null) {
+            this.active = true;
+        }
+    }
+    
+    /**
+     * Pre-update callback to update timestamp
+     */
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

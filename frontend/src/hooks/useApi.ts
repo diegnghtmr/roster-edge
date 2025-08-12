@@ -1,9 +1,11 @@
 import { useState, useCallback, useRef } from 'react';
 import { AxiosError } from 'axios';
+import type { ApiResponse } from '../types/user';
 
 interface ApiErrorDetails {
   message: string;
   statusCode?: number;
+  errorCode?: string;
   details?: unknown;
 }
 
@@ -38,18 +40,22 @@ export function useApi<T>(
       setState({ data: result, loading: false, error: null });
       return result;
     } catch (err) {
-      const axiosError = err as AxiosError<{message?: string}>;
+      const axiosError = err as AxiosError<ApiResponse<unknown>>;
       const errorDetails: ApiErrorDetails = {
         message: 'An error occurred',
         statusCode: axiosError.response?.status,
+        errorCode: axiosError.response?.data?.errorCode,
         details: axiosError.response?.data,
       };
       
-      // Provide more specific error messages based on status code
-      if (axiosError.response) {
+      // Extract error message from ApiResponse structure
+      if (axiosError.response?.data?.message) {
+        errorDetails.message = axiosError.response.data.message;
+      } else if (axiosError.response) {
+        // Provide more specific error messages based on status code
         switch (axiosError.response.status) {
           case 400:
-            errorDetails.message = axiosError.response.data?.message || 'Invalid request';
+            errorDetails.message = 'Invalid request';
             break;
           case 401:
             errorDetails.message = 'Authentication required';
@@ -64,7 +70,7 @@ export function useApi<T>(
             errorDetails.message = 'Server error. Please try again later';
             break;
           default:
-            errorDetails.message = axiosError.response.data?.message || axiosError.message || 'An error occurred';
+            errorDetails.message = axiosError.message || 'An error occurred';
         }
       } else if (axiosError.request) {
         errorDetails.message = 'Network error. Please check your connection';

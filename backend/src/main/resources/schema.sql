@@ -2,9 +2,11 @@ CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
     role VARCHAR(50) DEFAULT 'USER',
     status VARCHAR(20) DEFAULT 'ACTIVE',
+    auth_token VARCHAR(255),
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -12,6 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
+CREATE INDEX IF NOT EXISTS idx_users_auth_token ON users(auth_token);
+
 CREATE TABLE IF NOT EXISTS teams (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -22,6 +26,8 @@ CREATE TABLE IF NOT EXISTS teams (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_teams_active ON teams(active);
+
 CREATE TABLE IF NOT EXISTS players (
     id BIGSERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -38,6 +44,7 @@ CREATE TABLE IF NOT EXISTS players (
 );
 CREATE INDEX IF NOT EXISTS idx_players_team_id ON players(team_id);
 CREATE INDEX IF NOT EXISTS idx_players_active ON players(active);
+
 CREATE TABLE IF NOT EXISTS matches (
     id BIGSERIAL PRIMARY KEY,
     home_team_id BIGINT NOT NULL,

@@ -1,13 +1,12 @@
 -- Initial data for development and testing
--- This file is executed after schema.sql
--- PostgreSQL-compatible seed data
+-- Passwords are hashed with SHA-256
+-- Default password for all users is: password123
 
--- Insert sample users
-INSERT INTO users (username, email, full_name, role, status) VALUES
-    ('admin', 'admin@rosteredge.com', 'System Administrator', 'ADMIN', 'ACTIVE'),
-    ('coach1', 'coach@rosteredge.com', 'John Coach', 'COACH', 'ACTIVE'),
-    ('player1', 'player1@rosteredge.com', 'Mike Johnson', 'PLAYER', 'ACTIVE'),
-    ('viewer1', 'viewer@rosteredge.com', 'Jane Viewer', 'VIEWER', 'ACTIVE')
+INSERT INTO users (username, email, password, full_name, role, status) VALUES
+    ('admin', 'admin@rosteredge.com', 'IjZAgcfl7p92ldGxad68LJZdL17lhWy46abIr9Mc2qw=', 'System Administrator', 'ADMIN', 'ACTIVE'),
+    ('coach1', 'coach@rosteredge.com', 'IjZAgcfl7p92ldGxad68LJZdL17lhWy46abIr9Mc2qw=', 'John Coach', 'COACH', 'ACTIVE'),
+    ('player1', 'player1@rosteredge.com', 'IjZAgcfl7p92ldGxad68LJZdL17lhWy46abIr9Mc2qw=', 'Mike Johnson', 'PLAYER', 'ACTIVE'),
+    ('viewer1', 'viewer@rosteredge.com', 'IjZAgcfl7p92ldGxad68LJZdL17lhWy46abIr9Mc2qw=', 'Jane Viewer', 'VIEWER', 'ACTIVE')
 ON CONFLICT DO NOTHING;
 
 -- Insert sample teams

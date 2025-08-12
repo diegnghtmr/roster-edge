@@ -1,48 +1,56 @@
-// Definición del tipo User
+// User entity type matching backend UserDTO
 export interface User {
   id: number;
-  email: string;
   username: string;
-  firstName: string;
-  lastName: string;
-  avatar?: string;
-  role: UserRole;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  email: string;
+  fullName?: string;
+  role: 'ADMIN' | 'COACH' | 'PLAYER' | 'VIEWER';
+  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  active?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-// Roles de usuario
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-  MODERATOR = 'MODERATOR',
-}
-
-// DTO para crear usuario
+// DTO for creating a new user (registration)
 export interface CreateUserDto {
-  email: string;
   username: string;
+  email: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  role?: UserRole;
+  fullName?: string;
+  role?: 'ADMIN' | 'COACH' | 'PLAYER' | 'VIEWER';
+  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 }
 
-// DTO para actualizar usuario
+// DTO for updating user information
 export interface UpdateUserDto {
   email?: string;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
-  avatar?: string;
-  role?: UserRole;
-  isActive?: boolean;
+  fullName?: string;
+  password?: string;
+  role?: 'ADMIN' | 'COACH' | 'PLAYER' | 'VIEWER';
+  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  active?: boolean;
 }
 
-// Respuesta de autenticación
-export interface AuthResponse {
+// API Response wrapper matching backend ApiResponse
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T;
+  errorCode?: string;
+  timestamp: number;
+}
+
+// Login response type
+export interface LoginResponse {
   token: string;
-  user: User;
-  expiresIn: number;
+  username: string;
+}
+
+// Auth state type
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
+  loading: boolean;
+  error: string | null;
 }

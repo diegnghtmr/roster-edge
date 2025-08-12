@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
-import { isValidEmail } from '../utils/validations';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,12 +11,12 @@ const LoginPage: React.FC = () => {
   const { login, loading, error } = useAuth();
   
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   
   const [validationErrors, setValidationErrors] = useState({
-    email: '',
+    username: '',
     password: '',
   });
 
@@ -25,14 +24,14 @@ const LoginPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     const errors = {
-      email: '',
+      username: '',
       password: '',
     };
 
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!isValidEmail(formData.email)) {
-      errors.email = 'Please enter a valid email';
+    if (!formData.username) {
+      errors.username = 'Username or email is required';
+    } else if (formData.username.length < 3) {
+      errors.username = 'Username must be at least 3 characters';
     }
 
     if (!formData.password) {
@@ -40,7 +39,7 @@ const LoginPage: React.FC = () => {
     }
 
     setValidationErrors(errors);
-    return !errors.email && !errors.password;
+    return !errors.username && !errors.password;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +50,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData.username, formData.password);
       navigate(from, { replace: true });
     } catch {
       // Error is handled by the auth context
@@ -77,14 +76,14 @@ const LoginPage: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
+              label="Username or Email"
+              type="text"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
-              error={validationErrors.email}
-              placeholder="Enter your email"
-              autoComplete="email"
+              error={validationErrors.username}
+              placeholder="Enter your username or email"
+              autoComplete="username"
             />
             
             <Input

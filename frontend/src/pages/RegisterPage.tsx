@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
-import { isValidEmail, validatePassword } from '../utils/validations';
+import { isValidEmail } from '../utils/validations';
 import { userService } from '../services/userService';
 import { useAuth } from '../hooks/useAuth';
 
@@ -37,6 +37,8 @@ const RegisterPage: React.FC = () => {
       errors.username = 'Username is required';
     } else if (formData.username.length < 3) {
       errors.username = 'Username must be at least 3 characters';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      errors.username = 'Username can only contain letters, numbers and underscores';
     }
 
     if (!formData.firstName) {
@@ -49,11 +51,8 @@ const RegisterPage: React.FC = () => {
 
     if (!formData.password) {
       errors.password = 'Password is required';
-    } else {
-      const passwordValidation = validatePassword(formData.password);
-      if (!passwordValidation.isValid) {
-        errors.password = passwordValidation.errors[0];
-      }
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
     }
 
     if (!formData.confirmPassword) {
@@ -77,17 +76,18 @@ const RegisterPage: React.FC = () => {
     setError('');
 
     try {
-      // Register the user
-      await userService.create({
-        email: formData.email,
+      // Register the user with correct fields for backend
+      await userService.register({
         username: formData.username,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        email: formData.email,
         password: formData.password,
+        fullName: `${formData.firstName} ${formData.lastName}`.trim(),
+        role: 'VIEWER', // Default role
+        status: 'ACTIVE' // Default status
       });
 
-      // Auto-login after successful registration
-      await login(formData.email, formData.password);
+      // Auto-login after successful registration using username
+      await login(formData.username, formData.password);
       navigate('/dashboard');
     } catch (err) {
       const error = err as Error & {response?: {data?: {message?: string}}};
@@ -145,6 +145,7 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               error={validationErrors.username}
               placeholder="johndoe"
+              helperText="Letters, numbers and underscores only"
             />
             
             <Input
@@ -165,8 +166,8 @@ const RegisterPage: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               error={validationErrors.password}
-              placeholder="Create a strong password"
-              helperText="At least 8 characters with uppercase, lowercase, number and special character"
+              placeholder="Create a password"
+              helperText="At least 6 characters"
               autoComplete="new-password"
             />
             

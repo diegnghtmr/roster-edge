@@ -12,7 +12,7 @@ import java.util.Map;
  * Useful for verifying that the backend is working correctly
  */
 @RestController
-@RequestMapping("/api/health")
+@RequestMapping("/health")
 public class HealthController {
     
     /**

@@ -26,11 +26,17 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Here you can add authentication tokens if needed
+    // Add authentication token WITHOUT Bearer prefix (backend expects raw token)
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = token; // Just the token, no Bearer prefix
     }
+    
+    // Log requests in development
+    if (ENV === 'development' && import.meta.env.VITE_ENABLE_DEBUG_LOGS === 'true') {
+      console.log('API Request:', config.method?.toUpperCase(), config.url, config.data);
+    }
+    
     return config;
   },
   (error) => {
@@ -41,6 +47,10 @@ apiClient.interceptors.request.use(
 // Response interceptor
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
+    // Log responses in development
+    if (ENV === 'development' && import.meta.env.VITE_ENABLE_DEBUG_LOGS === 'true') {
+      console.log('API Response:', response.config.url, response.data);
+    }
     return response;
   },
   (error) => {
@@ -54,22 +64,31 @@ apiClient.interceptors.response.use(
     } else if (error.response) {
       // Server responded with error status
       if (error.response.status === 401) {
-        // Redirect to login if token expired
+        // Clear auth data if token is invalid
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // Only redirect if not already on login page
-        if (window.location.pathname !== '/login') {
+        // Only redirect if not already on login/register page
+        if (window.location.pathname !== '/login' && 
+            window.location.pathname !== '/register' &&
+            window.location.pathname !== '/') {
           window.location.href = '/login';
         }
       }
+      
+      // Extract error message from ApiResponse structure
+      if (error.response.data && error.response.data.message) {
+        error.message = error.response.data.message;
+      } else if (error.response.data && error.response.data.error) {
+        error.message = error.response.data.error;
+      }
     } else if (error.request) {
       // Request was made but no response received
-      error.message = 'No response from server. Please check your connection.';
+      error.message = 'No response from server. Please check if the backend is running.';
     }
     
     // Log errors in development
     if (ENV === 'development') {
-      console.error('API Error:', error);
+      console.error('API Error:', error.response?.status, error.message, error.response?.data);
     }
     
     return Promise.reject(error);

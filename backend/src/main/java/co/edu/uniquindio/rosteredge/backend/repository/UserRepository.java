@@ -1,6 +1,8 @@
 package co.edu.uniquindio.rosteredge.backend.repository;
 
 import co.edu.uniquindio.rosteredge.backend.model.User;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,56 +17,49 @@ public interface UserRepository extends BaseRepository<User, Long> {
     
     /**
      * Find a user by username
-     * 
-     * @param username The username
-     * @return Optional containing the found user
      */
-    Optional<User> findByUsername(String username);
+    @Query("SELECT * FROM users WHERE username = :username")
+    Optional<User> findByUsername(@Param("username") String username);
     
     /**
      * Find a user by email
-     * 
-     * @param email The email address
-     * @return Optional containing the found user
      */
-    Optional<User> findByEmail(String email);
+    @Query("SELECT * FROM users WHERE email = :email")
+    Optional<User> findByEmail(@Param("email") String email);
+    
+    /**
+     * Find a user by auth token
+     */
+    @Query("SELECT * FROM users WHERE auth_token = :token")
+    Optional<User> findByAuthToken(@Param("token") String token);
     
     /**
      * Find all active users
-     * 
-     * @return List of active users
      */
+    @Query("SELECT * FROM users WHERE active = true")
     List<User> findByActiveTrue();
     
     /**
      * Find users by role
-     * 
-     * @param role The role to search for
-     * @return List of users with that role
      */
-    List<User> findByRole(String role);
+    @Query("SELECT * FROM users WHERE role = :role")
+    List<User> findByRole(@Param("role") String role);
     
     /**
      * Find users by status
-     * 
-     * @param status The status to search for
-     * @return List of users with that status
      */
-    List<User> findByStatus(String status);
+    @Query("SELECT * FROM users WHERE status = :status")
+    List<User> findByStatus(@Param("status") String status);
     
     /**
      * Check if a user exists with the given username
-     * 
-     * @param username The username
-     * @return true if exists, false otherwise
      */
-    boolean existsByUsername(String username);
+    @Query("SELECT COUNT(*) > 0 FROM users WHERE username = :username")
+    boolean existsByUsername(@Param("username") String username);
     
     /**
      * Check if a user exists with the given email
-     * 
-     * @param email The email address
-     * @return true if exists, false otherwise
      */
-    boolean existsByEmail(String email);
+    @Query("SELECT COUNT(*) > 0 FROM users WHERE email = :email")
+    boolean existsByEmail(@Param("email") String email);
 }

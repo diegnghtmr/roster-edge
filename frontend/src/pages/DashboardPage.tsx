@@ -1,115 +1,205 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
-import { Calendar, Users, Trophy, Activity } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { teamService, playerService, matchService } from '../services';
+import type { Team, Match } from '../services';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const [stats, setStats] = useState({
+    teams: 0,
+    players: 0,
+    upcomingMatches: 0,
+    completedMatches: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [recentTeams, setRecentTeams] = useState<Team[]>([]);
+  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
 
-  const stats = [
-    {
-      title: 'Total Teams',
-      value: '3',
-      icon: <Users className="h-8 w-8 text-blue-600" />,
-      description: 'Active teams',
-    },
-    {
-      title: 'Upcoming Games',
-      value: '5',
-      icon: <Calendar className="h-8 w-8 text-green-600" />,
-      description: 'Next 30 days',
-    },
-    {
-      title: 'Win Rate',
-      value: '67%',
-      icon: <Trophy className="h-8 w-8 text-yellow-600" />,
-      description: 'This season',
-    },
-    {
-      title: 'Active Players',
-      value: '42',
-      icon: <Activity className="h-8 w-8 text-purple-600" />,
-      description: 'Across all teams',
-    },
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch teams
+        const teams = await teamService.getAll();
+        setRecentTeams(teams.slice(0, 5));
+        
+        // Fetch all matches
+        const matches = await matchService.getAll();
+        const upcoming = matches.filter(m => m.status === 'SCHEDULED');
+        const completed = matches.filter(m => m.status === 'COMPLETED');
+        setUpcomingMatches(upcoming.slice(0, 5));
+        
+        // Fetch players
+        const players = await playerService.getAll();
+        
+        setStats({
+          teams: teams.length,
+          players: players.length,
+          upcomingMatches: upcoming.length,
+          completedMatches: completed.length
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-gray-500">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back, {user?.firstName || user?.username}!
-        </h1>
-        <p className="mt-2 text-gray-600">
-          Here's an overview of your teams and recent activity.
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-2">
+          Welcome back, {user?.fullName || user?.username}!
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardDescription>{stat.title}</CardDescription>
-                {stat.icon}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-sm text-gray-500 mt-1">{stat.description}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Recent Games</CardTitle>
-            <CardDescription>Your teams' latest results</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Teams
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3].map((game) => (
-                <div key={game} className="flex items-center justify-between py-2 border-b last:border-0">
-                  <div>
-                    <p className="font-medium">Team Alpha vs Team Beta</p>
-                    <p className="text-sm text-gray-500">March {game}, 2024</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-green-600">W 3-2</p>
-                    <p className="text-sm text-gray-500">Home</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <div className="text-2xl font-bold">{stats.teams}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Schedule</CardTitle>
-            <CardDescription>Next games for your teams</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Players
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3].map((game) => (
-                <div key={game} className="flex items-center justify-between py-2 border-b last:border-0">
+            <div className="text-2xl font-bold">{stats.players}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Upcoming Matches
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.upcomingMatches}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Completed Matches
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.completedMatches}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Teams */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Teams</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {recentTeams.length > 0 ? (
+            <div className="space-y-3">
+              {recentTeams.map((team) => (
+                <div key={team.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <div>
-                    <p className="font-medium">Team Alpha vs Team Delta</p>
-                    <p className="text-sm text-gray-500">March {10 + game}, 2024</p>
+                    <div className="font-medium">{team.name}</div>
+                    <div className="text-sm text-gray-600">{team.sport}</div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-blue-600">{2 + game}:00 PM</p>
-                    <p className="text-sm text-gray-500">Away</p>
+                  <div className="text-sm text-gray-500">
+                    Founded {team.foundedYear}
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <p className="text-gray-500">No teams available</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Upcoming Matches */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Upcoming Matches</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {upcomingMatches.length > 0 ? (
+            <div className="space-y-3">
+              {upcomingMatches.map((match) => (
+                <div key={match.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium">
+                      Team {match.homeTeamId} vs Team {match.awayTeamId}
+                    </div>
+                    <div className="text-sm text-gray-600">{match.venue}</div>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {new Date(match.matchDate).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No upcoming matches</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* User Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Username:</span>
+              <span className="font-medium">{user?.username}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Email:</span>
+              <span className="font-medium">{user?.email}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Role:</span>
+              <span className="font-medium capitalize">{user?.role?.toLowerCase()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Status:</span>
+              <span className="font-medium">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  user?.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {user?.status}
+                </span>
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
