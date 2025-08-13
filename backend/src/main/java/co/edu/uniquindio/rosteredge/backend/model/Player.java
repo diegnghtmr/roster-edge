@@ -65,4 +65,6 @@ public class Player extends BaseEntity {
      * Team ID
      */
     private Long teamId;
+    
+    // Removed height & weight to align with current DB schema (no columns yet)
 }

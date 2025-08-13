@@ -35,29 +35,32 @@ public class Match extends BaseEntity {
     private Long awayTeamId;
     
     /**
-     * Match date and time
+     * Date & time of the match (was previously named startTime)
      */
     @NotNull(message = "Match date is required")
-    @Future(message = "Match date must be in the future for new matches")
+    @FutureOrPresent(message = "Match date must be in the future or present")
     private LocalDateTime matchDate;
     
     /**
-     * Home team score
+     * Home score
      */
     @Min(value = 0, message = "Score cannot be negative")
+    @lombok.Builder.Default
     private Integer homeScore = 0;
-    
+
     /**
-     * Away team score
+     * Away score
      */
     @Min(value = 0, message = "Score cannot be negative")
+    @lombok.Builder.Default
     private Integer awayScore = 0;
     
     /**
-     * Match status (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED)
+     * Match status (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED, POSTPONED)
      */
     @NotBlank(message = "Status is required")
     @Pattern(regexp = "^(SCHEDULED|IN_PROGRESS|COMPLETED|CANCELLED)$", message = "Invalid status")
+    @lombok.Builder.Default
     private String status = "SCHEDULED";
     
     /**
@@ -65,4 +68,7 @@ public class Match extends BaseEntity {
      */
     @Size(max = 200, message = "Venue cannot exceed 200 characters")
     private String venue;
+    
+    // Removed fields (competition, season, notes, attendance, startTime, scoreHome/scoreAway duplicates, actualStartTime, endTime)
+    // to align with current database schema.
 }

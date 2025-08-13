@@ -65,4 +65,13 @@ public interface BaseService<T, ID> {
      * @return The total number of entities
      */
     long count();
+    
+    /**
+     * Find an entity by ID or throw exception if not found
+     * 
+     * @param id The entity ID
+     * @return The found entity
+     * @throws EntityNotFoundException if entity is not found
+     */
+    T findByIdOrThrow(ID id);
 }

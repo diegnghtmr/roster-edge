@@ -88,7 +88,7 @@ public abstract class AbstractBaseService<T, ID> implements BaseService<T, ID> {
      * @return The found entity
      * @throws EntityNotFoundException if entity is not found
      */
-    protected T findByIdOrThrow(ID id) {
+    public T findByIdOrThrow(ID id) {
         return findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id.toString()));
     }

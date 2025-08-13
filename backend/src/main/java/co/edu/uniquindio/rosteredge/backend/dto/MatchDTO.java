@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -29,13 +30,16 @@ public class MatchDTO extends BaseDTO {
     private LocalDateTime matchDate;
     
     @Min(value = 0, message = "Score cannot be negative")
+    @Builder.Default
     private Integer homeScore = 0;
     
     @Min(value = 0, message = "Score cannot be negative")
+    @Builder.Default
     private Integer awayScore = 0;
     
     @NotBlank(message = "Status is required")
     @Pattern(regexp = "^(SCHEDULED|IN_PROGRESS|COMPLETED|CANCELLED)$", message = "Invalid status")
+    @Builder.Default
     private String status = "SCHEDULED";
     
     @Size(max = 200, message = "Venue cannot exceed 200 characters")
