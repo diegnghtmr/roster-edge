@@ -70,12 +70,10 @@ backend/*.war
 backend/*.ear
 backend/*.class
 
-# SQLite Database
+# SQ Database
 *.db
-*.sqlite
-*.sqlite3
 roster.db
-
+/.bd_data
 # Logs
 backend/logs/
 backend/*.log
@@ -137,6 +135,8 @@ logs/
 *.key
 *.crt
 *.p12
+
+*.env
 
 # Package lock files (optional, depending on team preference)
 # Uncomment if you don't want to commit lock files

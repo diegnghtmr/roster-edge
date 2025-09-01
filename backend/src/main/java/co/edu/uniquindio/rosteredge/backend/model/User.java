@@ -70,4 +70,8 @@ public class User extends BaseEntity {
      * Authentication token for simple auth
      */
     private String authToken;
+
+    public String getRole() {
+        return role;
+    }
 }
