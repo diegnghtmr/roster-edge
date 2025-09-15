@@ -174,7 +174,6 @@ CREATE TABLE "Evento" (
 
 CREATE TABLE "Partido" (
   "id" bigint PRIMARY KEY,
-  "evento_id" bigint UNIQUE NOT NULL,
   "jornada" text NOT NULL,
   "hora_inicio" time NOT NULL,
   "hora_fin" time NOT NULL,
@@ -345,8 +344,6 @@ ALTER TABLE "RosterPlantillaDocumento" ADD FOREIGN KEY ("plantilla_documento_id"
 ALTER TABLE "Evento" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
 
 ALTER TABLE "Evento" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
-
-ALTER TABLE "Partido" ADD FOREIGN KEY ("evento_id") REFERENCES "Evento" ("id");
 
 ALTER TABLE "Partido" ADD FOREIGN KEY ("estadio_id") REFERENCES "Estadio" ("id");
 

@@ -114,8 +114,8 @@ INSERT INTO "Evento" (id, temporada_id, sede_id, nombre, descripcion, fecha) VAL
 ON CONFLICT DO NOTHING;
 
 -- Insertar partido
-INSERT INTO "Partido" (id, evento_id, jornada, hora_inicio, hora_fin, fecha, estadio_id, temporada_id) VALUES
-    (1, 2, 'Jornada 1', '20:00:00', '22:00:00', '2024-01-20', 1, 1)
+INSERT INTO "Partido" (id, jornada, hora_inicio, hora_fin, fecha, estadio_id, temporada_id) VALUES
+    (1, 'Jornada 1', '20:00:00', '22:00:00', '2024-01-20', 1, 1)
 ON CONFLICT DO NOTHING;
 
 -- Insertar equipos participantes en el partido
