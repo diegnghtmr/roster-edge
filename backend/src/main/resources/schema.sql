@@ -145,14 +145,6 @@ CREATE TABLE "Jugador" (
   "equipo_id" bigint NOT NULL 
 ) INHERITS ("Usuario");
 
-CREATE TABLE "Posicion" (
-  "id" bigint PRIMARY KEY,
-  "nombre" varchar(50) NOT NULL,
-  "deporte" varchar(30) NOT NULL,
-  "descripcion" text
-);
-
-
 CREATE TABLE "Staff" (
   "fecha_contratacion" date DEFAULT (now()),
   "rol_staff" staff_rol_enum NOT NULL,
@@ -239,7 +231,6 @@ CREATE TABLE "Pago" (
   "plan_id" bigint NOT NULL
 );
 
-
 CREATE TABLE "ClubEvento" (
   "id" bigint PRIMARY KEY,
   "club_id" bigint NOT NULL,
@@ -275,8 +266,11 @@ CREATE TABLE "RosterPlantillaDocumento" (
   PRIMARY KEY ("roster_id", "plantilla_documento_id")
 );
 
-COMMENT ON TABLE "Usuario" IS 'Tabla principal de usuarios del sistema';
+-- ========================================
+-- COMENTARIOS DE TABLAS
+-- ========================================
 
+COMMENT ON TABLE "Usuario" IS 'Tabla principal de usuarios del sistema';
 
 COMMENT ON TABLE "Club" IS 'Clubes deportivos gestionados en la plataforma';
 
@@ -290,8 +284,6 @@ COMMENT ON TABLE "Estadio" IS 'Estadios con información de área, suelo, capaci
 
 COMMENT ON TABLE "Jugador" IS 'Jugadores registrados con posición principal';
 
-COMMENT ON TABLE "Posicion" IS 'Posiciones disponibles por deporte (portero, defensa, medio, delantero, etc.)';
-
 COMMENT ON TABLE "Staff" IS 'Personal técnico con roles específicos definidos por staff_rol_enum';
 
 -- Comentarios sobre los enums
@@ -302,7 +294,7 @@ COMMENT ON TYPE metodo_pago_enum IS 'Métodos de pago disponibles: tarjetas, bil
 
 COMMENT ON TYPE equipo_categoria_enum IS 'Categoría del equipo: MASCULINO, FEMENINO, MIXTO';
 
-COMMENT ON TABLE "Roster" IS 'Asignación de jugadores a equipos por temporada con posición específica.';
+COMMENT ON TABLE "Roster" IS 'Sistema de gestión de equipos con suscripciones.';
 
 
 COMMENT ON TABLE "Evento" IS 'Eventos del equipo. Tipos: ENTRENAMIENTO, PARTIDO, REUNION, EVALUACION';
@@ -317,7 +309,6 @@ COMMENT ON TABLE "Suscripcion" IS 'Suscripciones de usuarios. Estados: ACTIVO, I
 
 COMMENT ON TABLE "Pago" IS 'Registros de pagos realizados con información transaccional';
 
-
 COMMENT ON TABLE "ClubEvento" IS 'Relación de clubs que participan en eventos deportivos';
 
 COMMENT ON TABLE "Notificacion" IS 'Notificaciones sobre participaciones específicas de clubs en eventos';
@@ -328,13 +319,13 @@ COMMENT ON TABLE "Color" IS 'Catálogo de colores utilizados por los equipos';
 
 COMMENT ON TABLE "EquipoColor" IS 'Relación entre equipos y sus colores';
 
-ALTER TABLE "Club" ADD FOREIGN KEY ("propietario_id") REFERENCES "Usuario" ("id");
+-- ========================================
+-- FOREIGN KEYS
+-- ========================================
 
 ALTER TABLE "Temporada" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Equipo" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
-
-ALTER TABLE "Equipo" ADD FOREIGN KEY ("temporada_actual_id") REFERENCES "Temporada" ("id");
 
 ALTER TABLE "Sede" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
@@ -344,12 +335,6 @@ ALTER TABLE "Jugador" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "Staff" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
-ALTER TABLE "Roster" ADD FOREIGN KEY ("jugador_id") REFERENCES "Jugador" ("id");
-
-ALTER TABLE "Roster" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
-
-ALTER TABLE "Roster" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
-
 ALTER TABLE "Roster" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Roster" ADD FOREIGN KEY ("suscripcion_id") REFERENCES "Suscripcion" ("id");
@@ -358,14 +343,9 @@ ALTER TABLE "RosterPlantillaDocumento" ADD FOREIGN KEY ("roster_id") REFERENCES 
 
 ALTER TABLE "RosterPlantillaDocumento" ADD FOREIGN KEY ("plantilla_documento_id") REFERENCES "PlantillaDocumento" ("id");
 
-
-ALTER TABLE "Evento" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
-
 ALTER TABLE "Evento" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
 
 ALTER TABLE "Evento" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
-
-ALTER TABLE "Evento" ADD FOREIGN KEY ("created_by") REFERENCES "Usuario" ("id");
 
 ALTER TABLE "Evento" ADD FOREIGN KEY ("id") REFERENCES "Partido" ("evento_id");
 
@@ -383,8 +363,6 @@ ALTER TABLE "PartidoEquipoVisitante" ADD FOREIGN KEY ("equipo_id") REFERENCES "E
 
 ALTER TABLE "Racha" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
-ALTER TABLE "Racha" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
-
 ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("usuario_id") REFERENCES "Usuario" ("id");
 
 ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
@@ -398,8 +376,6 @@ ALTER TABLE "ClubEvento" ADD FOREIGN KEY ("evento_id") REFERENCES "Evento" ("id"
 ALTER TABLE "NotificacionClubEvento" ADD FOREIGN KEY ("notificacion_id") REFERENCES "Notificacion" ("id");
 
 ALTER TABLE "NotificacionClubEvento" ADD FOREIGN KEY ("club_evento_id") REFERENCES "ClubEvento" ("id");
-
-ALTER TABLE "Notificacion" ADD FOREIGN KEY ("created_by") REFERENCES "Usuario" ("id");
 
 ALTER TABLE "EquipoColor" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
