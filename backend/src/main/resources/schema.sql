@@ -4,24 +4,19 @@ CREATE TABLE "Usuario" (
   "password_hash" varchar(255) NOT NULL,
   "nombre" varchar(100) NOT NULL,
   "apellido" varchar(100) NOT NULL,
+  "origen" varchar(100) NOT NULL,
   "telefono" varchar(30),
   "fecha_nacimiento" date,
-  "activo" boolean DEFAULT true,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
+  "activo" boolean DEFAULT true
+  -- "created_at" timestamp DEFAULT (now()),
+  -- "updated_at" timestamp DEFAULT (now())
 );
 
-CREATE TABLE "Rol" (
-  "id" bigint PRIMARY KEY,
-  "nombre" varchar(50) UNIQUE NOT NULL,
-  "descripcion" text,
-  "activo" boolean DEFAULT true
-);
 
 CREATE TABLE "UsuarioRol" (
   "id" bigint PRIMARY KEY,
   "usuario_id" bigint NOT NULL,
-  "rol_id" bigint NOT NULL,
+  -- "rol_id" bigint NOT NULL,
   "club_id" bigint,
   "fecha_asignacion" date DEFAULT (now()),
   "activo" boolean DEFAULT true
@@ -70,17 +65,12 @@ CREATE TABLE "Sede" (
 );
 
 CREATE TABLE "Jugador" (
-  "id" bigint PRIMARY KEY,
-  "usuario_id" bigint,
-  "nombre" varchar(100) NOT NULL,
-  "apellido" varchar(100) NOT NULL,
-  "fecha_nacimiento" date,
-  "documento" varchar(30),
-  "telefono_contacto" varchar(30),
-  "contacto_emergencia" varchar(100),
-  "activo" boolean DEFAULT true,
-  "created_at" timestamp DEFAULT (now())
-);
+  "estado_fisico" varchar(30) NOT NULL,
+  "dorsal" varchar(30) NOT NULL,
+  "altura" varchar(4) NOT NULL,
+  "pie_dominate" varchar(30) NOT NULL,
+  "peso" varchar(10) NOT NULL,
+) INHERITS ("Usuario");
 
 CREATE TABLE "Posicion" (
   "id" bigint PRIMARY KEY,
@@ -89,29 +79,19 @@ CREATE TABLE "Posicion" (
   "descripcion" text
 );
 
+
 CREATE TABLE "Staff" (
-  "id" bigint PRIMARY KEY,
-  "usuario_id" bigint,
-  "nombre" varchar(100) NOT NULL,
-  "apellido" varchar(100) NOT NULL,
-  "rol_staff" varchar(20) NOT NULL,
-  "certificaciones" text,
-  "telefono" varchar(30),
-  "activo" boolean DEFAULT true,
-  "created_at" timestamp DEFAULT (now())
-);
+  "fecha_contratacion" date DEFAULT (now())
+) INHERITS ("Usuario");
+
 
 CREATE TABLE "Roster" (
   "id" bigint PRIMARY KEY,
-  "jugador_id" bigint NOT NULL,
-  "equipo_id" bigint NOT NULL,
-  "temporada_id" bigint NOT NULL,
-  "posicion_id" bigint,
-  "dorsal" integer,
-  "estado" varchar(20) NOT NULL DEFAULT 'ACTIVA',
-  "fecha_alta" date DEFAULT (now()),
-  "fecha_baja" date,
-  "created_at" timestamp DEFAULT (now())
+  "nombre" varchar(50) NOT NULL,
+  "email" varchar(50) NOT NULL,
+  "password_hash" varchar(255) NOT NULL,
+  "fecha_creacion" date DEFAULT (now()),
+  "ultimo_accesso" date DEFAULT (now())
 );
 
 CREATE TABLE "EquipoStaff" (
@@ -206,11 +186,11 @@ CREATE TABLE "Notificacion" (
 CREATE TABLE "PlantillaDocumento" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(120) NOT NULL,
+  "descripcion" varchar(120) NOT NULL,
+  "formato" varchar(120) NOT NULL,
   "tipo" varchar(20) NOT NULL,
-  "version" integer DEFAULT 1,
   "contenido_html" text NOT NULL,
   "placeholders_json" text,
-  "activo" boolean DEFAULT true,
   "created_at" timestamp DEFAULT (now())
 );
 
