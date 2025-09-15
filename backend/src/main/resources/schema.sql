@@ -213,7 +213,6 @@ CREATE TABLE "Plan" (
 
 CREATE TABLE "Suscripcion" (
   "id" bigint PRIMARY KEY,
-  "usuario_id" bigint NOT NULL,
   "plan_id" bigint NOT NULL,
   "fecha_inicio" date NOT NULL,
   "fecha_fin" date NOT NULL,
@@ -347,7 +346,7 @@ ALTER TABLE "Evento" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("i
 
 ALTER TABLE "Evento" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
 
-ALTER TABLE "Evento" ADD FOREIGN KEY ("id") REFERENCES "Partido" ("evento_id");
+ALTER TABLE "Partido" ADD FOREIGN KEY ("evento_id") REFERENCES "Evento" ("id");
 
 ALTER TABLE "Partido" ADD FOREIGN KEY ("estadio_id") REFERENCES "Estadio" ("id");
 
@@ -362,8 +361,6 @@ ALTER TABLE "PartidoEquipoVisitante" ADD FOREIGN KEY ("partido_id") REFERENCES "
 ALTER TABLE "PartidoEquipoVisitante" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "Racha" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
-
-ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("usuario_id") REFERENCES "Usuario" ("id");
 
 ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 
