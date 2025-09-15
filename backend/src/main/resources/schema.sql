@@ -1,3 +1,74 @@
+-- ========================================
+-- ENUMS PARA ROLES Y POSICIONES
+-- ========================================
+
+-- Enum para roles de staff técnico
+CREATE TYPE staff_rol_enum AS ENUM (
+  'ENTRENADOR',
+  'ASISTENTE_TECNICO', 
+  'PREPARADOR_FISICO',
+  'MEDICO',
+  'FISIOTERAPEUTA',
+  'PSICOLOGO_DEPORTIVO',
+  'ENTRENADOR_PORTEROS',
+  'ANALISTA_VIDEO',
+  'NUTRICIONISTA',
+  'DELEGADO',
+  'UTILERO'
+);
+
+-- Enum para posiciones de jugador en fútbol
+CREATE TYPE jugador_posicion_enum AS ENUM (
+  -- Portero
+  'PORTERO',
+  -- Defensas
+  'DEFENSA_CENTRAL',
+  'LATERAL_DERECHO',
+  'LATERAL_IZQUIERDO',
+  'LIBERO',
+  -- Centrocampistas
+  'MEDIOCENTRO_DEFENSIVO',
+  'MEDIOCENTRO',
+  'MEDIOCENTRO_OFENSIVO',
+  'EXTREMO_DERECHO',
+  'EXTREMO_IZQUIERDO',
+  'INTERIOR_DERECHO',
+  'INTERIOR_IZQUIERDO',
+  -- Delanteros
+  'DELANTERO_CENTRO',
+  'SEGUNDO_DELANTERO',
+  'EXTREMO_DELANTERO'
+);
+
+-- Enum para estados de suscripción
+CREATE TYPE suscripcion_estado_enum AS ENUM (
+  'ACTIVO',
+  'INACTIVO'
+);
+
+-- Enum para métodos de pago
+CREATE TYPE metodo_pago_enum AS ENUM (
+  'TARJETA_CREDITO',
+  'TARJETA_DEBITO',
+  'PSE',
+  'NEQUI',
+  'DAVIPLATA',
+  'DAVIVIENDA',
+  'BANCOLOMBIA',
+  'PAYPAL'
+);
+
+-- Enum para categorías de equipo
+CREATE TYPE equipo_categoria_enum AS ENUM (
+  'MASCULINO',
+  'FEMENINO',
+  'MIXTO'
+);
+
+-- ========================================
+-- TABLAS PRINCIPALES
+-- ========================================
+
 CREATE TABLE "Usuario" (
   "id" bigint PRIMARY KEY,
   "email" varchar(150) UNIQUE NOT NULL,
@@ -6,33 +77,14 @@ CREATE TABLE "Usuario" (
   "apellido" varchar(100) NOT NULL,
   "origen" varchar(100) NOT NULL,
   "telefono" varchar(30),
-  "fecha_nacimiento" date,
-  "activo" boolean DEFAULT true
-  -- "created_at" timestamp DEFAULT (now()),
-  -- "updated_at" timestamp DEFAULT (now())
-);
-
-
-CREATE TABLE "UsuarioRol" (
-  "id" bigint PRIMARY KEY,
-  "usuario_id" bigint NOT NULL,
-  -- "rol_id" bigint NOT NULL,
-  "club_id" bigint,
-  "fecha_asignacion" date DEFAULT (now()),
-  "activo" boolean DEFAULT true
+  "fecha_nacimiento" date NOT NULL
 );
 
 CREATE TABLE "Club" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(150) NOT NULL,
-  "nit" varchar(30),
-  "logo_url" varchar(255),
-  "color_hex" varchar(7),
-  "ciudad" varchar(100),
-  "telefono" varchar(30),
-  "propietario_id" bigint NOT NULL,
-  "activo" boolean DEFAULT true,
-  "created_at" timestamp DEFAULT (now())
+  "lema" text,
+  "fundacion" date NOT NULL
 );
 
 CREATE TABLE "Temporada" (
@@ -40,28 +92,44 @@ CREATE TABLE "Temporada" (
   "club_id" bigint NOT NULL,
   "nombre" varchar(100) NOT NULL,
   "fecha_inicio" date NOT NULL,
-  "fecha_fin" date NOT NULL,
-  "estado" varchar(20) NOT NULL DEFAULT 'PLANIFICADA'
+  "fecha_fin" date NOT NULL 
 );
 
 CREATE TABLE "Equipo" (
   "id" bigint PRIMARY KEY,
-  "club_id" bigint NOT NULL,
   "nombre" varchar(120) NOT NULL,
-  "categoria" varchar(50) NOT NULL,
-  "genero" varchar(10) NOT NULL DEFAULT 'MIXTO',
-  "temporada_actual_id" bigint,
-  "activo" boolean DEFAULT true,
-  "created_at" timestamp DEFAULT (now())
+  "genero" varchar(10) NOT NULL,
+  "categoria" equipo_categoria_enum NOT NULL,
+  "mascota" varchar(100),
+  "fundacion" date NOT NULL
+);
+
+CREATE TABLE "Color" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) NOT NULL
+);
+
+CREATE TABLE "EquipoColor" (
+  "equipo_id" bigint NOT NULL,
+  "color_id" bigint NOT NULL,
+  PRIMARY KEY ("equipo_id", "color_id")
 );
 
 CREATE TABLE "Sede" (
   "id" bigint PRIMARY KEY,
-  "club_id" bigint NOT NULL,
+  "email" varchar(150) NOT NULL,
+  "lugar_origen" varchar(200) NOT NULL,
+  "fundacion" date NOT NULL,
   "nombre" varchar(150) NOT NULL,
-  "direccion" varchar(200) NOT NULL,
-  "capacidad" integer,
-  "activo" boolean DEFAULT true
+  "telefono" varchar(30) NOT NULL
+);
+
+CREATE TABLE "Estadio" (
+  "id" bigint PRIMARY KEY,
+  "area" decimal(12,2) NOT NULL,
+  "suelo" varchar(50) NOT NULL,
+  "capacidad_total" integer NOT NULL,
+  "fundacion" date NOT NULL
 );
 
 CREATE TABLE "Jugador" (
@@ -70,6 +138,7 @@ CREATE TABLE "Jugador" (
   "altura" varchar(4) NOT NULL,
   "pie_dominate" varchar(30) NOT NULL,
   "peso" varchar(10) NOT NULL,
+  "posicion_principal" jugador_posicion_enum NOT NULL 
 ) INHERITS ("Usuario");
 
 CREATE TABLE "Posicion" (
@@ -81,7 +150,8 @@ CREATE TABLE "Posicion" (
 
 
 CREATE TABLE "Staff" (
-  "fecha_contratacion" date DEFAULT (now())
+  "fecha_contratacion" date DEFAULT (now()),
+  "rol_staff" staff_rol_enum NOT NULL 
 ) INHERITS ("Usuario");
 
 
@@ -107,48 +177,34 @@ CREATE TABLE "EquipoStaff" (
 
 CREATE TABLE "Evento" (
   "id" bigint PRIMARY KEY,
-  "equipo_id" bigint NOT NULL,
   "temporada_id" bigint NOT NULL,
   "sede_id" bigint,
-  "tipo" varchar(20) NOT NULL,
-  "titulo" varchar(150) NOT NULL,
+  "nombre" varchar(150) NOT NULL,
   "descripcion" text,
-  "fecha_inicio" timestamp NOT NULL,
-  "fecha_fin" timestamp NOT NULL,
-  "estado" varchar(20) NOT NULL DEFAULT 'PROGRAMADO',
-  "created_by" bigint,
-  "created_at" timestamp DEFAULT (now())
+  "fecha" date NOT NULL 
 );
 
 CREATE TABLE "Partido" (
   "id" bigint PRIMARY KEY,
   "evento_id" bigint UNIQUE NOT NULL,
-  "rival" varchar(150) NOT NULL,
-  "marcador_local" integer DEFAULT 0,
-  "marcador_rival" integer DEFAULT 0,
-  "incidencias" text
+  "jornada" text NOT NULL,
+  "hora_inicio" time NOT NULL,
+  "hora_fin" time NOT NULL,
+  "fecha" date NOT NULL
 );
 
 CREATE TABLE "Racha" (
   "id" bigint PRIMARY KEY,
   "equipo_id" bigint NOT NULL,
-  "temporada_id" bigint,
-  "tipo_racha" varchar(20) NOT NULL,
-  "longitud" integer NOT NULL,
   "fecha_inicio" date NOT NULL,
-  "fecha_fin" date,
-  "activa" boolean DEFAULT true
+  "fecha_fin" date
 );
-
 CREATE TABLE "Plan" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(80) UNIQUE NOT NULL,
   "descripcion" varchar(255),
-  "precio_cop" decimal(12,2) NOT NULL,
-  "periodo" varchar(10) NOT NULL,
-  "max_equipos" integer,
-  "max_jugadores" integer,
-  "activo" boolean DEFAULT true
+  "beneficios" varchar(255),
+  "precio" decimal(12,2) NOT NULL 
 );
 
 CREATE TABLE "Suscripcion" (
@@ -157,30 +213,38 @@ CREATE TABLE "Suscripcion" (
   "plan_id" bigint NOT NULL,
   "fecha_inicio" date NOT NULL,
   "fecha_fin" date NOT NULL,
-  "estado" varchar(20) NOT NULL DEFAULT 'ACTIVA',
-  "created_at" timestamp DEFAULT (now())
+  "estado" suscripcion_estado_enum NOT NULL DEFAULT 'ACTIVO' 
 );
 
 CREATE TABLE "Pago" (
   "id" bigint PRIMARY KEY,
-  "suscripcion_id" bigint NOT NULL,
-  "fecha" timestamp DEFAULT (now()),
-  "metodo" varchar(20) NOT NULL,
+  "fecha_pago" timestamp DEFAULT (now()),
+  "metodo_pago" metodo_pago_enum NOT NULL,
+  "descripcion" varchar(255),
   "monto" decimal(12,2) NOT NULL,
-  "estado" varchar(20) NOT NULL,
-  "referencia" varchar(100)
+  "descuento" decimal(12,2) DEFAULT 0,
+  "divisa" varchar(3) NOT NULL DEFAULT 'COP'
+);
+
+CREATE TABLE "PlanPago" (
+  "plan_id" bigint NOT NULL,
+  "pago_id" bigint NOT NULL,
+  "fecha_proximo_pago" date NOT NULL,
+  PRIMARY KEY ("plan_id", "pago_id")
+);
+
+CREATE TABLE "ClubEvento" (
+  "id" bigint PRIMARY KEY,
+  "club_id" bigint NOT NULL,
+  "evento_id" bigint NOT NULL,
+  UNIQUE ("club_id", "evento_id")
 );
 
 CREATE TABLE "Notificacion" (
   "id" bigint PRIMARY KEY,
-  "titulo" varchar(150) NOT NULL,
-  "contenido" text NOT NULL,
-  "canal" varchar(10) NOT NULL,
-  "usuario_destinatario_id" bigint,
-  "evento_id" bigint,
-  "created_by" bigint,
-  "created_at" timestamp DEFAULT (now()),
-  "enviada" boolean DEFAULT false
+  "mensaje" text NOT NULL,
+  "club_evento_id" bigint NOT NULL,
+  "fecha_envio" timestamp DEFAULT (now()) 
 );
 
 CREATE TABLE "PlantillaDocumento" (
@@ -189,9 +253,8 @@ CREATE TABLE "PlantillaDocumento" (
   "descripcion" varchar(120) NOT NULL,
   "formato" varchar(120) NOT NULL,
   "tipo" varchar(20) NOT NULL,
-  "contenido_html" text NOT NULL,
-  "placeholders_json" text,
-  "created_at" timestamp DEFAULT (now())
+  "contenido" text NOT NULL,
+  "creacion" timestamp DEFAULT (now())
 );
 
 COMMENT ON TABLE "Usuario" IS 'Tabla principal de usuarios del sistema';
@@ -208,13 +271,23 @@ COMMENT ON TABLE "Equipo" IS 'Equipos de un club. Géneros: M, F, MIXTO';
 
 COMMENT ON TABLE "Sede" IS 'Sedes donde se realizan eventos y entrenamientos';
 
-COMMENT ON TABLE "Jugador" IS 'Jugadores registrados en la plataforma';
+COMMENT ON TABLE "Estadio" IS 'Estadios con información de área, suelo, capacidad y fundación';
+
+COMMENT ON TABLE "Jugador" IS 'Jugadores registrados con posición principal';
 
 COMMENT ON TABLE "Posicion" IS 'Posiciones disponibles por deporte (portero, defensa, medio, delantero, etc.)';
 
-COMMENT ON TABLE "Staff" IS 'Personal técnico: ENTRENADOR, ASISTENTE, MEDICO, ARBITRO, PREPARADOR_FISICO';
+COMMENT ON TABLE "Staff" IS 'Personal técnico con roles específicos definidos por staff_rol_enum';
 
-COMMENT ON TABLE "Roster" IS 'Asignación de jugadores a equipos por temporada. Estados: ACTIVA, INACTIVA, LESIONADO, SUSPENDIDO';
+-- Comentarios sobre los enums
+COMMENT ON TYPE staff_rol_enum IS 'Roles disponibles para el staff técnico: entrenadores, cuerpo médico, analistas, etc.';
+COMMENT ON TYPE jugador_posicion_enum IS 'Posiciones específicas de jugadores de fútbol organizadas por líneas: portero, defensas, centrocampistas y delanteros';
+COMMENT ON TYPE suscripcion_estado_enum IS 'Estados simples para suscripciones: ACTIVO (suscripción vigente), INACTIVO (suspendida o vencida)';
+COMMENT ON TYPE metodo_pago_enum IS 'Métodos de pago disponibles: tarjetas, billeteras digitales y transferencias';
+
+COMMENT ON TYPE equipo_categoria_enum IS 'Categoría del equipo: MASCULINO, FEMENINO, MIXTO';
+
+COMMENT ON TABLE "Roster" IS 'Asignación de jugadores a equipos por temporada con posición específica.';
 
 COMMENT ON TABLE "EquipoStaff" IS 'Asignación de staff a equipos por temporada';
 
@@ -226,13 +299,21 @@ COMMENT ON TABLE "Racha" IS 'Rachas de equipos. Tipos: VICTORIAS, DERROTAS, EMPA
 
 COMMENT ON TABLE "Plan" IS 'Planes de suscripción. Períodos: MENSUAL, ANUAL';
 
-COMMENT ON TABLE "Suscripcion" IS 'Suscripciones de usuarios. Estados: ACTIVA, SUSPENDIDA, VENCIDA';
+COMMENT ON TABLE "Suscripcion" IS 'Suscripciones de usuarios. Estados: ACTIVO, INACTIVO';
 
-COMMENT ON TABLE "Pago" IS 'Pagos realizados. Métodos: TARJETA, PSE, BILLETERA, EFECTIVO';
+COMMENT ON TABLE "Pago" IS 'Registros de pagos realizados con información transaccional';
 
-COMMENT ON TABLE "Notificacion" IS 'Notificaciones del sistema. Canales: IN_APP, EMAIL, SMS';
+COMMENT ON TABLE "PlanPago" IS 'Tabla intermedia que relaciona planes con pagos, incluyendo fecha del próximo pago y datos temporales';
+
+COMMENT ON TABLE "ClubEvento" IS 'Relación de clubs que participan en eventos deportivos';
+
+COMMENT ON TABLE "Notificacion" IS 'Notificaciones sobre participaciones específicas de clubs en eventos';
 
 COMMENT ON TABLE "PlantillaDocumento" IS 'Plantillas para documentos. Tipos: FACTURA, PERMISO, COMPROBANTE';
+
+COMMENT ON TABLE "Color" IS 'Catálogo de colores utilizados por los equipos';
+
+COMMENT ON TABLE "EquipoColor" IS 'Relación entre equipos y sus colores';
 
 ALTER TABLE "UsuarioRol" ADD FOREIGN KEY ("usuario_id") REFERENCES "Usuario" ("id");
 
@@ -260,8 +341,6 @@ ALTER TABLE "Roster" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "Roster" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
 
-ALTER TABLE "Roster" ADD FOREIGN KEY ("posicion_id") REFERENCES "Posicion" ("id");
-
 ALTER TABLE "EquipoStaff" ADD FOREIGN KEY ("staff_id") REFERENCES "Staff" ("id");
 
 ALTER TABLE "EquipoStaff" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
@@ -286,10 +365,18 @@ ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("usuario_id") REFERENCES "Usuario" ("
 
 ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 
-ALTER TABLE "Pago" ADD FOREIGN KEY ("suscripcion_id") REFERENCES "Suscripcion" ("id");
+ALTER TABLE "PlanPago" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 
-ALTER TABLE "Notificacion" ADD FOREIGN KEY ("usuario_destinatario_id") REFERENCES "Usuario" ("id");
+ALTER TABLE "PlanPago" ADD FOREIGN KEY ("pago_id") REFERENCES "Pago" ("id");
 
-ALTER TABLE "Notificacion" ADD FOREIGN KEY ("evento_id") REFERENCES "Evento" ("id");
+ALTER TABLE "ClubEvento" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
+
+ALTER TABLE "ClubEvento" ADD FOREIGN KEY ("evento_id") REFERENCES "Evento" ("id");
+
+ALTER TABLE "Notificacion" ADD FOREIGN KEY ("club_evento_id") REFERENCES "ClubEvento" ("id");
 
 ALTER TABLE "Notificacion" ADD FOREIGN KEY ("created_by") REFERENCES "Usuario" ("id");
+
+ALTER TABLE "EquipoColor" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
+
+ALTER TABLE "EquipoColor" ADD FOREIGN KEY ("color_id") REFERENCES "Color" ("id");
