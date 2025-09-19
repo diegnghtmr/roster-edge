@@ -229,3 +229,4 @@ INSERT INTO "RosterPlantillaDocumento" (roster_id, plantilla_documento_id) VALUE
     (1, 1),
     (1, 2)
 ON CONFLICT DO NOTHING;
+
