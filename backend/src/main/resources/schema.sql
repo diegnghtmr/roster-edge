@@ -1,4 +1,4 @@
--- ========================================
+﻿-- ========================================
 -- CATALOGOS (reemplazo de ENUMs)
 -- ========================================
 
@@ -32,6 +32,17 @@ CREATE TABLE "EquipoGenero" (
   "nombre" varchar(20) UNIQUE NOT NULL
 );
 
+CREATE TABLE "Pais" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE "Ciudad" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(100) NOT NULL,
+  "pais_id" bigint NOT NULL
+);
+
 -- ========================================
 -- TABLAS PRINCIPALES
 -- ========================================
@@ -42,8 +53,7 @@ CREATE TABLE "Usuario" (
   "password_hash" varchar(255) NOT NULL,
   "nombre" varchar(100) NOT NULL,
   "apellido" varchar(100) NOT NULL,
-  "pais" varchar(100) NOT NULL,
-  "ciudad" varchar(100) NOT NULL,
+  "ciudad_id" bigint NOT NULL,
   "telefono" varchar(30),
   "fecha_nacimiento" date NOT NULL
 );
@@ -87,8 +97,7 @@ CREATE TABLE "EquipoColor" (
 CREATE TABLE "Sede" (
   "id" bigint PRIMARY KEY,
   "email" varchar(150) NOT NULL,
-  "pais" varchar(100) NOT NULL,
-  "ciudad" varchar(100) NOT NULL,
+  "ciudad_id" bigint NOT NULL,
   "fundacion" date NOT NULL,
   "nombre" varchar(150) NOT NULL,
   "telefono" varchar(30) NOT NULL,
@@ -302,6 +311,10 @@ COMMENT ON TABLE "EquipoColor" IS 'Relación entre equipos y sus colores';
 -- FOREIGN KEYS
 -- ========================================
 
+ALTER TABLE "Ciudad" ADD FOREIGN KEY ("pais_id") REFERENCES "Pais" ("id");
+
+ALTER TABLE "Usuario" ADD FOREIGN KEY ("ciudad_id") REFERENCES "Ciudad" ("id");
+
 ALTER TABLE "Temporada" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Equipo" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
@@ -311,6 +324,8 @@ ALTER TABLE "Equipo" ADD FOREIGN KEY ("categoria_id") REFERENCES "EquipoCategori
 ALTER TABLE "Equipo" ADD FOREIGN KEY ("genero_id") REFERENCES "EquipoGenero" ("id");
 
 ALTER TABLE "Sede" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
+
+ALTER TABLE "Sede" ADD FOREIGN KEY ("ciudad_id") REFERENCES "Ciudad" ("id");
 
 ALTER TABLE "Estadio" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
 
