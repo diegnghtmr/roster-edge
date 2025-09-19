@@ -1,4 +1,4 @@
--- ========================================
+﻿-- ========================================
 -- CATALOGOS (reemplazo de ENUMs)
 -- ========================================
 
@@ -27,6 +27,11 @@ CREATE TABLE "EquipoCategoria" (
   "nombre" varchar(50) UNIQUE NOT NULL
 );
 
+CREATE TABLE "EquipoGenero" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(20) UNIQUE NOT NULL
+);
+
 -- ========================================
 -- TABLAS PRINCIPALES
 -- ========================================
@@ -37,7 +42,8 @@ CREATE TABLE "Usuario" (
   "password_hash" varchar(255) NOT NULL,
   "nombre" varchar(100) NOT NULL,
   "apellido" varchar(100) NOT NULL,
-  "origen" varchar(100) NOT NULL,
+  "pais" varchar(100) NOT NULL,
+  "ciudad" varchar(100) NOT NULL,
   "telefono" varchar(30),
   "fecha_nacimiento" date NOT NULL
 );
@@ -60,7 +66,7 @@ CREATE TABLE "Temporada" (
 CREATE TABLE "Equipo" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(120) NOT NULL,
-  "genero" varchar(10) NOT NULL,
+  "genero_id" bigint NOT NULL,
   "categoria_id" bigint NOT NULL,
   "mascota" varchar(100),
   "fundacion" date NOT NULL,
@@ -81,7 +87,8 @@ CREATE TABLE "EquipoColor" (
 CREATE TABLE "Sede" (
   "id" bigint PRIMARY KEY,
   "email" varchar(150) NOT NULL,
-  "lugar_origen" varchar(200) NOT NULL,
+  "pais" varchar(100) NOT NULL,
+  "ciudad" varchar(100) NOT NULL,
   "fundacion" date NOT NULL,
   "nombre" varchar(150) NOT NULL,
   "telefono" varchar(30) NOT NULL,
@@ -104,13 +111,17 @@ CREATE TABLE "Jugador" (
   "pie_dominate" varchar(30) NOT NULL,
   "peso" varchar(10) NOT NULL,
   "posicion_principal_id" bigint NOT NULL,
-  "equipo_id" bigint NOT NULL 
+  "equipo_id" bigint NOT NULL,
+  PRIMARY KEY ("id"),
+  UNIQUE ("email")
 ) INHERITS ("Usuario");
 
 CREATE TABLE "Staff" (
   "fecha_contratacion" date DEFAULT (now()),
   "rol_staff_id" bigint NOT NULL,
-  "equipo_id" bigint NOT NULL 
+  "equipo_id" bigint NOT NULL,
+  PRIMARY KEY ("id"),
+  UNIQUE ("email")
 ) INHERITS ("Usuario");
 
 
@@ -168,8 +179,14 @@ CREATE TABLE "Plan" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(80) UNIQUE NOT NULL,
   "descripcion" varchar(255),
-  "beneficios" varchar(255),
   "precio" decimal(12,2) NOT NULL 
+);
+
+CREATE TABLE "PlanBeneficio" (
+  "id" bigint PRIMARY KEY,
+  "plan_id" bigint NOT NULL,
+  "descripcion" varchar(255) NOT NULL,
+  UNIQUE ("plan_id", "descripcion")
 );
 
 CREATE TABLE "Suscripcion" (
@@ -251,8 +268,9 @@ COMMENT ON TABLE "StaffRol" IS 'Catálogo de roles disponibles para el staff té
 COMMENT ON TABLE "JugadorPosicion" IS 'Catálogo de posiciones específicas de jugadores de fútbol';
 COMMENT ON TABLE "SuscripcionEstado" IS 'Catálogo de estados de suscripción';
 COMMENT ON TABLE "MetodoPago" IS 'Catálogo de métodos de pago disponibles';
-COMMENT ON TABLE "EquipoCategoria" IS 'Catálogo de categorías del equipo: MASCULINO, FEMENINO, MIXTO';
+COMMENT ON TABLE "EquipoCategoria" IS 'Catalogo de categorias del equipo: MASCULINO, FEMENINO, MIXTO';
 
+COMMENT ON TABLE "EquipoGenero" IS 'Catalogo de generos de equipo: MASCULINO, FEMENINO, MIXTO';
 COMMENT ON TABLE "Roster" IS 'Sistema de gestión de equipos con suscripciones.';
 
 
@@ -263,6 +281,8 @@ COMMENT ON TABLE "Partido" IS 'Información específica de partidos';
 COMMENT ON TABLE "Racha" IS 'Rachas de equipos. Tipos: VICTORIAS, DERROTAS, EMPATES, GOLES';
 
 COMMENT ON TABLE "Plan" IS 'Planes de suscripción. Períodos: MENSUAL, ANUAL';
+
+COMMENT ON TABLE "PlanBeneficio" IS 'Beneficios atomicos asociados a cada plan de suscripcion';
 
 COMMENT ON TABLE "Suscripcion" IS 'Suscripciones de usuarios. Estados: ACTIVO, INACTIVO';
 
@@ -287,6 +307,8 @@ ALTER TABLE "Temporada" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 ALTER TABLE "Equipo" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Equipo" ADD FOREIGN KEY ("categoria_id") REFERENCES "EquipoCategoria" ("id");
+
+ALTER TABLE "Equipo" ADD FOREIGN KEY ("genero_id") REFERENCES "EquipoGenero" ("id");
 
 ALTER TABLE "Sede" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
@@ -330,6 +352,8 @@ ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 
 ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("estado_id") REFERENCES "SuscripcionEstado" ("id");
 
+ALTER TABLE "PlanBeneficio" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
+
 ALTER TABLE "Pago" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 ALTER TABLE "Pago" ADD FOREIGN KEY ("metodo_pago_id") REFERENCES "MetodoPago" ("id");
 
@@ -344,3 +368,4 @@ ALTER TABLE "NotificacionClubEvento" ADD FOREIGN KEY ("club_evento_id") REFERENC
 ALTER TABLE "EquipoColor" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "EquipoColor" ADD FOREIGN KEY ("color_id") REFERENCES "Color" ("id");
+

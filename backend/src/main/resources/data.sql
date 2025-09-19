@@ -10,8 +10,15 @@
 -- CATALOGOS (reemplazo de ENUMS)
 -- ========================================
 
--- Categorías de equipo
+-- Categorias de equipo
 INSERT INTO "EquipoCategoria" (id, nombre) VALUES
+    (1, 'PRIMERA_DIVISION'),
+    (2, 'RESERVA'),
+    (3, 'SUB_20')
+ON CONFLICT DO NOTHING;
+
+-- Generos de equipo
+INSERT INTO "EquipoGenero" (id, nombre) VALUES
     (1, 'MASCULINO'),
     (2, 'FEMENINO'),
     (3, 'MIXTO')
@@ -59,8 +66,8 @@ INSERT INTO "Temporada" (id, club_id, nombre, fecha_inicio, fecha_fin) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Insertar equipo
-INSERT INTO "Equipo" (id, nombre, genero, categoria_id, mascota, fundacion, club_id) VALUES
-    (1, 'Águilas Primera División', 'Masculino', 1, 'Águila Dorada', '2010-03-15', 1)
+INSERT INTO "Equipo" (id, nombre, genero_id, categoria_id, mascota, fundacion, club_id) VALUES
+    (1, 'Águilas Primera División', 1, 1, 'Águila Dorada', '2010-03-15', 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -81,8 +88,8 @@ INSERT INTO "EquipoColor" (equipo_id, color_id) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Insertar sede
-INSERT INTO "Sede" (id, email, lugar_origen, fundacion, nombre, telefono, club_id) VALUES
-    (1, 'sede@aguilasdoradas.com', 'Medellín, Colombia', '2010-03-15', 'Sede Principal Águilas', '+57044123456', 1)
+INSERT INTO "Sede" (id, email, pais, ciudad, fundacion, nombre, telefono, club_id) VALUES
+    (1, 'sede@aguilasdoradas.com', 'Colombia', 'Medellín', '2010-03-15', 'Sede Principal Águilas', '+57044123456', 1)
 ON CONFLICT DO NOTHING;
 
 -- Insertar estadio
@@ -95,28 +102,40 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 -- Insertar staff con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Staff" (id, email, password_hash, nombre, apellido, origen, telefono, fecha_nacimiento, fecha_contratacion, rol_staff_id, equipo_id) VALUES
-    (1, 'entrenador@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Miguel', 'Rodríguez', 'Argentina', '+54911234567', '1978-07-22', '2023-01-15', 1, 1),
-    (2, 'medico@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'García', 'España', '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
-    (3, 'fisioterapeuta@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejía', 'Colombia', '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
+INSERT INTO "Staff" (id, email, password_hash, nombre, apellido, pais, ciudad, telefono, fecha_nacimiento, fecha_contratacion, rol_staff_id, equipo_id) VALUES
+    (1, 'entrenador@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Miguel', 'Rodríguez', 'Argentina', 'Buenos Aires', '+54911234567', '1978-07-22', '2023-01-15', 1, 1),
+    (2, 'medico@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'García', 'España', 'Madrid', '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
+    (3, 'fisioterapeuta@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejía', 'Colombia', 'Medellín', '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- Insertar jugadores con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, origen, telefono, fecha_nacimiento, estado_fisico, dorsal, altura, pie_dominate, peso, posicion_principal_id, equipo_id) VALUES
-    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 'Colombia', '+57300987654', '1995-04-10', 'Disponible', '10', '175', 'Derecho', '70', 1, 1),
-    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 'Colombia', '+57301123456', '1997-09-18', 'Disponible', '9', '182', 'Izquierdo', '75', 2, 1),
-    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 'Colombia', '+57302234567', '1994-12-03', 'Disponible', '1', '188', 'Derecho', '80', 3, 1)
+INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, pais, ciudad, telefono, fecha_nacimiento, estado_fisico, dorsal, altura, pie_dominate, peso, posicion_principal_id, equipo_id) VALUES
+    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 'Colombia', 'Medellín', '+57300987654', '1995-04-10', 'Disponible', '10', '175', 'Derecho', '70', 1, 1),
+    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 'Colombia', 'Cali', '+57301123456', '1997-09-18', 'Disponible', '9', '182', 'Izquierdo', '75', 2, 1),
+    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 'Colombia', 'Bogotá', '+57302234567', '1994-12-03', 'Disponible', '1', '188', 'Derecho', '80', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
 -- PLANES Y SUSCRIPCIONES
 -- ========================================
 
--- Insertar planes de suscripción
-INSERT INTO "Plan" (id, nombre, descripcion, beneficios, precio) VALUES
-    (1, 'Plan Básico', 'Plan básico para clubes pequeños', 'Gestión de equipos, estadísticas básicas', 50000.00),
-    (2, 'Plan Profesional', 'Plan completo para clubes profesionales', 'Gestión avanzada, reportes detallados, análisis táctico', 150000.00),
-    (3, 'Plan Premium', 'Plan premium con todas las funcionalidades', 'Funcionalidades completas, soporte prioritario, integraciones', 300000.00)
+-- Insertar planes de suscripcion
+INSERT INTO "Plan" (id, nombre, descripcion, precio) VALUES
+    (1, 'Plan Basico', 'Plan basico para clubes pequeños', 50000.00),
+    (2, 'Plan Profesional', 'Plan completo para clubes profesionales', 150000.00),
+    (3, 'Plan Premium', 'Plan premium con todas las funcionalidades', 300000.00)
+ON CONFLICT DO NOTHING;
+
+-- Insertar beneficios por plan
+INSERT INTO "PlanBeneficio" (id, plan_id, descripcion) VALUES
+    (1, 1, 'Gestion de equipos'),
+    (2, 1, 'Estadisticas basicas'),
+    (3, 2, 'Gestion avanzada'),
+    (4, 2, 'Reportes detallados'),
+    (5, 2, 'Analisis tactico'),
+    (6, 3, 'Funcionalidades completas'),
+    (7, 3, 'Soporte prioritario'),
+    (8, 3, 'Integraciones')
 ON CONFLICT DO NOTHING;
 
 -- Insertar suscripción para el admin del sistema
