@@ -51,6 +51,48 @@ INSERT INTO "MetodoPago" (id, nombre) VALUES
     (3, 'NEQUI')
 ON CONFLICT DO NOTHING;
 
+-- Estados físicos de jugadores
+INSERT INTO "EstadoFisico" (id, nombre) VALUES
+    (1, 'Disponible'),
+    (2, 'Lesionado'),
+    (3, 'En recuperación'),
+    (4, 'Suspendido'),
+    (5, 'No disponible')
+ON CONFLICT DO NOTHING;
+
+-- Jornadas de competición
+INSERT INTO "Jornada" (id, nombre, descripcion) VALUES
+    (1, 'Jornada 1', 'Primera jornada de la temporada regular'),
+    (2, 'Jornada 2', 'Segunda jornada de la temporada regular'),
+    (3, 'Cuartos de Final', 'Fase de cuartos de final'),
+    (4, 'Semifinales', 'Fase de semifinales'),
+    (5, 'Final', 'Partido final del torneo')
+ON CONFLICT DO NOTHING;
+
+-- Divisas
+INSERT INTO "Divisa" (id, nombre, simbolo) VALUES
+    (1, 'Peso Colombiano', 'COP'),
+    (2, 'Dólar Estadounidense', 'USD'),
+    (3, 'Euro', 'EUR')
+ON CONFLICT DO NOTHING;
+
+-- Tipos de documento
+INSERT INTO "TipoDocumento" (id, nombre) VALUES
+    (1, 'CONVOCATORIA'),
+    (2, 'MEDICO'),
+    (3, 'FACTURA'),
+    (4, 'PERMISO'),
+    (5, 'COMPROBANTE')
+ON CONFLICT DO NOTHING;
+
+-- Formatos de documento
+INSERT INTO "FormatoDocumento" (id, nombre) VALUES
+    (1, 'PDF'),
+    (2, 'DOCX'),
+    (3, 'HTML'),
+    (4, 'TXT')
+ON CONFLICT DO NOTHING;
+
 -- Países
 INSERT INTO "Pais" (id, nombre) VALUES
     (1, 'Colombia'),
@@ -125,10 +167,10 @@ INSERT INTO "Staff" (id, email, password_hash, nombre, apellido, ciudad_id, tele
 ON CONFLICT DO NOTHING;
 
 -- Insertar jugadores con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, ciudad_id, telefono, fecha_nacimiento, estado_fisico, dorsal, altura, pie_dominate, peso, posicion_principal_id, equipo_id) VALUES
-    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 1, '+57300987654', '1995-04-10', 'Disponible', '10', '175', 'Derecho', '70', 1, 1),
-    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 4, '+57301123456', '1997-09-18', 'Disponible', '9', '182', 'Izquierdo', '75', 2, 1),
-    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 5, '+57302234567', '1994-12-03', 'Disponible', '1', '188', 'Derecho', '80', 3, 1)
+INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, ciudad_id, telefono, fecha_nacimiento, estado_fisico_id, dorsal, altura, pie_dominate, peso, posicion_principal_id, equipo_id) VALUES
+    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 1, '+57300987654', '1995-04-10', 1, '10', '175', 'Derecho', '70', 1, 1),
+    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 4, '+57301123456', '1997-09-18', 1, '9', '182', 'Izquierdo', '75', 2, 1),
+    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 5, '+57302234567', '1994-12-03', 1, '1', '188', 'Derecho', '80', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -169,10 +211,10 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 -- Insertar pagos relacionados a planes
-INSERT INTO "Pago" (id, fecha_pago, metodo_pago_id, descripcion, monto, descuento, divisa, plan_id) VALUES
-    (1, '2024-01-01 09:30:00', 1, 'Pago mensual Plan Profesional', 150000.00, 0, 'COP', 2),
-    (2, '2024-02-01 10:15:00', 2, 'Pago mensual Plan Profesional con descuento', 150000.00, 15000.00, 'COP', 2),
-    (3, '2024-03-01 14:30:00', 3, 'Pago Plan Básico', 50000.00, 0, 'COP', 1)
+INSERT INTO "Pago" (id, fecha_pago, metodo_pago_id, descripcion, monto, descuento, divisa_id, plan_id) VALUES
+    (1, '2024-01-01 09:30:00', 1, 'Pago mensual Plan Profesional', 150000.00, 0, 1, 2),
+    (2, '2024-02-01 10:15:00', 2, 'Pago mensual Plan Profesional con descuento', 150000.00, 15000.00, 1, 2),
+    (3, '2024-03-01 14:30:00', 3, 'Pago Plan Básico', 50000.00, 0, 1, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -187,8 +229,8 @@ INSERT INTO "Evento" (id, temporada_id, sede_id, nombre, descripcion, fecha) VAL
 ON CONFLICT DO NOTHING;
 
 -- Insertar partido
-INSERT INTO "Partido" (id, jornada, hora_inicio, hora_fin, fecha, estadio_id, temporada_id) VALUES
-    (1, 'Jornada 1', '20:00:00', '22:00:00', '2024-01-20', 1, 1)
+INSERT INTO "Partido" (id, jornada_id, hora_inicio, hora_fin, fecha, estadio_id, temporada_id) VALUES
+    (1, 1, '20:00:00', '22:00:00', '2024-01-20', 1, 1)
 ON CONFLICT DO NOTHING;
 
 -- Insertar equipos participantes en el partido
@@ -235,9 +277,9 @@ INSERT INTO "Racha" (id, equipo_id, fecha_inicio, fecha_fin) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Insertar plantillas de documentos
-INSERT INTO "PlantillaDocumento" (id, nombre, descripcion, formato, tipo, contenido, creacion) VALUES
-    (1, 'Convocatoria Partido', 'Plantilla para convocar jugadores', 'PDF', 'CONVOCATORIA', 'Estimado jugador, queda convocado para el partido...', '2024-01-01 10:00:00'),
-    (2, 'Informe Médico', 'Plantilla para informes médicos', 'PDF', 'MEDICO', 'Informe médico del jugador: [NOMBRE]...', '2024-01-01 10:00:00')
+INSERT INTO "PlantillaDocumento" (id, nombre, descripcion, formato_documento_id, tipo_documento_id, contenido, creacion) VALUES
+    (1, 'Convocatoria Partido', 'Plantilla para convocar jugadores', 1, 1, 'Estimado jugador, queda convocado para el partido...', '2024-01-01 10:00:00'),
+    (2, 'Informe Médico', 'Plantilla para informes médicos', 1, 2, 'Informe médico del jugador: [NOMBRE]...', '2024-01-01 10:00:00')
 ON CONFLICT DO NOTHING;
 
 -- Insertar relación roster-plantillas

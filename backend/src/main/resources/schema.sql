@@ -32,6 +32,33 @@ CREATE TABLE "EquipoGenero" (
   "nombre" varchar(20) UNIQUE NOT NULL
 );
 
+CREATE TABLE "EstadoFisico" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE "Jornada" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(100) NOT NULL,
+  "descripcion" varchar(255)
+);
+
+CREATE TABLE "Divisa" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) UNIQUE NOT NULL,
+  "simbolo" varchar(10) UNIQUE NOT NULL
+);
+
+CREATE TABLE "TipoDocumento" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE "FormatoDocumento" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) UNIQUE NOT NULL
+);
+
 CREATE TABLE "Pais" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(100) UNIQUE NOT NULL
@@ -114,7 +141,7 @@ CREATE TABLE "Estadio" (
 );
 
 CREATE TABLE "Jugador" (
-  "estado_fisico" varchar(30) NOT NULL,
+  "estado_fisico_id" bigint NOT NULL,
   "dorsal" varchar(30) NOT NULL,
   "altura" varchar(4) NOT NULL,
   "pie_dominate" varchar(30) NOT NULL,
@@ -156,7 +183,7 @@ CREATE TABLE "Evento" (
 
 CREATE TABLE "Partido" (
   "id" bigint PRIMARY KEY,
-  "jornada" text NOT NULL,
+  "jornada_id" bigint NOT NULL,
   "hora_inicio" time NOT NULL,
   "hora_fin" time NOT NULL,
   "fecha" date NOT NULL,
@@ -213,7 +240,7 @@ CREATE TABLE "Pago" (
   "descripcion" varchar(255),
   "monto" decimal(12,2) NOT NULL,
   "descuento" decimal(12,2) DEFAULT 0,
-  "divisa" varchar(3) NOT NULL DEFAULT 'COP',
+  "divisa_id" bigint NOT NULL,
   "plan_id" bigint NOT NULL
 );
 
@@ -240,8 +267,8 @@ CREATE TABLE "PlantillaDocumento" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(120) NOT NULL,
   "descripcion" varchar(120) NOT NULL,
-  "formato" varchar(120) NOT NULL,
-  "tipo" varchar(20) NOT NULL,
+  "formato_documento_id" bigint NOT NULL,
+  "tipo_documento_id" bigint NOT NULL,
   "contenido" text NOT NULL,
   "creacion" timestamp DEFAULT (now())
 );
@@ -333,6 +360,8 @@ ALTER TABLE "Jugador" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "Jugador" ADD FOREIGN KEY ("posicion_principal_id") REFERENCES "JugadorPosicion" ("id");
 
+ALTER TABLE "Jugador" ADD FOREIGN KEY ("estado_fisico_id") REFERENCES "EstadoFisico" ("id");
+
 ALTER TABLE "Staff" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "Staff" ADD FOREIGN KEY ("rol_staff_id") REFERENCES "StaffRol" ("id");
@@ -345,6 +374,10 @@ ALTER TABLE "RosterPlantillaDocumento" ADD FOREIGN KEY ("roster_id") REFERENCES 
 
 ALTER TABLE "RosterPlantillaDocumento" ADD FOREIGN KEY ("plantilla_documento_id") REFERENCES "PlantillaDocumento" ("id");
 
+ALTER TABLE "PlantillaDocumento" ADD FOREIGN KEY ("tipo_documento_id") REFERENCES "TipoDocumento" ("id");
+
+ALTER TABLE "PlantillaDocumento" ADD FOREIGN KEY ("formato_documento_id") REFERENCES "FormatoDocumento" ("id");
+
 ALTER TABLE "Evento" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
 
 ALTER TABLE "Evento" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
@@ -352,6 +385,8 @@ ALTER TABLE "Evento" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
 ALTER TABLE "Partido" ADD FOREIGN KEY ("estadio_id") REFERENCES "Estadio" ("id");
 
 ALTER TABLE "Partido" ADD FOREIGN KEY ("temporada_id") REFERENCES "Temporada" ("id");
+
+ALTER TABLE "Partido" ADD FOREIGN KEY ("jornada_id") REFERENCES "Jornada" ("id");
 
 ALTER TABLE "PartidoEquipoLocal" ADD FOREIGN KEY ("partido_id") REFERENCES "Partido" ("id");
 
@@ -371,6 +406,7 @@ ALTER TABLE "PlanBeneficio" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id")
 
 ALTER TABLE "Pago" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 ALTER TABLE "Pago" ADD FOREIGN KEY ("metodo_pago_id") REFERENCES "MetodoPago" ("id");
+ALTER TABLE "Pago" ADD FOREIGN KEY ("divisa_id") REFERENCES "Divisa" ("id");
 
 ALTER TABLE "ClubEvento" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
