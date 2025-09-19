@@ -7,6 +7,44 @@
 -- ========================================
 
 -- ========================================
+-- CATALOGOS (reemplazo de ENUMS)
+-- ========================================
+
+-- Categorías de equipo
+INSERT INTO "EquipoCategoria" (id, nombre) VALUES
+    (1, 'MASCULINO'),
+    (2, 'FEMENINO'),
+    (3, 'MIXTO')
+ON CONFLICT DO NOTHING;
+
+-- Roles de staff (solo los utilizados en este seed)
+INSERT INTO "StaffRol" (id, nombre) VALUES
+    (1, 'ENTRENADOR'),
+    (2, 'MEDICO'),
+    (3, 'FISIOTERAPEUTA')
+ON CONFLICT DO NOTHING;
+
+-- Posiciones de jugador (solo las utilizadas en este seed)
+INSERT INTO "JugadorPosicion" (id, nombre) VALUES
+    (1, 'MEDIOCENTRO_OFENSIVO'),
+    (2, 'DELANTERO_CENTRO'),
+    (3, 'PORTERO')
+ON CONFLICT DO NOTHING;
+
+-- Estados de suscripción
+INSERT INTO "SuscripcionEstado" (id, nombre) VALUES
+    (1, 'ACTIVO'),
+    (2, 'INACTIVO')
+ON CONFLICT DO NOTHING;
+
+-- Métodos de pago (solo los utilizados en este seed)
+INSERT INTO "MetodoPago" (id, nombre) VALUES
+    (1, 'TARJETA_CREDITO'),
+    (2, 'PSE'),
+    (3, 'NEQUI')
+ON CONFLICT DO NOTHING;
+
+-- ========================================
 -- ESTRUCTURA DE CLUBES
 -- ========================================
 
@@ -21,8 +59,8 @@ INSERT INTO "Temporada" (id, club_id, nombre, fecha_inicio, fecha_fin) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Insertar equipo
-INSERT INTO "Equipo" (id, nombre, genero, categoria, mascota, fundacion, club_id) VALUES
-    (1, 'Águilas Primera División', 'Masculino', 'MASCULINO', 'Águila Dorada', '2010-03-15', 1)
+INSERT INTO "Equipo" (id, nombre, genero, categoria_id, mascota, fundacion, club_id) VALUES
+    (1, 'Águilas Primera División', 'Masculino', 1, 'Águila Dorada', '2010-03-15', 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -57,17 +95,17 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 -- Insertar staff con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Staff" (id, email, password_hash, nombre, apellido, origen, telefono, fecha_nacimiento, fecha_contratacion, rol_staff, equipo_id) VALUES
-    (1, 'entrenador@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Miguel', 'Rodríguez', 'Argentina', '+54911234567', '1978-07-22', '2023-01-15', 'ENTRENADOR', 1),
-    (2, 'medico@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'García', 'España', '+34612345678', '1982-11-08', '2023-02-01', 'MEDICO', 1),
-    (3, 'fisioterapeuta@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejía', 'Colombia', '+57300111222', '1985-03-15', '2023-03-01', 'FISIOTERAPEUTA', 1)
+INSERT INTO "Staff" (id, email, password_hash, nombre, apellido, origen, telefono, fecha_nacimiento, fecha_contratacion, rol_staff_id, equipo_id) VALUES
+    (1, 'entrenador@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Miguel', 'Rodríguez', 'Argentina', '+54911234567', '1978-07-22', '2023-01-15', 1, 1),
+    (2, 'medico@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'García', 'España', '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
+    (3, 'fisioterapeuta@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejía', 'Colombia', '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- Insertar jugadores con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, origen, telefono, fecha_nacimiento, estado_fisico, dorsal, altura, pie_dominate, peso, posicion_principal, equipo_id) VALUES
-    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 'Colombia', '+57300987654', '1995-04-10', 'Disponible', '10', '175', 'Derecho', '70', 'MEDIOCENTRO_OFENSIVO', 1),
-    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 'Colombia', '+57301123456', '1997-09-18', 'Disponible', '9', '182', 'Izquierdo', '75', 'DELANTERO_CENTRO', 1),
-    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 'Colombia', '+57302234567', '1994-12-03', 'Disponible', '1', '188', 'Derecho', '80', 'PORTERO', 1)
+INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, origen, telefono, fecha_nacimiento, estado_fisico, dorsal, altura, pie_dominate, peso, posicion_principal_id, equipo_id) VALUES
+    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 'Colombia', '+57300987654', '1995-04-10', 'Disponible', '10', '175', 'Derecho', '70', 1, 1),
+    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 'Colombia', '+57301123456', '1997-09-18', 'Disponible', '9', '182', 'Izquierdo', '75', 2, 1),
+    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 'Colombia', '+57302234567', '1994-12-03', 'Disponible', '1', '188', 'Derecho', '80', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -82,8 +120,8 @@ INSERT INTO "Plan" (id, nombre, descripcion, beneficios, precio) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Insertar suscripción para el admin del sistema
-INSERT INTO "Suscripcion" (id, plan_id, fecha_inicio, fecha_fin, estado) VALUES
-    (1, 2, '2024-01-01', '2024-12-31', 'ACTIVO')
+INSERT INTO "Suscripcion" (id, plan_id, fecha_inicio, fecha_fin, estado_id) VALUES
+    (1, 2, '2024-01-01', '2024-12-31', 1)
 ON CONFLICT DO NOTHING;
 
 -- Insertar roster (el admin del sistema de gestión)
@@ -96,10 +134,10 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 -- Insertar pagos relacionados a planes
-INSERT INTO "Pago" (id, fecha_pago, metodo_pago, descripcion, monto, descuento, divisa, plan_id) VALUES
-    (1, '2024-01-01 09:30:00', 'TARJETA_CREDITO', 'Pago mensual Plan Profesional', 150000.00, 0, 'COP', 2),
-    (2, '2024-02-01 10:15:00', 'PSE', 'Pago mensual Plan Profesional con descuento', 150000.00, 15000.00, 'COP', 2),
-    (3, '2024-03-01 14:30:00', 'NEQUI', 'Pago Plan Básico', 50000.00, 0, 'COP', 1)
+INSERT INTO "Pago" (id, fecha_pago, metodo_pago_id, descripcion, monto, descuento, divisa, plan_id) VALUES
+    (1, '2024-01-01 09:30:00', 1, 'Pago mensual Plan Profesional', 150000.00, 0, 'COP', 2),
+    (2, '2024-02-01 10:15:00', 2, 'Pago mensual Plan Profesional con descuento', 150000.00, 15000.00, 'COP', 2),
+    (3, '2024-03-01 14:30:00', 3, 'Pago Plan Básico', 50000.00, 0, 'COP', 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================

@@ -1,68 +1,30 @@
 -- ========================================
--- ENUMS PARA ROLES Y POSICIONES
+-- CATALOGOS (reemplazo de ENUMs)
 -- ========================================
 
--- Enum para roles de staff técnico
-CREATE TYPE staff_rol_enum AS ENUM (
-  'ENTRENADOR',
-  'ASISTENTE_TECNICO', 
-  'PREPARADOR_FISICO',
-  'MEDICO',
-  'FISIOTERAPEUTA',
-  'PSICOLOGO_DEPORTIVO',
-  'ENTRENADOR_PORTEROS',
-  'ANALISTA_VIDEO',
-  'NUTRICIONISTA',
-  'DELEGADO',
-  'UTILERO'
+CREATE TABLE "StaffRol" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(100) UNIQUE NOT NULL
 );
 
--- Enum para posiciones de jugador en fútbol
-CREATE TYPE jugador_posicion_enum AS ENUM (
-  -- Portero
-  'PORTERO',
-  -- Defensas
-  'DEFENSA_CENTRAL',
-  'LATERAL_DERECHO',
-  'LATERAL_IZQUIERDO',
-  'LIBERO',
-  -- Centrocampistas
-  'MEDIOCENTRO_DEFENSIVO',
-  'MEDIOCENTRO',
-  'MEDIOCENTRO_OFENSIVO',
-  'EXTREMO_DERECHO',
-  'EXTREMO_IZQUIERDO',
-  'INTERIOR_DERECHO',
-  'INTERIOR_IZQUIERDO',
-  -- Delanteros
-  'DELANTERO_CENTRO',
-  'SEGUNDO_DELANTERO',
-  'EXTREMO_DELANTERO'
+CREATE TABLE "JugadorPosicion" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(100) UNIQUE NOT NULL
 );
 
--- Enum para estados de suscripción
-CREATE TYPE suscripcion_estado_enum AS ENUM (
-  'ACTIVO',
-  'INACTIVO'
+CREATE TABLE "SuscripcionEstado" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) UNIQUE NOT NULL
 );
 
--- Enum para métodos de pago
-CREATE TYPE metodo_pago_enum AS ENUM (
-  'TARJETA_CREDITO',
-  'TARJETA_DEBITO',
-  'PSE',
-  'NEQUI',
-  'DAVIPLATA',
-  'DAVIVIENDA',
-  'BANCOLOMBIA',
-  'PAYPAL'
+CREATE TABLE "MetodoPago" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(80) UNIQUE NOT NULL
 );
 
--- Enum para categorías de equipo
-CREATE TYPE equipo_categoria_enum AS ENUM (
-  'MASCULINO',
-  'FEMENINO',
-  'MIXTO'
+CREATE TABLE "EquipoCategoria" (
+  "id" bigint PRIMARY KEY,
+  "nombre" varchar(50) UNIQUE NOT NULL
 );
 
 -- ========================================
@@ -99,7 +61,7 @@ CREATE TABLE "Equipo" (
   "id" bigint PRIMARY KEY,
   "nombre" varchar(120) NOT NULL,
   "genero" varchar(10) NOT NULL,
-  "categoria" equipo_categoria_enum NOT NULL,
+  "categoria_id" bigint NOT NULL,
   "mascota" varchar(100),
   "fundacion" date NOT NULL,
   "club_id" bigint NOT NULL
@@ -141,13 +103,13 @@ CREATE TABLE "Jugador" (
   "altura" varchar(4) NOT NULL,
   "pie_dominate" varchar(30) NOT NULL,
   "peso" varchar(10) NOT NULL,
-  "posicion_principal" jugador_posicion_enum NOT NULL,
+  "posicion_principal_id" bigint NOT NULL,
   "equipo_id" bigint NOT NULL 
 ) INHERITS ("Usuario");
 
 CREATE TABLE "Staff" (
   "fecha_contratacion" date DEFAULT (now()),
-  "rol_staff" staff_rol_enum NOT NULL,
+  "rol_staff_id" bigint NOT NULL,
   "equipo_id" bigint NOT NULL 
 ) INHERITS ("Usuario");
 
@@ -215,13 +177,13 @@ CREATE TABLE "Suscripcion" (
   "plan_id" bigint NOT NULL,
   "fecha_inicio" date NOT NULL,
   "fecha_fin" date NOT NULL,
-  "estado" suscripcion_estado_enum NOT NULL DEFAULT 'ACTIVO' 
+  "estado_id" bigint NOT NULL 
 );
 
 CREATE TABLE "Pago" (
   "id" bigint PRIMARY KEY,
   "fecha_pago" timestamp DEFAULT (now()),
-  "metodo_pago" metodo_pago_enum NOT NULL,
+  "metodo_pago_id" bigint NOT NULL,
   "descripcion" varchar(255),
   "monto" decimal(12,2) NOT NULL,
   "descuento" decimal(12,2) DEFAULT 0,
@@ -282,15 +244,14 @@ COMMENT ON TABLE "Estadio" IS 'Estadios con información de área, suelo, capaci
 
 COMMENT ON TABLE "Jugador" IS 'Jugadores registrados con posición principal';
 
-COMMENT ON TABLE "Staff" IS 'Personal técnico con roles específicos definidos por staff_rol_enum';
+COMMENT ON TABLE "Staff" IS 'Personal técnico con roles específicos definidos por el catálogo StaffRol';
 
--- Comentarios sobre los enums
-COMMENT ON TYPE staff_rol_enum IS 'Roles disponibles para el staff técnico: entrenadores, cuerpo médico, analistas, etc.';
-COMMENT ON TYPE jugador_posicion_enum IS 'Posiciones específicas de jugadores de fútbol organizadas por líneas: portero, defensas, centrocampistas y delanteros';
-COMMENT ON TYPE suscripcion_estado_enum IS 'Estados simples para suscripciones: ACTIVO (suscripción vigente), INACTIVO (suspendida o vencida)';
-COMMENT ON TYPE metodo_pago_enum IS 'Métodos de pago disponibles: tarjetas, billeteras digitales y transferencias';
-
-COMMENT ON TYPE equipo_categoria_enum IS 'Categoría del equipo: MASCULINO, FEMENINO, MIXTO';
+-- Comentarios sobre los catálogos
+COMMENT ON TABLE "StaffRol" IS 'Catálogo de roles disponibles para el staff técnico';
+COMMENT ON TABLE "JugadorPosicion" IS 'Catálogo de posiciones específicas de jugadores de fútbol';
+COMMENT ON TABLE "SuscripcionEstado" IS 'Catálogo de estados de suscripción';
+COMMENT ON TABLE "MetodoPago" IS 'Catálogo de métodos de pago disponibles';
+COMMENT ON TABLE "EquipoCategoria" IS 'Catálogo de categorías del equipo: MASCULINO, FEMENINO, MIXTO';
 
 COMMENT ON TABLE "Roster" IS 'Sistema de gestión de equipos con suscripciones.';
 
@@ -325,13 +286,19 @@ ALTER TABLE "Temporada" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Equipo" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
+ALTER TABLE "Equipo" ADD FOREIGN KEY ("categoria_id") REFERENCES "EquipoCategoria" ("id");
+
 ALTER TABLE "Sede" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Estadio" ADD FOREIGN KEY ("sede_id") REFERENCES "Sede" ("id");
 
 ALTER TABLE "Jugador" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
+ALTER TABLE "Jugador" ADD FOREIGN KEY ("posicion_principal_id") REFERENCES "JugadorPosicion" ("id");
+
 ALTER TABLE "Staff" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
+
+ALTER TABLE "Staff" ADD FOREIGN KEY ("rol_staff_id") REFERENCES "StaffRol" ("id");
 
 ALTER TABLE "Roster" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
@@ -361,7 +328,10 @@ ALTER TABLE "Racha" ADD FOREIGN KEY ("equipo_id") REFERENCES "Equipo" ("id");
 
 ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 
+ALTER TABLE "Suscripcion" ADD FOREIGN KEY ("estado_id") REFERENCES "SuscripcionEstado" ("id");
+
 ALTER TABLE "Pago" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
+ALTER TABLE "Pago" ADD FOREIGN KEY ("metodo_pago_id") REFERENCES "MetodoPago" ("id");
 
 ALTER TABLE "ClubEvento" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
