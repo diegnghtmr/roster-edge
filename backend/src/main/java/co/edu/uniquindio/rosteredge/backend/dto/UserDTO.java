@@ -1,5 +1,6 @@
 package co.edu.uniquindio.rosteredge.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * DTO for User entity
@@ -51,8 +53,9 @@ public class UserDTO extends BaseDTO {
     @Size(max = 30, message = "Phone cannot exceed 30 characters")
     private String phone;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @NotNull(message = "Birth date is required")
-    private LocalDate birthDate;
+    private LocalDateTime birthDate;
 
     // Additional field for city name in responses
     // private String cityName;
