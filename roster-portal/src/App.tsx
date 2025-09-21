@@ -1,20 +1,18 @@
-import { useState } from "react";
-
 import "./App.css";
-import { Button } from "./components/ui/button";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import useRouterApp from "./router";
+import { CookiesProvider } from "react-cookie";
+import { RouterProvider } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0);
+const queryClient = new QueryClient();
 
+export default function App() {
   return (
-    <>
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </Button>
-      </div>
-    </>
+    <CookiesProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* <Toaster richColors position="top-center" /> */}
+        <RouterProvider router={useRouterApp()} />
+      </QueryClientProvider>
+    </CookiesProvider>
   );
 }
-
-export default App;
