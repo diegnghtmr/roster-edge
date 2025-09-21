@@ -18,71 +18,65 @@ import java.util.Optional;
 @Transactional
 @Slf4j
 public class TeamServiceImpl extends AbstractBaseService<Team, Long> implements TeamService {
-    
+
     private final TeamRepository teamRepository;
-    
+
     public TeamServiceImpl(TeamRepository teamRepository) {
         super(teamRepository);
         this.teamRepository = teamRepository;
     }
-    
+
     @Override
     protected String getEntityName() {
         return "Team";
     }
-    
+
     @Override
     @Cacheable("teams")
     public Optional<Team> findByName(String name) {
         log.debug("Finding team by name: {}", name);
         return teamRepository.findByName(name);
     }
-    
-    @Override
-    public List<Team> findBySport(String sport) {
-        log.debug("Finding teams by sport: {}", sport);
-        return teamRepository.findBySport(sport);
-    }
-    
+
     @Override
     public List<Team> findActiveTeams() {
         log.debug("Finding all active teams");
         return teamRepository.findByActiveTrue();
     }
-    
+
     @Override
     public boolean existsByName(String name) {
         return teamRepository.existsByName(name);
     }
-    
+
     @Override
     @CacheEvict(value = "teams", allEntries = true)
     public Team save(Team entity) {
         log.debug("Saving team: {}", entity.getName());
-        
+
         if (entity.getId() == null && existsByName(entity.getName())) {
             throw new BusinessException("Team name already exists", "DUPLICATE_TEAM_NAME");
         }
-        
+
         entity.prePersist();
         return super.save(entity);
     }
-    
+
     @Override
     @CacheEvict(value = "teams", allEntries = true)
     public Team update(Long id, Team entity) {
         log.debug("Updating team with id: {}", id);
-        
+
         Team existingTeam = findByIdOrThrow(id);
-        
+
         if (!existingTeam.getName().equals(entity.getName()) && existsByName(entity.getName())) {
             throw new BusinessException("Team name already exists", "DUPLICATE_TEAM_NAME");
         }
-        
+
         entity.setId(id);
         entity.setCreatedAt(existingTeam.getCreatedAt());
         entity.preUpdate();
-        
+
         return teamRepository.save(entity);
     }
 }

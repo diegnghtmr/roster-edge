@@ -1,5 +1,6 @@
 package co.edu.uniquindio.rosteredge.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -16,22 +17,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder
 public abstract class BaseDTO {
-    
+
     /**
      * Unique record identifier
      */
     private Long id;
-    
+
     /**
      * Record creation date and time
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
-    
+
     /**
      * Last update date and time
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
-    
+
     /**
      * Indicates if the record is active (soft delete)
      */

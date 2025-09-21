@@ -18,37 +18,53 @@ import java.time.LocalDateTime;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlayerResponse {
-    
+
     private Long id;
-    
-    private String firstName;
-    
+
+    private String email;
+
+    private String name;
+
     private String lastName;
-    
-    private String fullName; // Computed field: firstName + " " + lastName
-    
+
+    private String fullName; // Computed field: name + " " + lastName
+
+    private Long cityId;
+
+    private String cityName;
+
+    private String phone;
+
+    private LocalDate birthDate;
+
+    private Integer age; // Computed field based on birthDate
+
+    private Long physicalStateId;
+
+    private String physicalStateName;
+
+    private String jerseyNumber;
+
+    private String height;
+
+    private String dominantFoot;
+
+    private String weight;
+
+    private Long primaryPositionId;
+
+    private String primaryPositionName;
+
     private Long teamId;
-    
-    private String teamName; // Team name for display purposes
-    
-    private String position;
-    
-    private Integer jerseyNumber;
-    
+
+    private String teamName;
+
     private Boolean active;
-    
-    private LocalDate dateOfBirth;
-    
-    private Integer age; // Computed field based on dateOfBirth
-    
-    private String nationality;
-    
-    // Removed height & weight to align with DB schema
-    
+
     private LocalDateTime createdAt;
-    
+
     private LocalDateTime updatedAt;
-    
+
     /**
      * Team summary for consistent display
      */
@@ -59,8 +75,7 @@ public class PlayerResponse {
     public static class TeamSummary {
         private Long id;
         private String name;
-        private String sport;
     }
-    
-    private TeamSummary team; // Optional: Include team summary if following TeamController pattern
+
+    private TeamSummary team;
 }

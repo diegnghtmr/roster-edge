@@ -13,16 +13,13 @@ import java.util.Optional;
  */
 @Repository
 public interface TeamRepository extends BaseRepository<Team, Long> {
-    
-    @Query("SELECT * FROM teams WHERE name = :name")
+
+    @Query("SELECT * FROM \"Team\" WHERE name = :name")
     Optional<Team> findByName(@Param("name") String name);
-    
-    @Query("SELECT * FROM teams WHERE sport = :sport")
-    List<Team> findBySport(@Param("sport") String sport);
-    
-    @Query("SELECT * FROM teams WHERE active = true")
+
+    @Query("SELECT * FROM \"Team\" WHERE active = true")
     List<Team> findByActiveTrue();
-    
-    @Query("SELECT COUNT(*) > 0 FROM teams WHERE name = :name")
+
+    @Query("SELECT COUNT(*) > 0 FROM \"Team\" WHERE name = :name")
     boolean existsByName(@Param("name") String name);
 }

@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface PlayerService extends BaseService<Player, Long> {
     List<Player> findByTeamId(Long teamId);
-    List<Player> findByPosition(String position);
+    List<Player> findByPrimaryPositionId(Long primaryPositionId);
     List<Player> findActivePlayer();
 }

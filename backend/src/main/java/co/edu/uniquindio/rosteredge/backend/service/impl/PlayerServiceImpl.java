@@ -16,57 +16,57 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class PlayerServiceImpl extends AbstractBaseService<Player, Long> implements PlayerService {
-    
+
     private final PlayerRepository playerRepository;
-    
+
     public PlayerServiceImpl(PlayerRepository playerRepository) {
         super(playerRepository);
         this.playerRepository = playerRepository;
     }
-    
+
     @Override
     protected String getEntityName() {
         return "Player";
     }
-    
+
     @Override
     @Cacheable("players")
     public List<Player> findByTeamId(Long teamId) {
         log.debug("Finding players by team id: {}", teamId);
         return playerRepository.findByTeamId(teamId);
     }
-    
+
     @Override
-    public List<Player> findByPosition(String position) {
-        log.debug("Finding players by position: {}", position);
-        return playerRepository.findByPosition(position);
+    public List<Player> findByPrimaryPositionId(Long primaryPositionId) {
+        log.debug("Finding players by position: {}", primaryPositionId);
+        return playerRepository.findByPrimaryPositionId(primaryPositionId);
     }
-    
+
     @Override
     public List<Player> findActivePlayer() {
         log.debug("Finding all active players");
         return playerRepository.findByActiveTrue();
     }
-    
+
     @Override
     @CacheEvict(value = "players", allEntries = true)
     public Player save(Player entity) {
-        log.debug("Saving player: {} {}", entity.getFirstName(), entity.getLastName());
+        log.debug("Saving player: {} {}", entity.getName(), entity.getLastName());
         entity.prePersist();
         return super.save(entity);
     }
-    
+
     @Override
     @CacheEvict(value = "players", allEntries = true)
     public Player update(Long id, Player entity) {
         log.debug("Updating player with id: {}", id);
-        
+
         Player existingPlayer = findByIdOrThrow(id);
-        
+
         entity.setId(id);
         entity.setCreatedAt(existingPlayer.getCreatedAt());
         entity.preUpdate();
-        
+
         return playerRepository.save(entity);
     }
 }

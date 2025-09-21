@@ -1,6 +1,8 @@
 package co.edu.uniquindio.rosteredge.backend.model;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -8,63 +10,61 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDate;
-
 /**
  * Player entity
- * Represents a player in a team
+ * Represents players registered with primary position
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-@Table("players")
-public class Player extends BaseEntity {
-    
+@Table("Player")
+public class Player extends User {
+
     /**
-     * Player's first name
+     * Physical state ID
      */
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-    private String firstName;
-    
-    /**
-     * Player's last name
-     */
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
-    private String lastName;
-    
+    @NotNull(message = "Physical state ID is required")
+    private Long physicalStateId;
+
     /**
      * Jersey number
      */
-    @Min(value = 0, message = "Jersey number cannot be negative")
-    @Max(value = 999, message = "Jersey number cannot exceed 999")
-    private Integer jerseyNumber;
-    
+    @NotBlank(message = "Jersey number is required")
+    @Size(max = 30, message = "Jersey number cannot exceed 30 characters")
+    private String jerseyNumber;
+
     /**
-     * Player position
+     * Player height
      */
-    @Size(max = 50, message = "Position cannot exceed 50 characters")
-    private String position;
-    
+    @NotBlank(message = "Height is required")
+    @Size(max = 4, message = "Height cannot exceed 4 characters")
+    private String height;
+
     /**
-     * Date of birth
+     * Dominant foot
      */
-    @Past(message = "Date of birth must be in the past")
-    private LocalDate dateOfBirth;
-    
+    @NotBlank(message = "Dominant foot is required")
+    @Size(max = 30, message = "Dominant foot cannot exceed 30 characters")
+    private String dominantFoot;
+
     /**
-     * Player nationality
+     * Player weight
      */
-    @Size(max = 50, message = "Nationality cannot exceed 50 characters")
-    private String nationality;
-    
+    @NotBlank(message = "Weight is required")
+    @Size(max = 10, message = "Weight cannot exceed 10 characters")
+    private String weight;
+
+    /**
+     * Primary position ID
+     */
+    @NotNull(message = "Primary position ID is required")
+    private Long primaryPositionId;
+
     /**
      * Team ID
      */
+    @NotNull(message = "Team ID is required")
     private Long teamId;
-    
-    // Removed height & weight to align with current DB schema (no columns yet)
 }

@@ -19,30 +19,30 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder
 public abstract class BaseEntity {
-    
+
     /**
      * Auto-generated unique identifier
      */
     @Id
     private Long id;
-    
+
     /**
      * Record creation date and time
      */
     @CreatedDate
     private LocalDateTime createdAt;
-    
+
     /**
      * Last update date and time
      */
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    
+
     /**
      * Indicates if the record is active (for soft delete)
      */
     private Boolean active = true;
-    
+
     /**
      * Method to perform soft delete
      */
@@ -50,7 +50,7 @@ public abstract class BaseEntity {
         this.active = false;
         this.updatedAt = LocalDateTime.now();
     }
-    
+
     /**
      * Method to restore a deleted record
      */
@@ -58,7 +58,7 @@ public abstract class BaseEntity {
         this.active = true;
         this.updatedAt = LocalDateTime.now();
     }
-    
+
     /**
      * Pre-persist callback to set timestamps
      */
@@ -71,7 +71,7 @@ public abstract class BaseEntity {
             this.active = true;
         }
     }
-    
+
     /**
      * Pre-update callback to update timestamp
      */

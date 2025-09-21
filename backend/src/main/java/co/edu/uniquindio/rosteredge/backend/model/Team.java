@@ -1,6 +1,8 @@
 package co.edu.uniquindio.rosteredge.backend.model;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -8,41 +10,54 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDate;
+
 /**
  * Team entity
- * Represents a sports team
+ * Represents teams in a club
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-@Table("teams")
+@Table("Team")
 public class Team extends BaseEntity {
-    
+
     /**
      * Team name
      */
     @NotBlank(message = "Team name is required")
-    @Size(min = 2, max = 100, message = "Team name must be between 2 and 100 characters")
+    @Size(max = 120, message = "Team name cannot exceed 120 characters")
     private String name;
-    
+
     /**
-     * Sport type
+     * Team gender ID
      */
-    @Size(max = 50, message = "Sport cannot exceed 50 characters")
-    private String sport;
-    
+    @NotNull(message = "Gender ID is required")
+    private Long genderId;
+
     /**
-     * Team description
+     * Team category ID
      */
-    @Size(max = 500, message = "Description cannot exceed 500 characters")
-    private String description;
-    
+    @NotNull(message = "Category ID is required")
+    private Long categoryId;
+
     /**
-     * Year the team was founded
+     * Team mascot
      */
-    @Min(value = 1800, message = "Founded year must be after 1800")
-    @Max(value = 2100, message = "Founded year cannot be in the far future")
-    private Integer foundedYear;
+    @Size(max = 100, message = "Mascot cannot exceed 100 characters")
+    private String mascot;
+
+    /**
+     * Team foundation date
+     */
+    @NotNull(message = "Foundation date is required")
+    private LocalDate foundation;
+
+    /**
+     * Club ID
+     */
+    @NotNull(message = "Club ID is required")
+    private Long clubId;
 }

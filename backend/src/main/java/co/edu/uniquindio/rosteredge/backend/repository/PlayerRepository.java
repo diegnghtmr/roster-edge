@@ -12,16 +12,13 @@ import java.util.List;
  */
 @Repository
 public interface PlayerRepository extends BaseRepository<Player, Long> {
-    
-    @Query("SELECT * FROM players WHERE team_id = :teamId")
+
     List<Player> findByTeamId(@Param("teamId") Long teamId);
-    
-    @Query("SELECT * FROM players WHERE position = :position")
-    List<Player> findByPosition(@Param("position") String position);
-    
-    @Query("SELECT * FROM players WHERE active = true")
+
+    List<Player> findByPrimaryPositionId(@Param("primaryPositionId") Long primaryPositionId);
+
+    @Query("SELECT * FROM \"Player\" WHERE active = true")
     List<Player> findByActiveTrue();
-    
-    @Query("SELECT * FROM players WHERE jersey_number = :number AND team_id = :teamId")
-    List<Player> findByJerseyNumberAndTeamId(@Param("number") Integer number, @Param("teamId") Long teamId);
+
+    List<Player> findByJerseyNumberAndTeamId(@Param("number") String number, @Param("teamId") Long teamId);
 }

@@ -1,107 +1,107 @@
 -- ========================================
--- DATOS DE EJEMPLO PARA ROSTER EDGE
+-- SAMPLE DATA FOR ROSTER EDGE
 -- ========================================
--- Contraseña predeterminada para todos: password123
+-- Default password for all users: password123
 -- ========================================
--- USUARIOS BASE (Jugadores y Staff)
--- ========================================
-
--- ========================================
--- CATALOGOS (reemplazo de ENUMS)
+-- BASE USERS (Players and Staff)
 -- ========================================
 
--- Categorias de equipo
-INSERT INTO "EquipoCategoria" (id, nombre) VALUES
-    (1, 'PRIMERA_DIVISION'),
-    (2, 'RESERVA'),
-    (3, 'SUB_20')
+-- ========================================
+-- CATALOGS (replacement for ENUMs)
+-- ========================================
+
+-- Team categories
+INSERT INTO "TeamCategory" (id, name) VALUES
+    (1, 'FIRST_DIVISION'),
+    (2, 'RESERVE'),
+    (3, 'UNDER_20')
 ON CONFLICT DO NOTHING;
 
--- Generos de equipo
-INSERT INTO "EquipoGenero" (id, nombre) VALUES
-    (1, 'MASCULINO'),
-    (2, 'FEMENINO'),
-    (3, 'MIXTO')
+-- Team genders
+INSERT INTO "TeamGender" (id, name) VALUES
+    (1, 'MALE'),
+    (2, 'FEMALE'),
+    (3, 'MIXED')
 ON CONFLICT DO NOTHING;
 
--- Roles de staff (solo los utilizados en este seed)
-INSERT INTO "StaffRol" (id, nombre) VALUES
-    (1, 'ENTRENADOR'),
-    (2, 'MEDICO'),
-    (3, 'FISIOTERAPEUTA')
+-- Staff roles (only those used in this seed)
+INSERT INTO "StaffRole" (id, name) VALUES
+    (1, 'COACH'),
+    (2, 'DOCTOR'),
+    (3, 'PHYSIOTHERAPIST')
 ON CONFLICT DO NOTHING;
 
--- Posiciones de jugador (solo las utilizadas en este seed)
-INSERT INTO "JugadorPosicion" (id, nombre) VALUES
-    (1, 'MEDIOCENTRO_OFENSIVO'),
-    (2, 'DELANTERO_CENTRO'),
-    (3, 'PORTERO')
+-- Player positions (only those used in this seed)
+INSERT INTO "PlayerPosition" (id, name) VALUES
+    (1, 'ATTACKING_MIDFIELDER'),
+    (2, 'CENTER_FORWARD'),
+    (3, 'GOALKEEPER')
 ON CONFLICT DO NOTHING;
 
--- Estados de suscripción
-INSERT INTO "SuscripcionEstado" (id, nombre) VALUES
-    (1, 'ACTIVO'),
-    (2, 'INACTIVO')
+-- Subscription statuses
+INSERT INTO "SubscriptionStatus" (id, name) VALUES
+    (1, 'ACTIVE'),
+    (2, 'INACTIVE')
 ON CONFLICT DO NOTHING;
 
--- Métodos de pago (solo los utilizados en este seed)
-INSERT INTO "MetodoPago" (id, nombre) VALUES
-    (1, 'TARJETA_CREDITO'),
+-- Payment methods (only those used in this seed)
+INSERT INTO "PaymentMethod" (id, name) VALUES
+    (1, 'CREDIT_CARD'),
     (2, 'PSE'),
     (3, 'NEQUI')
 ON CONFLICT DO NOTHING;
 
--- Estados físicos de jugadores
-INSERT INTO "EstadoFisico" (id, nombre) VALUES
-    (1, 'Disponible'),
-    (2, 'Lesionado'),
-    (3, 'En recuperación'),
-    (4, 'Suspendido'),
-    (5, 'No disponible')
+-- Physical states of players
+INSERT INTO "PhysicalState" (id, name) VALUES
+    (1, 'Available'),
+    (2, 'Injured'),
+    (3, 'In recovery'),
+    (4, 'Suspended'),
+    (5, 'Not available')
 ON CONFLICT DO NOTHING;
 
--- Jornadas de competición
-INSERT INTO "Jornada" (id, nombre, descripcion) VALUES
-    (1, 'Jornada 1', 'Primera jornada de la temporada regular'),
-    (2, 'Jornada 2', 'Segunda jornada de la temporada regular'),
-    (3, 'Cuartos de Final', 'Fase de cuartos de final'),
-    (4, 'Semifinales', 'Fase de semifinales'),
-    (5, 'Final', 'Partido final del torneo')
+-- Competition matchdays
+INSERT INTO "Matchday" (id, name, description) VALUES
+    (1, 'Matchday 1', 'First matchday of the regular season'),
+    (2, 'Matchday 2', 'Second matchday of the regular season'),
+    (3, 'Quarter Finals', 'Quarter finals phase'),
+    (4, 'Semi Finals', 'Semi finals phase'),
+    (5, 'Final', 'Tournament final match')
 ON CONFLICT DO NOTHING;
 
--- Divisas
-INSERT INTO "Divisa" (id, nombre, simbolo) VALUES
-    (1, 'Peso Colombiano', 'COP'),
-    (2, 'Dólar Estadounidense', 'USD'),
+-- Currencies
+INSERT INTO "Currency" (id, name, symbol) VALUES
+    (1, 'Colombian Peso', 'COP'),
+    (2, 'US Dollar', 'USD'),
     (3, 'Euro', 'EUR')
 ON CONFLICT DO NOTHING;
 
--- Tipos de documento
-INSERT INTO "TipoDocumento" (id, nombre) VALUES
-    (1, 'CONVOCATORIA'),
-    (2, 'MEDICO'),
-    (3, 'FACTURA'),
-    (4, 'PERMISO'),
-    (5, 'COMPROBANTE')
+-- Document types
+INSERT INTO "DocumentType" (id, name) VALUES
+    (1, 'SUMMONS'),
+    (2, 'MEDICAL'),
+    (3, 'INVOICE'),
+    (4, 'PERMIT'),
+    (5, 'RECEIPT')
 ON CONFLICT DO NOTHING;
 
--- Formatos de documento
-INSERT INTO "FormatoDocumento" (id, nombre) VALUES
+-- Document formats
+INSERT INTO "DocumentFormat" (id, name) VALUES
     (1, 'PDF'),
     (2, 'DOCX'),
     (3, 'HTML'),
     (4, 'TXT')
 ON CONFLICT DO NOTHING;
 
--- Países
-INSERT INTO "Pais" (id, nombre) VALUES
+-- Countries
+INSERT INTO "Country" (id, name) VALUES
     (1, 'Colombia'),
     (2, 'Argentina'),
-    (3, 'España')
+    (3, 'Spain')
 ON CONFLICT DO NOTHING;
 
--- Ciudades
-INSERT INTO "Ciudad" (id, nombre, pais_id) VALUES
+-- Cities
+INSERT INTO "City" (id, name, country_id) VALUES
     (1, 'Medellín', 1),
     (2, 'Buenos Aires', 2),
     (3, 'Madrid', 3),
@@ -110,180 +110,179 @@ INSERT INTO "Ciudad" (id, nombre, pais_id) VALUES
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- ESTRUCTURA DE CLUBES
+-- CLUB STRUCTURE
 -- ========================================
 
--- Insertar club
-INSERT INTO "Club" (id, nombre, lema, fundacion) VALUES
-    (1, 'Águilas Doradas FC', 'Volar alto, jugar con honor', '2010-03-15')
+-- Insert club
+INSERT INTO "Club" (id, name, motto, foundation) VALUES
+    (1, 'Águilas Doradas FC', 'Fly high, play with honor', '2010-03-15')
 ON CONFLICT DO NOTHING;
 
--- Insertar temporada
-INSERT INTO "Temporada" (id, club_id, nombre, fecha_inicio, fecha_fin) VALUES
-    (1, 1, 'Temporada 2024', '2024-01-01', '2024-12-31')
+-- Insert season
+INSERT INTO "Season" (id, club_id, name, start_date, end_date) VALUES
+    (1, 1, 'Season 2024', '2024-01-01', '2024-12-31')
 ON CONFLICT DO NOTHING;
 
--- Insertar equipo
-INSERT INTO "Equipo" (id, nombre, genero_id, categoria_id, mascota, fundacion, club_id) VALUES
-    (1, 'Águilas Primera División', 1, 1, 'Águila Dorada', '2010-03-15', 1)
+-- Insert team
+INSERT INTO "Team" (id, name, gender_id, category_id, mascot, foundation, club_id) VALUES
+    (1, 'Águilas First Division', 1, 1, 'Golden Eagle', '2010-03-15', 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- COLORES Y SEDES
+-- COLORS AND VENUES
 -- ========================================
 
--- Insertar colores
-INSERT INTO "Color" (id, nombre) VALUES
-    (1, 'Dorado'),
-    (2, 'Negro'),
-    (3, 'Blanco')
+-- Insert colors
+INSERT INTO "Color" (id, name) VALUES
+    (1, 'Gold'),
+    (2, 'Black'),
+    (3, 'White')
 ON CONFLICT DO NOTHING;
 
--- Insertar relación equipo-colores
-INSERT INTO "EquipoColor" (equipo_id, color_id) VALUES
+-- Insert team-color relationships
+INSERT INTO "TeamColor" (teamId, colorId) VALUES
     (1, 1),
     (1, 2)
 ON CONFLICT DO NOTHING;
 
--- Insertar sede
-INSERT INTO "Sede" (id, email, ciudad_id, fundacion, nombre, telefono, club_id) VALUES
-    (1, 'sede@aguilasdoradas.com', 1, '2010-03-15', 'Sede Principal Águilas', '+57044123456', 1)
+-- Insert venue
+INSERT INTO "Venue" (id, email, city_id, foundation, name, phone, club_id) VALUES
+    (1, 'venue@aguilasdoradas.com', 1, '2010-03-15', 'Main Venue Águilas', '+57044123456', 1)
 ON CONFLICT DO NOTHING;
 
--- Insertar estadio
-INSERT INTO "Estadio" (id, area, suelo, capacidad_total, fundacion, sede_id) VALUES
-    (1, 7500.50, 'Césped natural', 25000, '2010-04-01', 1)
-ON CONFLICT DO NOTHING;
-
--- ========================================
--- STAFF Y JUGADORES
--- ========================================
-
--- Insertar staff con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Staff" (id, email, password_hash, nombre, apellido, ciudad_id, telefono, fecha_nacimiento, fecha_contratacion, rol_staff_id, equipo_id) VALUES
-    (1, 'entrenador@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Miguel', 'Rodríguez', 2, '+54911234567', '1978-07-22', '2023-01-15', 1, 1),
-    (2, 'medico@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'García', 3, '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
-    (3, 'fisioterapeuta@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejía', 1, '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
-ON CONFLICT DO NOTHING;
-
--- Insertar jugadores con equipos asignados (incluye todos los campos de Usuario)
-INSERT INTO "Jugador" (id, email, password_hash, nombre, apellido, ciudad_id, telefono, fecha_nacimiento, estado_fisico_id, dorsal, altura, pie_dominate, peso, posicion_principal_id, equipo_id) VALUES
-    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 1, '+57300987654', '1995-04-10', 1, '10', '175', 'Derecho', '70', 1, 1),
-    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 4, '+57301123456', '1997-09-18', 1, '9', '182', 'Izquierdo', '75', 2, 1),
-    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 5, '+57302234567', '1994-12-03', 1, '1', '188', 'Derecho', '80', 3, 1)
+-- Insert stadium
+INSERT INTO "Stadium" (id, area, surface, total_capacity, foundation, venue_id) VALUES
+    (1, 7500.50, 'Natural grass', 25000, '2010-04-01', 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- PLANES Y SUSCRIPCIONES
+-- STAFF AND PLAYERS
 -- ========================================
 
--- Insertar planes de suscripcion
-INSERT INTO "Plan" (id, nombre, descripcion, precio) VALUES
-    (1, 'Plan Basico', 'Plan basico para clubes pequeños', 50000.00),
-    (2, 'Plan Profesional', 'Plan completo para clubes profesionales', 150000.00),
-    (3, 'Plan Premium', 'Plan premium con todas las funcionalidades', 300000.00)
+-- Insert staff with assigned teams (includes all User fields)
+INSERT INTO "Staff" (id, email, password_hash, name, last_name, city_id, phone, birth_date, hire_date, staff_role_id, team_id) VALUES
+    (2, 'doctor@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'García', 3, '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
+    (3, 'physiotherapist@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejía', 1, '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
 ON CONFLICT DO NOTHING;
 
--- Insertar beneficios por plan
-INSERT INTO "PlanBeneficio" (id, plan_id, descripcion) VALUES
-    (1, 1, 'Gestion de equipos'),
-    (2, 1, 'Estadisticas basicas'),
-    (3, 2, 'Gestion avanzada'),
-    (4, 2, 'Reportes detallados'),
-    (5, 2, 'Analisis tactico'),
-    (6, 3, 'Funcionalidades completas'),
-    (7, 3, 'Soporte prioritario'),
-    (8, 3, 'Integraciones')
+-- Insert players with assigned teams (includes all User fields)
+INSERT INTO "Player" (id, email, password_hash, name, last_name, city_id, phone, birth_date, physical_state_id, jersey_number, height, dominant_foot, weight, primary_position_id, team_id) VALUES
+    (4, 'lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martínez', 1, '+57300987654', '1995-04-10', 1, '10', '175', 'Right', '70', 1, 1),
+    (5, 'diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'López', 4, '+57301123456', '1997-09-18', 1, '9', '182', 'Left', '75', 2, 1),
+    (6, 'santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Pérez', 5, '+57302234567', '1994-12-03', 1, '1', '188', 'Right', '80', 3, 1)
 ON CONFLICT DO NOTHING;
 
--- Insertar suscripción para el admin del sistema
-INSERT INTO "Suscripcion" (id, plan_id, fecha_inicio, fecha_fin, estado_id) VALUES
+-- ========================================
+-- PLANS AND SUBSCRIPTIONS
+-- ========================================
+
+-- Insert subscription plans
+INSERT INTO "Plan" (id, name, description, price) VALUES
+    (1, 'Basic Plan', 'Basic plan for small clubs', 50000.00),
+    (2, 'Professional Plan', 'Complete plan for professional clubs', 150000.00),
+    (3, 'Premium Plan', 'Premium plan with all functionalities', 300000.00)
+ON CONFLICT DO NOTHING;
+
+-- Insert plan benefits
+INSERT INTO "PlanBenefit" (id, plan_id, description) VALUES
+    (1, 1, 'Team management'),
+    (2, 1, 'Basic statistics'),
+    (3, 2, 'Advanced management'),
+    (4, 2, 'Detailed reports'),
+    (5, 2, 'Tactical analysis'),
+    (6, 3, 'Complete functionalities'),
+    (7, 3, 'Priority support'),
+    (8, 3, 'Integrations')
+ON CONFLICT DO NOTHING;
+
+-- Insert subscription for system admin
+INSERT INTO "Subscription" (id, plan_id, start_date, end_date, status_id) VALUES
     (1, 2, '2024-01-01', '2024-12-31', 1)
 ON CONFLICT DO NOTHING;
 
--- Insertar roster (el admin del sistema de gestión)
-INSERT INTO "Roster" (id, nombre, email, password_hash, fecha_creacion, ultimo_accesso, club_id, suscripcion_id) VALUES
+-- Insert roster (system admin)
+INSERT INTO "Roster" (id, name, email, password_hash, creation_date, last_access, club_id, subscription_id) VALUES
     (1, 'Águilas Admin', 'admin@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '2024-01-01', '2024-01-01', 1, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- PAGOS
+-- PAYMENTS
 -- ========================================
 
--- Insertar pagos relacionados a planes
-INSERT INTO "Pago" (id, fecha_pago, metodo_pago_id, descripcion, monto, descuento, divisa_id, plan_id) VALUES
-    (1, '2024-01-01 09:30:00', 1, 'Pago mensual Plan Profesional', 150000.00, 0, 1, 2),
-    (2, '2024-02-01 10:15:00', 2, 'Pago mensual Plan Profesional con descuento', 150000.00, 15000.00, 1, 2),
-    (3, '2024-03-01 14:30:00', 3, 'Pago Plan Básico', 50000.00, 0, 1, 1)
+-- Insert payments related to plans
+INSERT INTO "Payment" (id, payment_date, payment_method_id, description, amount, discount, currency_id, plan_id) VALUES
+    (1, '2024-01-01 09:30:00', 1, 'Monthly payment Professional Plan', 150000.00, 0, 1, 2),
+    (2, '2024-02-01 10:15:00', 2, 'Monthly payment Professional Plan with discount', 150000.00, 15000.00, 1, 2),
+    (3, '2024-03-01 14:30:00', 3, 'Basic Plan payment', 50000.00, 0, 1, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- EVENTOS Y PARTIDOS
+-- EVENTS AND MATCHES
 -- ========================================
 
--- Insertar eventos
-INSERT INTO "Evento" (id, temporada_id, sede_id, nombre, descripcion, fecha) VALUES
-    (1, 1, 1, 'Entrenamiento Preparatorio', 'Sesión de entrenamiento para preparar el próximo partido', '2024-01-15'),
-    (2, 1, 1, 'Partido vs Deportivo Cali', 'Partido de liga contra Deportivo Cali', '2024-01-20'),
-    (3, 1, 1, 'Reunión Técnica', 'Análisis táctico previo al partido', '2024-01-18')
+-- Insert events
+INSERT INTO "Event" (id, season_id, venue_id, name, description, date) VALUES
+    (1, 1, 1, 'Preparatory Training', 'Training session to prepare for the next match', '2024-01-15'),
+    (2, 1, 1, 'Match vs Deportivo Cali', 'League match against Deportivo Cali', '2024-01-20'),
+    (3, 1, 1, 'Technical Meeting', 'Pre-match tactical analysis', '2024-01-18')
 ON CONFLICT DO NOTHING;
 
--- Insertar partido
-INSERT INTO "Partido" (id, jornada_id, hora_inicio, hora_fin, fecha, estadio_id, temporada_id) VALUES
+-- Insert match
+INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, season_id) VALUES
     (1, 1, '20:00:00', '22:00:00', '2024-01-20', 1, 1)
 ON CONFLICT DO NOTHING;
 
--- Insertar equipos participantes en el partido
-INSERT INTO "PartidoEquipoLocal" (partido_id, equipo_id, marcador) VALUES
+-- Insert participating teams in the match
+INSERT INTO "MatchHomeTeam" (match_id, team_id, score) VALUES
     (1, 1, 2)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO "PartidoEquipoVisitante" (partido_id, equipo_id, marcador) VALUES
+INSERT INTO "MatchAwayTeam" (match_id, team_id, score) VALUES
     (1, 1, 1)
 ON CONFLICT DO NOTHING;
 
--- Insertar participación del club en eventos
-INSERT INTO "ClubEvento" (id, club_id, evento_id) VALUES
+-- Insert club participation in events
+INSERT INTO "ClubEvent" (id, club_id, event_id) VALUES
     (1, 1, 1),
     (2, 1, 2),
     (3, 1, 3)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- NOTIFICACIONES
+-- NOTIFICATIONS
 -- ========================================
 
--- Insertar notificaciones
-INSERT INTO "Notificacion" (id, mensaje, fecha_envio) VALUES
-    (1, 'Recordatorio: Entrenamiento preparatorio programado para mañana a las 4:00 PM en las instalaciones del club.', '2024-01-14 09:00:00'),
-    (2, 'Confirmación: Partido contra Deportivo Cali este sábado 20 de enero a las 8:00 PM. Favor confirmar asistencia del plantel.', '2024-01-18 10:00:00'),
-    (3, 'Convocatoria: Reunión técnica obligatoria para todo el cuerpo técnico y jugadores titulares.', '2024-01-17 08:00:00')
+-- Insert notifications
+INSERT INTO "Notification" (id, message, sendDate) VALUES
+    (1, 'Reminder: Preparatory training scheduled for tomorrow at 4:00 PM at the club facilities.', '2024-01-14 09:00:00'),
+    (2, 'Confirmation: Match against Deportivo Cali this Saturday January 20 at 8:00 PM. Please confirm squad attendance.', '2024-01-18 10:00:00'),
+    (3, 'Summons: Mandatory technical meeting for all technical staff and starting players.', '2024-01-17 08:00:00')
 ON CONFLICT DO NOTHING;
 
--- Insertar relaciones notificación-club evento
-INSERT INTO "NotificacionClubEvento" (notificacion_id, club_evento_id) VALUES
+-- Insert notification-club event relationships
+INSERT INTO "NotificationClubEvent" (notification_id, club_event_id) VALUES
     (1, 1),
     (2, 2),
     (3, 3)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- RACHAS Y PLANTILLAS
+-- STREAKS AND DOCUMENT TEMPLATES
 -- ========================================
 
--- Insertar racha del equipo
-INSERT INTO "Racha" (id, equipo_id, fecha_inicio, fecha_fin) VALUES
+-- Insert team streak
+INSERT INTO "Streak" (id, team_id, start_date, end_date) VALUES
     (1, 1, '2024-01-01', null)
 ON CONFLICT DO NOTHING;
 
--- Insertar plantillas de documentos
-INSERT INTO "PlantillaDocumento" (id, nombre, descripcion, formato_documento_id, tipo_documento_id, contenido, creacion) VALUES
-    (1, 'Convocatoria Partido', 'Plantilla para convocar jugadores', 1, 1, 'Estimado jugador, queda convocado para el partido...', '2024-01-01 10:00:00'),
-    (2, 'Informe Médico', 'Plantilla para informes médicos', 1, 2, 'Informe médico del jugador: [NOMBRE]...', '2024-01-01 10:00:00')
+-- Insert document templates
+INSERT INTO "DocumentTemplate" (id, name, description, document_format_id, document_type_id, content, creation) VALUES
+    (1, 'Match Summons', 'Template for summoning players', 1, 1, 'Dear player, you are summoned for the match...', '2024-01-01 10:00:00'),
+    (2, 'Medical Report', 'Template for medical reports', 1, 2, 'Medical report of player: [NAME]...', '2024-01-01 10:00:00')
 ON CONFLICT DO NOTHING;
 
--- Insertar relación roster-plantillas
-INSERT INTO "RosterPlantillaDocumento" (roster_id, plantilla_documento_id) VALUES
+-- Insert roster-document template relationships
+INSERT INTO "RosterDocumentTemplate" (roster_id, document_template_id) VALUES
     (1, 1),
     (1, 2)
 ON CONFLICT DO NOTHING;

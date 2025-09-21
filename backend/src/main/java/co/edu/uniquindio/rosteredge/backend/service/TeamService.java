@@ -6,7 +6,6 @@ import java.util.Optional;
 
 public interface TeamService extends BaseService<Team, Long> {
     Optional<Team> findByName(String name);
-    List<Team> findBySport(String sport);
     List<Team> findActiveTeams();
     boolean existsByName(String name);
 }
