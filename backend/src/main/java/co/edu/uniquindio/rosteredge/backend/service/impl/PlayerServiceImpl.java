@@ -1,72 +1,90 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
+import co.edu.uniquindio.rosteredge.backend.dto.PlayerDTO;
+import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
+import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Player;
 import co.edu.uniquindio.rosteredge.backend.repository.PlayerRepository;
-import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.PlayerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
 @Slf4j
-public class PlayerServiceImpl extends AbstractBaseService<Player, Long> implements PlayerService {
+@RequiredArgsConstructor
+public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepository;
+    private final EntityMapper entityMapper;
 
-    public PlayerServiceImpl(PlayerRepository playerRepository) {
-        super(playerRepository);
-        this.playerRepository = playerRepository;
+    @Override
+    public PlayerDTO createPlayer(PlayerDTO playerDTO) {
+        log.info("Creating player: {}", playerDTO.getName());
+        Player player = entityMapper.toPlayerEntity(playerDTO);
+        player.prePersist();
+        Player savedPlayer = playerRepository.save(player);
+        return entityMapper.toPlayerDTO(savedPlayer);
     }
 
     @Override
-    protected String getEntityName() {
-        return "Player";
+    @Transactional(readOnly = true)
+    public List<PlayerDTO> findAllPlayers() {
+        log.info("Finding all players");
+        return StreamSupport.stream(playerRepository.findAll().spliterator(), false)
+                .map(entityMapper::toPlayerDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    @Cacheable("players")
-    public List<Player> findByTeamId(Long teamId) {
-        log.debug("Finding players by team id: {}", teamId);
-        return playerRepository.findByTeamId(teamId);
+    @Transactional(readOnly = true)
+    public PlayerDTO findPlayerById(Long id) {
+        log.info("Finding player with id: {}", id);
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + id));
+        return entityMapper.toPlayerDTO(player);
     }
 
     @Override
-    public List<Player> findByPrimaryPositionId(Long primaryPositionId) {
-        log.debug("Finding players by position: {}", primaryPositionId);
-        return playerRepository.findByPrimaryPositionId(primaryPositionId);
+    public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
+        log.info("Updating player with id: {}", id);
+        Player existingPlayer = playerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + id));
+
+        // Update user fields
+        existingPlayer.setEmail(playerDTO.getEmail());
+        existingPlayer.setName(playerDTO.getName());
+        existingPlayer.setLastName(playerDTO.getLastName());
+        existingPlayer.setCityId(playerDTO.getCityId());
+        existingPlayer.setPhone(playerDTO.getPhone());
+        existingPlayer.setBirthDate(playerDTO.getBirthDate());
+
+        // Update player fields
+        existingPlayer.setPhysicalStateId(playerDTO.getPhysicalStateId());
+        existingPlayer.setJerseyNumber(playerDTO.getJerseyNumber());
+        existingPlayer.setHeight(playerDTO.getHeight());
+        existingPlayer.setDominantFoot(playerDTO.getDominantFoot());
+        existingPlayer.setWeight(playerDTO.getWeight());
+        existingPlayer.setPrimaryPositionId(playerDTO.getPrimaryPositionId());
+        existingPlayer.setTeamId(playerDTO.getTeamId());
+        existingPlayer.preUpdate();
+
+        Player updatedPlayer = playerRepository.save(existingPlayer);
+        return entityMapper.toPlayerDTO(updatedPlayer);
     }
 
     @Override
-    public List<Player> findActivePlayer() {
-        log.debug("Finding all active players");
-        return playerRepository.findByActiveTrue();
-    }
-
-    @Override
-    @CacheEvict(value = "players", allEntries = true)
-    public Player save(Player entity) {
-        log.debug("Saving player: {} {}", entity.getName(), entity.getLastName());
-        entity.prePersist();
-        return super.save(entity);
-    }
-
-    @Override
-    @CacheEvict(value = "players", allEntries = true)
-    public Player update(Long id, Player entity) {
-        log.debug("Updating player with id: {}", id);
-
-        Player existingPlayer = findByIdOrThrow(id);
-
-        entity.setId(id);
-        entity.setCreatedAt(existingPlayer.getCreatedAt());
-        entity.preUpdate();
-
-        return playerRepository.save(entity);
+    public void deletePlayer(Long id) {
+        log.info("Deleting player with id: {}", id);
+        if (!playerRepository.existsById(id)) {
+            throw new EntityNotFoundException("Player not found with id: " + id);
+        }
+        playerRepository.deleteById(id);
     }
 }

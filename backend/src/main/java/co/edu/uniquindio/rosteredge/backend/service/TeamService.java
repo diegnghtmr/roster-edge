@@ -1,11 +1,12 @@
 package co.edu.uniquindio.rosteredge.backend.service;
 
-import co.edu.uniquindio.rosteredge.backend.model.Team;
+import co.edu.uniquindio.rosteredge.backend.dto.TeamDTO;
 import java.util.List;
-import java.util.Optional;
 
-public interface TeamService extends BaseService<Team, Long> {
-    Optional<Team> findByName(String name);
-    List<Team> findActiveTeams();
-    boolean existsByName(String name);
+public interface TeamService {
+    TeamDTO createTeam(TeamDTO teamDTO);
+    List<TeamDTO> findAllTeams();
+    TeamDTO findTeamById(Long id);
+    TeamDTO updateTeam(Long id, TeamDTO teamDTO);
+    void deleteTeam(Long id);
 }

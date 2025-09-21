@@ -20,6 +20,11 @@ public interface TeamRepository extends BaseRepository<Team, Long> {
     @Query("SELECT * FROM \"Team\" WHERE active = true")
     List<Team> findByActiveTrue();
 
+    @Override
+    @Query("SELECT * FROM \"Team\"")
+    List<Team> findAll();
+
     @Query("SELECT COUNT(*) > 0 FROM \"Team\" WHERE name = :name")
     boolean existsByName(@Param("name") String name);
+
 }

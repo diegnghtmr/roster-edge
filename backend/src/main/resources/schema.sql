@@ -90,6 +90,9 @@ CREATE TABLE "User" (
 
 CREATE TABLE "Club" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(150) NOT NULL,
   "motto" text,
   "foundation" date NOT NULL
@@ -97,6 +100,9 @@ CREATE TABLE "Club" (
 
 CREATE TABLE "Season" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "club_id" bigint NOT NULL,
   "name" varchar(100) NOT NULL,
   "start_date" date NOT NULL,
@@ -105,6 +111,9 @@ CREATE TABLE "Season" (
 
 CREATE TABLE "Team" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(120) NOT NULL,
   "gender_id" bigint NOT NULL,
   "category_id" bigint NOT NULL,
@@ -176,6 +185,9 @@ CREATE TABLE "Roster" (
 
 CREATE TABLE "Event" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "season_id" bigint NOT NULL,
   "venue_id" bigint,
   "name" varchar(150) NOT NULL,

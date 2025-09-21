@@ -1,12 +1,9 @@
 package co.edu.uniquindio.rosteredge.backend.repository;
 
-import co.edu.uniquindio.rosteredge.backend.model.Player;
+import co.edu.uniquindio.rosteredge.backend.model.Event;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository for Player entity
- */
 @Repository
-public interface PlayerRepository extends CrudRepository<Player, Long> {
+public interface EventRepository extends CrudRepository<Event, Long> {
 }

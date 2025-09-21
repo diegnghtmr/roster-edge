@@ -1,82 +1,80 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
-import co.edu.uniquindio.rosteredge.backend.exception.BusinessException;
+import co.edu.uniquindio.rosteredge.backend.dto.TeamDTO;
+import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
+import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Team;
 import co.edu.uniquindio.rosteredge.backend.repository.TeamRepository;
-import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.TeamService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
 @Slf4j
-public class TeamServiceImpl extends AbstractBaseService<Team, Long> implements TeamService {
+@RequiredArgsConstructor
+public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
+    private final EntityMapper entityMapper;
 
-    public TeamServiceImpl(TeamRepository teamRepository) {
-        super(teamRepository);
-        this.teamRepository = teamRepository;
+    @Override
+    public TeamDTO createTeam(TeamDTO teamDTO) {
+        log.info("Creating team: {}", teamDTO.getName());
+        Team team = entityMapper.toTeamEntity(teamDTO);
+        team.prePersist();
+        Team savedTeam = teamRepository.save(team);
+        return entityMapper.toTeamDTO(savedTeam);
     }
 
     @Override
-    protected String getEntityName() {
-        return "Team";
+    @Transactional(readOnly = true)
+    public List<TeamDTO> findAllTeams() {
+        log.info("Finding all teams");
+        return StreamSupport.stream(teamRepository.findAll().spliterator(), false)
+                .map(entityMapper::toTeamDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    @Cacheable("teams")
-    public Optional<Team> findByName(String name) {
-        log.debug("Finding team by name: {}", name);
-        return teamRepository.findByName(name);
+    @Transactional(readOnly = true)
+    public TeamDTO findTeamById(Long id) {
+        log.info("Finding team with id: {}", id);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
+        return entityMapper.toTeamDTO(team);
     }
 
     @Override
-    public List<Team> findActiveTeams() {
-        log.debug("Finding all active teams");
-        return teamRepository.findByActiveTrue();
+    public TeamDTO updateTeam(Long id, TeamDTO teamDTO) {
+        log.info("Updating team with id: {}", id);
+        Team existingTeam = teamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
+
+        existingTeam.setName(teamDTO.getName());
+        existingTeam.setGenderId(teamDTO.getGenderId());
+        existingTeam.setCategoryId(teamDTO.getCategoryId());
+        existingTeam.setMascot(teamDTO.getMascot());
+        existingTeam.setFoundation(teamDTO.getFoundation());
+        existingTeam.setClubId(teamDTO.getClubId());
+        existingTeam.preUpdate();
+
+        Team updatedTeam = teamRepository.save(existingTeam);
+        return entityMapper.toTeamDTO(updatedTeam);
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return teamRepository.existsByName(name);
-    }
-
-    @Override
-    @CacheEvict(value = "teams", allEntries = true)
-    public Team save(Team entity) {
-        log.debug("Saving team: {}", entity.getName());
-
-        if (entity.getId() == null && existsByName(entity.getName())) {
-            throw new BusinessException("Team name already exists", "DUPLICATE_TEAM_NAME");
+    public void deleteTeam(Long id) {
+        log.info("Deleting team with id: {}", id);
+        if (!teamRepository.existsById(id)) {
+            throw new EntityNotFoundException("Team not found with id: " + id);
         }
-
-        entity.prePersist();
-        return super.save(entity);
-    }
-
-    @Override
-    @CacheEvict(value = "teams", allEntries = true)
-    public Team update(Long id, Team entity) {
-        log.debug("Updating team with id: {}", id);
-
-        Team existingTeam = findByIdOrThrow(id);
-
-        if (!existingTeam.getName().equals(entity.getName()) && existsByName(entity.getName())) {
-            throw new BusinessException("Team name already exists", "DUPLICATE_TEAM_NAME");
-        }
-
-        entity.setId(id);
-        entity.setCreatedAt(existingTeam.getCreatedAt());
-        entity.preUpdate();
-
-        return teamRepository.save(entity);
+        teamRepository.deleteById(id);
     }
 }
