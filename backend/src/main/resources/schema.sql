@@ -4,68 +4,108 @@
 
 CREATE TABLE IF NOT EXISTS "StaffRole" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "PlayerPosition" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "SubscriptionStatus" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "PaymentMethod" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(80) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "TeamCategory" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "TeamGender" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(20) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "PhysicalState" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "Matchday" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(100) NOT NULL,
   "description" varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS "Currency" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) UNIQUE NOT NULL,
   "symbol" varchar(10) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "DocumentType" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "DocumentFormat" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) UNIQUE NOT NULL
+
 );
 
 CREATE TABLE IF NOT EXISTS "Country" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "City" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(100) NOT NULL,
   "country_id" bigint NOT NULL
 );
@@ -124,10 +164,16 @@ CREATE TABLE IF NOT EXISTS "Team" (
 
 CREATE TABLE IF NOT EXISTS "Color" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "TeamColor" (
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "team_id" bigint NOT NULL,
   "color_id" bigint NOT NULL,
   PRIMARY KEY ("team_id", "color_id")
@@ -135,6 +181,9 @@ CREATE TABLE IF NOT EXISTS "TeamColor" (
 
 CREATE TABLE IF NOT EXISTS "Venue" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "email" varchar(150) NOT NULL,
   "city_id" bigint NOT NULL,
   "foundation" date NOT NULL,
@@ -145,6 +194,9 @@ CREATE TABLE IF NOT EXISTS "Venue" (
 
 CREATE TABLE IF NOT EXISTS "Stadium" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "area" decimal(12,2) NOT NULL,
   "surface" varchar(50) NOT NULL,
   "total_capacity" integer NOT NULL,
@@ -174,6 +226,9 @@ CREATE TABLE IF NOT EXISTS "Staff" (
 
 CREATE TABLE IF NOT EXISTS "Roster" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(50) NOT NULL,
   "email" varchar(50) NOT NULL,
   "password_hash" varchar(255) NOT NULL,
@@ -197,6 +252,9 @@ CREATE TABLE IF NOT EXISTS "Event" (
 
 CREATE TABLE IF NOT EXISTS "Match" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "matchday_id" bigint NOT NULL,
   "start_time" time NOT NULL,
   "end_time" time NOT NULL,
@@ -206,6 +264,9 @@ CREATE TABLE IF NOT EXISTS "Match" (
 );
 
 CREATE TABLE IF NOT EXISTS "MatchHomeTeam" (
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "match_id" bigint NOT NULL,
   "team_id" bigint NOT NULL,
   "score" integer DEFAULT 0,
@@ -213,6 +274,9 @@ CREATE TABLE IF NOT EXISTS "MatchHomeTeam" (
 );
 
 CREATE TABLE IF NOT EXISTS "MatchAwayTeam" (
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "match_id" bigint NOT NULL,
   "team_id" bigint NOT NULL,
   "score" integer DEFAULT 0,
@@ -221,6 +285,9 @@ CREATE TABLE IF NOT EXISTS "MatchAwayTeam" (
 
 CREATE TABLE IF NOT EXISTS "Streak" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "team_id" bigint UNIQUE NOT NULL,
   "start_date" date NOT NULL,
   "end_date" date
@@ -228,6 +295,9 @@ CREATE TABLE IF NOT EXISTS "Streak" (
 
 CREATE TABLE IF NOT EXISTS "Plan" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(80) UNIQUE NOT NULL,
   "description" varchar(255),
   "price" decimal(12,2) NOT NULL
@@ -235,6 +305,9 @@ CREATE TABLE IF NOT EXISTS "Plan" (
 
 CREATE TABLE IF NOT EXISTS "PlanBenefit" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "plan_id" bigint NOT NULL,
   "description" varchar(255) NOT NULL,
   UNIQUE ("plan_id", "description")
@@ -242,6 +315,9 @@ CREATE TABLE IF NOT EXISTS "PlanBenefit" (
 
 CREATE TABLE IF NOT EXISTS "Subscription" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "plan_id" bigint NOT NULL,
   "start_date" date NOT NULL,
   "end_date" date NOT NULL,
@@ -250,6 +326,9 @@ CREATE TABLE IF NOT EXISTS "Subscription" (
 
 CREATE TABLE IF NOT EXISTS "Payment" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "payment_date" timestamp DEFAULT (now()),
   "payment_method_id" bigint NOT NULL,
   "description" varchar(255),
@@ -261,6 +340,9 @@ CREATE TABLE IF NOT EXISTS "Payment" (
 
 CREATE TABLE IF NOT EXISTS "ClubEvent" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "club_id" bigint NOT NULL,
   "event_id" bigint NOT NULL,
   UNIQUE ("club_id", "event_id")
@@ -268,11 +350,17 @@ CREATE TABLE IF NOT EXISTS "ClubEvent" (
 
 CREATE TABLE IF NOT EXISTS "Notification" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "message" text NOT NULL,
   "send_date" timestamp DEFAULT (now())
 );
 
 CREATE TABLE IF NOT EXISTS "NotificationClubEvent" (
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "notification_id" bigint NOT NULL,
   "club_event_id" bigint NOT NULL,
   PRIMARY KEY ("notification_id", "club_event_id")
@@ -280,6 +368,9 @@ CREATE TABLE IF NOT EXISTS "NotificationClubEvent" (
 
 CREATE TABLE IF NOT EXISTS "DocumentTemplate" (
   "id" BIGSERIAL PRIMARY KEY,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "name" varchar(120) NOT NULL,
   "description" varchar(120) NOT NULL,
   "document_format_id" bigint NOT NULL,
@@ -289,6 +380,9 @@ CREATE TABLE IF NOT EXISTS "DocumentTemplate" (
 );
 
 CREATE TABLE IF NOT EXISTS "RosterDocumentTemplate" (
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now()),
+  "active" boolean DEFAULT true,
   "roster_id" bigint NOT NULL,
   "document_template_id" bigint NOT NULL,
   PRIMARY KEY ("roster_id", "document_template_id")
