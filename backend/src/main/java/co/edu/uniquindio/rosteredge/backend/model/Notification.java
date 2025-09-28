@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.time.LocalDateTime;
 
@@ -31,5 +32,6 @@ public class Notification extends BaseEntity {
     /**
      * Send date
      */
+    @Column("send_date")
     private LocalDateTime sendDate;
 }

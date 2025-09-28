@@ -1,70 +1,70 @@
-﻿-- ========================================
+-- ========================================
 -- CATALOGS (replacement for ENUMs)
 -- ========================================
 
-CREATE TABLE "StaffRole" (
+CREATE TABLE IF NOT EXISTS "StaffRole" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(100) UNIQUE NOT NULL
 );
 
-CREATE TABLE "PlayerPosition" (
+CREATE TABLE IF NOT EXISTS "PlayerPosition" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(100) UNIQUE NOT NULL
 );
 
-CREATE TABLE "SubscriptionStatus" (
+CREATE TABLE IF NOT EXISTS "SubscriptionStatus" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE "PaymentMethod" (
+CREATE TABLE IF NOT EXISTS "PaymentMethod" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(80) UNIQUE NOT NULL
 );
 
-CREATE TABLE "TeamCategory" (
+CREATE TABLE IF NOT EXISTS "TeamCategory" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE "TeamGender" (
+CREATE TABLE IF NOT EXISTS "TeamGender" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(20) UNIQUE NOT NULL
 );
 
-CREATE TABLE "PhysicalState" (
+CREATE TABLE IF NOT EXISTS "PhysicalState" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE "Matchday" (
+CREATE TABLE IF NOT EXISTS "Matchday" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(100) NOT NULL,
   "description" varchar(255)
 );
 
-CREATE TABLE "Currency" (
+CREATE TABLE IF NOT EXISTS "Currency" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) UNIQUE NOT NULL,
   "symbol" varchar(10) UNIQUE NOT NULL
 );
 
-CREATE TABLE "DocumentType" (
+CREATE TABLE IF NOT EXISTS "DocumentType" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE "DocumentFormat" (
+CREATE TABLE IF NOT EXISTS "DocumentFormat" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE "Country" (
+CREATE TABLE IF NOT EXISTS "Country" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(100) UNIQUE NOT NULL
 );
 
-CREATE TABLE "City" (
+CREATE TABLE IF NOT EXISTS "City" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(100) NOT NULL,
   "country_id" bigint NOT NULL
@@ -74,7 +74,7 @@ CREATE TABLE "City" (
 -- MAIN TABLES
 -- ========================================
 
-CREATE TABLE "User" (
+CREATE TABLE IF NOT EXISTS "User" (
   "id" BIGSERIAL PRIMARY KEY,
   "created_at" timestamp DEFAULT (now()),
   "updated_at" timestamp DEFAULT (now()),
@@ -88,7 +88,7 @@ CREATE TABLE "User" (
   "birth_date" date NOT NULL
 );
 
-CREATE TABLE "Club" (
+CREATE TABLE IF NOT EXISTS "Club" (
   "id" BIGSERIAL PRIMARY KEY,
   "created_at" timestamp DEFAULT (now()),
   "updated_at" timestamp DEFAULT (now()),
@@ -98,7 +98,7 @@ CREATE TABLE "Club" (
   "foundation" date NOT NULL
 );
 
-CREATE TABLE "Season" (
+CREATE TABLE IF NOT EXISTS "Season" (
   "id" BIGSERIAL PRIMARY KEY,
   "created_at" timestamp DEFAULT (now()),
   "updated_at" timestamp DEFAULT (now()),
@@ -109,7 +109,7 @@ CREATE TABLE "Season" (
   "end_date" date NOT NULL
 );
 
-CREATE TABLE "Team" (
+CREATE TABLE IF NOT EXISTS "Team" (
   "id" BIGSERIAL PRIMARY KEY,
   "created_at" timestamp DEFAULT (now()),
   "updated_at" timestamp DEFAULT (now()),
@@ -122,18 +122,18 @@ CREATE TABLE "Team" (
   "club_id" bigint NOT NULL
 );
 
-CREATE TABLE "Color" (
+CREATE TABLE IF NOT EXISTS "Color" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) NOT NULL
 );
 
-CREATE TABLE "TeamColor" (
-  "teamId" bigint NOT NULL,
-  "colorId" bigint NOT NULL,
-  PRIMARY KEY ("teamId", "colorId")
+CREATE TABLE IF NOT EXISTS "TeamColor" (
+  "team_id" bigint NOT NULL,
+  "color_id" bigint NOT NULL,
+  PRIMARY KEY ("team_id", "color_id")
 );
 
-CREATE TABLE "Venue" (
+CREATE TABLE IF NOT EXISTS "Venue" (
   "id" BIGSERIAL PRIMARY KEY,
   "email" varchar(150) NOT NULL,
   "city_id" bigint NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE "Venue" (
   "club_id" bigint NOT NULL
 );
 
-CREATE TABLE "Stadium" (
+CREATE TABLE IF NOT EXISTS "Stadium" (
   "id" BIGSERIAL PRIMARY KEY,
   "area" decimal(12,2) NOT NULL,
   "surface" varchar(50) NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE "Stadium" (
   "venue_id" bigint NOT NULL
 );
 
-CREATE TABLE "Player" (
+CREATE TABLE IF NOT EXISTS "Player" (
   "physical_state_id" bigint NOT NULL,
   "jersey_number" varchar(30) NOT NULL,
   "height" varchar(4) NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE "Player" (
   UNIQUE ("email")
 ) INHERITS ("User");
 
-CREATE TABLE "Staff" (
+CREATE TABLE IF NOT EXISTS "Staff" (
   "hire_date" date DEFAULT (now()),
   "staff_role_id" bigint NOT NULL,
   "team_id" bigint NOT NULL,
@@ -172,7 +172,7 @@ CREATE TABLE "Staff" (
   UNIQUE ("email")
 ) INHERITS ("User");
 
-CREATE TABLE "Roster" (
+CREATE TABLE IF NOT EXISTS "Roster" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(50) NOT NULL,
   "email" varchar(50) NOT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE "Roster" (
   "subscription_id" bigint NOT NULL
 );
 
-CREATE TABLE "Event" (
+CREATE TABLE IF NOT EXISTS "Event" (
   "id" BIGSERIAL PRIMARY KEY,
   "created_at" timestamp DEFAULT (now()),
   "updated_at" timestamp DEFAULT (now()),
@@ -195,7 +195,7 @@ CREATE TABLE "Event" (
   "date" date NOT NULL
 );
 
-CREATE TABLE "Match" (
+CREATE TABLE IF NOT EXISTS "Match" (
   "id" BIGSERIAL PRIMARY KEY,
   "matchday_id" bigint NOT NULL,
   "start_time" time NOT NULL,
@@ -205,42 +205,42 @@ CREATE TABLE "Match" (
   "season_id" bigint NOT NULL
 );
 
-CREATE TABLE "MatchHomeTeam" (
+CREATE TABLE IF NOT EXISTS "MatchHomeTeam" (
   "match_id" bigint NOT NULL,
   "team_id" bigint NOT NULL,
   "score" integer DEFAULT 0,
   PRIMARY KEY ("match_id", "team_id")
 );
 
-CREATE TABLE "MatchAwayTeam" (
+CREATE TABLE IF NOT EXISTS "MatchAwayTeam" (
   "match_id" bigint NOT NULL,
   "team_id" bigint NOT NULL,
   "score" integer DEFAULT 0,
   PRIMARY KEY ("match_id", "team_id")
 );
 
-CREATE TABLE "Streak" (
+CREATE TABLE IF NOT EXISTS "Streak" (
   "id" BIGSERIAL PRIMARY KEY,
   "team_id" bigint UNIQUE NOT NULL,
   "start_date" date NOT NULL,
   "end_date" date
 );
 
-CREATE TABLE "Plan" (
+CREATE TABLE IF NOT EXISTS "Plan" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(80) UNIQUE NOT NULL,
   "description" varchar(255),
   "price" decimal(12,2) NOT NULL
 );
 
-CREATE TABLE "PlanBenefit" (
+CREATE TABLE IF NOT EXISTS "PlanBenefit" (
   "id" BIGSERIAL PRIMARY KEY,
   "plan_id" bigint NOT NULL,
   "description" varchar(255) NOT NULL,
   UNIQUE ("plan_id", "description")
 );
 
-CREATE TABLE "Subscription" (
+CREATE TABLE IF NOT EXISTS "Subscription" (
   "id" BIGSERIAL PRIMARY KEY,
   "plan_id" bigint NOT NULL,
   "start_date" date NOT NULL,
@@ -248,7 +248,7 @@ CREATE TABLE "Subscription" (
   "status_id" bigint NOT NULL
 );
 
-CREATE TABLE "Payment" (
+CREATE TABLE IF NOT EXISTS "Payment" (
   "id" BIGSERIAL PRIMARY KEY,
   "payment_date" timestamp DEFAULT (now()),
   "payment_method_id" bigint NOT NULL,
@@ -259,26 +259,26 @@ CREATE TABLE "Payment" (
   "plan_id" bigint NOT NULL
 );
 
-CREATE TABLE "ClubEvent" (
+CREATE TABLE IF NOT EXISTS "ClubEvent" (
   "id" BIGSERIAL PRIMARY KEY,
   "club_id" bigint NOT NULL,
   "event_id" bigint NOT NULL,
   UNIQUE ("club_id", "event_id")
 );
 
-CREATE TABLE "Notification" (
+CREATE TABLE IF NOT EXISTS "Notification" (
   "id" BIGSERIAL PRIMARY KEY,
   "message" text NOT NULL,
-  "sendDate" timestamp DEFAULT (now())
+  "send_date" timestamp DEFAULT (now())
 );
 
-CREATE TABLE "NotificationClubEvent" (
+CREATE TABLE IF NOT EXISTS "NotificationClubEvent" (
   "notification_id" bigint NOT NULL,
   "club_event_id" bigint NOT NULL,
   PRIMARY KEY ("notification_id", "club_event_id")
 );
 
-CREATE TABLE "DocumentTemplate" (
+CREATE TABLE IF NOT EXISTS "DocumentTemplate" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar(120) NOT NULL,
   "description" varchar(120) NOT NULL,
@@ -288,7 +288,7 @@ CREATE TABLE "DocumentTemplate" (
   "creation" timestamp DEFAULT (now())
 );
 
-CREATE TABLE "RosterDocumentTemplate" (
+CREATE TABLE IF NOT EXISTS "RosterDocumentTemplate" (
   "roster_id" bigint NOT NULL,
   "document_template_id" bigint NOT NULL,
   PRIMARY KEY ("roster_id", "document_template_id")

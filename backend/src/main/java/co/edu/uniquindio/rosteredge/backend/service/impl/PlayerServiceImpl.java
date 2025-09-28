@@ -63,7 +63,7 @@ public class PlayerServiceImpl implements PlayerService {
         existingPlayer.setLastName(playerDTO.getLastName());
         existingPlayer.setCityId(playerDTO.getCityId());
         existingPlayer.setPhone(playerDTO.getPhone());
-        existingPlayer.setBirthDate(playerDTO.getBirthDate());
+        existingPlayer.setBirthDate(playerDTO.getBirthDate() != null ? playerDTO.getBirthDate().toLocalDate() : null);
 
         // Update player fields
         existingPlayer.setPhysicalStateId(playerDTO.getPhysicalStateId());

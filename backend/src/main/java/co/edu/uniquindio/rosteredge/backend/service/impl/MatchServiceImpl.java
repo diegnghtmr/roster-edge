@@ -2,7 +2,6 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 
 import co.edu.uniquindio.rosteredge.backend.model.Match;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchRepository;
-import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.MatchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -16,7 +15,7 @@ import java.util.List;
 @Service
 @Transactional
 @Slf4j
-public class MatchServiceImpl extends AbstractBaseService<Match, Long> implements MatchService {
+public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchService {
 
     private final MatchRepository matchRepository;
 
@@ -53,7 +52,6 @@ public class MatchServiceImpl extends AbstractBaseService<Match, Long> implement
     @CacheEvict(value = "matches", allEntries = true)
     public Match save(Match entity) {
         log.debug("Saving match");
-        entity.prePersist();
         return super.save(entity);
     }
 
@@ -61,13 +59,6 @@ public class MatchServiceImpl extends AbstractBaseService<Match, Long> implement
     @CacheEvict(value = "matches", allEntries = true)
     public Match update(Long id, Match entity) {
         log.debug("Updating match with id: {}", id);
-
-        Match existingMatch = findByIdOrThrow(id);
-
-        entity.setId(id);
-        entity.setCreatedAt(existingMatch.getCreatedAt());
-        entity.preUpdate();
-
-        return matchRepository.save(entity);
+        return super.update(id, entity);
     }
 }

@@ -36,7 +36,7 @@ public class EntityMapper {
     dto.setLastName(entity.getLastName());
     dto.setCityId(entity.getCityId());
     dto.setPhone(entity.getPhone());
-    dto.setBirthDate(entity.getBirthDate());
+    dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().atStartOfDay() : null);
     return dto;
   }
 
@@ -55,7 +55,7 @@ public class EntityMapper {
     entity.setLastName(dto.getLastName());
     entity.setCityId(dto.getCityId());
     entity.setPhone(dto.getPhone());
-    entity.setBirthDate(dto.getBirthDate());
+    entity.setBirthDate(dto.getBirthDate() != null ? dto.getBirthDate().toLocalDate() : null);
     return entity;
   }
 
@@ -177,7 +177,7 @@ public class EntityMapper {
     dto.setLastName(entity.getLastName());
     dto.setCityId(entity.getCityId());
     dto.setPhone(entity.getPhone());
-    dto.setBirthDate(entity.getBirthDate());
+    dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().atStartOfDay() : null);
 
     // Player fields
     dto.setPhysicalStateId(entity.getPhysicalStateId());
@@ -206,7 +206,7 @@ public class EntityMapper {
     entity.setLastName(dto.getLastName());
     entity.setCityId(dto.getCityId());
     entity.setPhone(dto.getPhone());
-    entity.setBirthDate(dto.getBirthDate());
+    entity.setBirthDate(dto.getBirthDate() != null ? dto.getBirthDate().toLocalDate() : null);
 
     // Player fields
     entity.setPhysicalStateId(dto.getPhysicalStateId());
