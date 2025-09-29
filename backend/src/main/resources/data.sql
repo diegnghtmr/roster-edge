@@ -161,15 +161,15 @@ ON CONFLICT DO NOTHING;
 
 -- Insert staff with assigned teams (includes all User fields)
 INSERT INTO "Staff" (email, password_hash, name, last_name, city_id, phone, birth_date, hire_date, staff_role_id, team_id) VALUES
-    ('doctor@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Ana', 'Garcia', 3, '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
-    ('physiotherapist@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Carlos', 'Mejia', 1, '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
+    ('doctor@aguilasdoradas.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Ana', 'Garcia', 3, '+34612345678', '1982-11-08', '2023-02-01', 2, 1),
+    ('physiotherapist@aguilasdoradas.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Carlos', 'Mejia', 1, '+57300111222', '1985-03-15', '2023-03-01', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- Insert players with assigned teams (includes all User fields)
 INSERT INTO "Player" (email, password_hash, name, last_name, city_id, phone, birth_date, physical_state_id, jersey_number, height, dominant_foot, weight, primary_position_id, team_id) VALUES
-    ('lionel.martinez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Lionel', 'Martinez', 1, '+57300987654', '1995-04-10', 1, '10', '175', 'Right', '70', 1, 1),
-    ('diego.lopez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Diego', 'Lopez', 4, '+57301123456', '1997-09-18', 1, '9', '182', 'Left', '75', 2, 1),
-    ('santiago.perez@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'Santiago', 'Perez', 5, '+57302234567', '1994-12-03', 1, '1', '188', 'Right', '80', 3, 1)
+    ('lionel.martinez@aguilasdoradas.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Lionel', 'Martinez', 1, '+57300987654', '1995-04-10', 1, '10', '175', 'Right', '70', 1, 1),
+    ('diego.lopez@aguilasdoradas.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Diego', 'Lopez', 4, '+57301123456', '1997-09-18', 1, '9', '182', 'Left', '75', 2, 1),
+    ('santiago.perez@aguilasdoradas.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Santiago', 'Perez', 5, '+57302234567', '1994-12-03', 1, '1', '188', 'Right', '80', 3, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -202,7 +202,7 @@ ON CONFLICT DO NOTHING;
 
 -- Insert roster (system admin)
 INSERT INTO "Roster" (name, email, password_hash, creation_date, last_access, club_id, subscription_id) VALUES
-    ('Aguilas Admin', 'admin@aguilasdoradas.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '2024-01-01', '2024-01-01', 1, 1)
+    ('Aguilas Admin', 'admin@aguilasdoradas.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '2024-01-01', '2024-01-01', 1, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================

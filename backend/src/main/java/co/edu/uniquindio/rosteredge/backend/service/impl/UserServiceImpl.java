@@ -7,14 +7,11 @@ import co.edu.uniquindio.rosteredge.backend.model.User;
 import co.edu.uniquindio.rosteredge.backend.repository.UserRepository;
 import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.UserService;
+import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,11 +22,13 @@ public class UserServiceImpl extends AbstractBaseService<User, Long> implements 
 
     private final UserRepository userRepository;
     private final EntityMapper mapper;
+    private final PasswordHasher passwordHasher;
 
-    public UserServiceImpl(UserRepository userRepository, EntityMapper mapper) {
+    public UserServiceImpl(UserRepository userRepository, EntityMapper mapper, PasswordHasher passwordHasher) {
         super(userRepository);
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.passwordHasher = passwordHasher;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class UserServiceImpl extends AbstractBaseService<User, Long> implements 
         User user = mapper.toUserEntity(userDTO);
         user.setActive(true);
         if (userDTO.getPassword() != null) {
-            user.setPasswordHash(hashPassword(userDTO.getPassword()));
+            user.setPasswordHash(passwordHasher.hash(userDTO.getPassword()));
         }
 
         User savedUser = save(user);
@@ -89,14 +88,7 @@ public class UserServiceImpl extends AbstractBaseService<User, Long> implements 
                         getEntityName(), id));
     }
 
-    private String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error hashing password", e);
-        }
-    }
 
 }
+
+
