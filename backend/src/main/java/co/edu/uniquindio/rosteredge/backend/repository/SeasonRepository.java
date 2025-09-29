@@ -14,10 +14,10 @@ public interface SeasonRepository extends BaseRepository<Season, Long> {
     @Query("SELECT * FROM \"Season\" WHERE (:clubId IS NULL OR club_id = :clubId) " +
            "AND (:name IS NULL OR LOWER(name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:startFrom IS NULL OR start_date >= :startFrom) " +
-           "AND (:startTo IS NULL OR start_date <= :startTo) " +
-           "AND (:endFrom IS NULL OR end_date >= :endFrom) " +
-           "AND (:endTo IS NULL OR end_date <= :endTo)")
+           "AND (CAST(:startFrom AS DATE) IS NULL OR start_date >= CAST(:startFrom AS DATE)) " +
+           "AND (CAST(:startTo AS DATE) IS NULL OR start_date <= CAST(:startTo AS DATE)) " +
+           "AND (CAST(:endFrom AS DATE) IS NULL OR end_date >= CAST(:endFrom AS DATE)) " +
+           "AND (CAST(:endTo AS DATE) IS NULL OR end_date <= CAST(:endTo AS DATE))")
     List<Season> findByFilters(@Param("clubId") Long clubId,
                                @Param("name") String name,
                                @Param("active") Boolean active,

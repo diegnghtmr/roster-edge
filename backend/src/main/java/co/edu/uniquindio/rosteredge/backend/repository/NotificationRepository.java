@@ -13,8 +13,8 @@ public interface NotificationRepository extends BaseRepository<Notification, Lon
 
     @Query("SELECT * FROM \"Notification\" WHERE (:message IS NULL OR LOWER(message) LIKE LOWER(CONCAT('%', :message, '%'))) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:sendFrom IS NULL OR send_date >= :sendFrom) " +
-           "AND (:sendTo IS NULL OR send_date <= :sendTo)")
+           "AND (CAST(:sendFrom AS TIMESTAMP) IS NULL OR send_date >= CAST(:sendFrom AS TIMESTAMP)) " +
+           "AND (CAST(:sendTo AS TIMESTAMP) IS NULL OR send_date <= CAST(:sendTo AS TIMESTAMP))")
     List<Notification> findByFilters(@Param("message") String message,
                                      @Param("active") Boolean active,
                                      @Param("sendFrom") LocalDateTime sendFrom,

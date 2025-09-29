@@ -16,8 +16,8 @@ public interface PaymentRepository extends BaseRepository<Payment, Long> {
            "AND (:currencyId IS NULL OR currency_id = :currencyId) " +
            "AND (:planId IS NULL OR plan_id = :planId) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:paymentDateFrom IS NULL OR payment_date >= :paymentDateFrom) " +
-           "AND (:paymentDateTo IS NULL OR payment_date <= :paymentDateTo) " +
+           "AND (CAST(:paymentDateFrom AS TIMESTAMP) IS NULL OR payment_date >= CAST(:paymentDateFrom AS TIMESTAMP)) " +
+           "AND (CAST(:paymentDateTo AS TIMESTAMP) IS NULL OR payment_date <= CAST(:paymentDateTo AS TIMESTAMP)) " +
            "AND (:amountFrom IS NULL OR amount >= :amountFrom) " +
            "AND (:amountTo IS NULL OR amount <= :amountTo)")
     List<Payment> findByFilters(@Param("paymentMethodId") Long paymentMethodId,

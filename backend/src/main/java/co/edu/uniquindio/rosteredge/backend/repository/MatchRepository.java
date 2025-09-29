@@ -35,8 +35,8 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
            "AND (:stadiumId IS NULL OR m.stadium_id = :stadiumId) " +
            "AND (:teamId IS NULL OR mht.team_id = :teamId OR mat.team_id = :teamId) " +
            "AND (:active IS NULL OR m.active = :active) " +
-           "AND (:dateFrom IS NULL OR m.date >= :dateFrom) " +
-           "AND (:dateTo IS NULL OR m.date <= :dateTo)")
+           "AND (CAST(:dateFrom AS DATE) IS NULL OR m.date >= CAST(:dateFrom AS DATE)) " +
+           "AND (CAST(:dateTo AS DATE) IS NULL OR m.date <= CAST(:dateTo AS DATE))")
     List<Match> findByFilters(@Param("seasonId") Long seasonId,
                               @Param("matchdayId") Long matchdayId,
                               @Param("stadiumId") Long stadiumId,

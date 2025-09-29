@@ -16,8 +16,8 @@ public interface VenueRepository extends BaseRepository<Venue, Long> {
            "AND (:active IS NULL OR active = :active) " +
            "AND (:name IS NULL OR LOWER(name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
            "AND (:email IS NULL OR LOWER(email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
-           "AND (:foundationFrom IS NULL OR foundation >= :foundationFrom) " +
-           "AND (:foundationTo IS NULL OR foundation <= :foundationTo)")
+           "AND (CAST(:foundationFrom AS DATE) IS NULL OR foundation >= CAST(:foundationFrom AS DATE)) " +
+           "AND (CAST(:foundationTo AS DATE) IS NULL OR foundation <= CAST(:foundationTo AS DATE))")
     List<Venue> findByFilters(@Param("clubId") Long clubId,
                               @Param("cityId") Long cityId,
                               @Param("active") Boolean active,

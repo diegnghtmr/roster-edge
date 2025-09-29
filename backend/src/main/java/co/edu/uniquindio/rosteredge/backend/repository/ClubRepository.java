@@ -13,8 +13,8 @@ public interface ClubRepository extends BaseRepository<Club, Long> {
 
     @Query("SELECT * FROM \"Club\" WHERE (:name IS NULL OR LOWER(name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:foundationFrom IS NULL OR foundation >= :foundationFrom) " +
-           "AND (:foundationTo IS NULL OR foundation <= :foundationTo)")
+           "AND (CAST(:foundationFrom AS DATE) IS NULL OR foundation >= CAST(:foundationFrom AS DATE)) " +
+           "AND (CAST(:foundationTo AS DATE) IS NULL OR foundation <= CAST(:foundationTo AS DATE))")
     List<Club> findByFilters(@Param("name") String name,
                              @Param("active") Boolean active,
                              @Param("foundationFrom") LocalDate foundationFrom,

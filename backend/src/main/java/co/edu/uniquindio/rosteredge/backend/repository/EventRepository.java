@@ -18,8 +18,8 @@ public interface EventRepository extends BaseRepository<Event, Long> {
     @Query("SELECT * FROM \"Event\" WHERE (:seasonId IS NULL OR season_id = :seasonId) " +
            "AND (:venueId IS NULL OR venue_id = :venueId) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:dateFrom IS NULL OR date >= :dateFrom) " +
-           "AND (:dateTo IS NULL OR date <= :dateTo)")
+           "AND (CAST(:dateFrom AS DATE) IS NULL OR date >= CAST(:dateFrom AS DATE)) " +
+           "AND (CAST(:dateTo AS DATE) IS NULL OR date <= CAST(:dateTo AS DATE))")
     List<Event> findByFilters(@Param("seasonId") Long seasonId,
                               @Param("venueId") Long venueId,
                               @Param("active") Boolean active,

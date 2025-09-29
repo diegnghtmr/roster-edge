@@ -14,10 +14,10 @@ public interface SubscriptionRepository extends BaseRepository<Subscription, Lon
     @Query("SELECT * FROM \"Subscription\" WHERE (:planId IS NULL OR plan_id = :planId) " +
            "AND (:statusId IS NULL OR status_id = :statusId) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:startDateFrom IS NULL OR start_date >= :startDateFrom) " +
-           "AND (:startDateTo IS NULL OR start_date <= :startDateTo) " +
-           "AND (:endDateFrom IS NULL OR end_date >= :endDateFrom) " +
-           "AND (:endDateTo IS NULL OR end_date <= :endDateTo)")
+           "AND (CAST(:startDateFrom AS DATE) IS NULL OR start_date >= CAST(:startDateFrom AS DATE)) " +
+           "AND (CAST(:startDateTo AS DATE) IS NULL OR start_date <= CAST(:startDateTo AS DATE)) " +
+           "AND (CAST(:endDateFrom AS DATE) IS NULL OR end_date >= CAST(:endDateFrom AS DATE)) " +
+           "AND (CAST(:endDateTo AS DATE) IS NULL OR end_date <= CAST(:endDateTo AS DATE))")
     List<Subscription> findByFilters(@Param("planId") Long planId,
                                      @Param("statusId") Long statusId,
                                      @Param("active") Boolean active,
