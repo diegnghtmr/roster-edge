@@ -6,17 +6,31 @@ import co.edu.uniquindio.rosteredge.backend.service.DocumentTemplateService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @Transactional
 public class DocumentTemplateServiceImpl extends SimpleCrudService<DocumentTemplate> implements DocumentTemplateService {
 
+    private final DocumentTemplateRepository documentTemplateRepository;
+
     public DocumentTemplateServiceImpl(DocumentTemplateRepository repository) {
         super(repository);
+        this.documentTemplateRepository = repository;
     }
 
     @Override
     protected String getEntityName() {
         return "DocumentTemplate";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DocumentTemplate> findByFilters(String name, Long documentFormatId, Long documentTypeId,
+                                                Boolean active, LocalDateTime creationFrom, LocalDateTime creationTo) {
+        return documentTemplateRepository.findByFilters(name, documentFormatId, documentTypeId, active,
+                creationFrom, creationTo);
     }
 }
 

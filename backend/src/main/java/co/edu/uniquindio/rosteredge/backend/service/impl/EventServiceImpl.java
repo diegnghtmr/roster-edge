@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -35,9 +35,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventDTO> findAllEvents() {
-        log.info("Finding all events");
-        return StreamSupport.stream(eventRepository.findAll().spliterator(), false)
+    public List<EventDTO> findAllEvents(Long seasonId, Long venueId, Boolean active, LocalDate dateFrom, LocalDate dateTo) {
+        log.info("Finding events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                seasonId, venueId, active, dateFrom, dateTo);
+        return eventRepository.findByFilters(seasonId, venueId, active, dateFrom, dateTo)
+                .stream()
                 .map(entityMapper::toEventDTO)
                 .collect(Collectors.toList());
     }

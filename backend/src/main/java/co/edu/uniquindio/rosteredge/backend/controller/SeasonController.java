@@ -6,10 +6,12 @@ import co.edu.uniquindio.rosteredge.backend.service.SeasonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,9 +30,17 @@ public class SeasonController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SeasonDTO>>> getAllSeasons() {
-        log.info("Request to get all seasons");
-        List<SeasonDTO> seasons = seasonService.findAllSeasons();
+    public ResponseEntity<ApiResponse<List<SeasonDTO>>> getAllSeasons(
+            @RequestParam(required = false) Long clubId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDateTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateTo) {
+        log.info("Request to get seasons with filters - clubId: {}, name: {}, active: {}, startDateFrom: {}, startDateTo: {}, endDateFrom: {}, endDateTo: {}",
+                clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
+        List<SeasonDTO> seasons = seasonService.findAllSeasons(clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
         return ResponseEntity.ok(ApiResponse.success(seasons));
     }
 

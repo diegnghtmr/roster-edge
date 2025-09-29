@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -35,9 +34,10 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PlayerDTO> findAllPlayers() {
-        log.info("Finding all players");
-        return StreamSupport.stream(playerRepository.findAll().spliterator(), false)
+    public List<PlayerDTO> findAllPlayers(Long teamId, Long primaryPositionId, Boolean active) {
+        log.info("Finding players with filters - teamId: {}, primaryPositionId: {}, active: {}", teamId, primaryPositionId, active);
+        return playerRepository.findByFilters(teamId, primaryPositionId, active)
+                .stream()
                 .map(entityMapper::toPlayerDTO)
                 .collect(Collectors.toList());
     }

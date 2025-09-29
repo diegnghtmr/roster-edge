@@ -72,9 +72,10 @@ public class UserServiceImpl extends AbstractBaseService<User, Long> implements 
     }
 
     @Override
-    public List<UserDTO> findAllUsers() {
-        log.info("Finding all users");
-        return userRepository.findAll().stream()
+    public List<UserDTO> findAllUsers(Long cityId, Boolean active, String name, String email) {
+        log.info("Finding users with filters - cityId: {}, active: {}, name: {}, email: {}",
+                cityId, active, name, email);
+        return userRepository.findByFilters(cityId, active, name, email).stream()
                 .map(mapper::toUserDTO)
                 .toList();
     }

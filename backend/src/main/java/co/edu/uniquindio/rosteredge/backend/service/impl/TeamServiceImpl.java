@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -35,9 +34,10 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeamDTO> findAllTeams() {
-        log.info("Finding all teams");
-        return StreamSupport.stream(teamRepository.findAll().spliterator(), false)
+    public List<TeamDTO> findAllTeams(Long clubId, Long genderId, Long categoryId, Boolean active) {
+        log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}", clubId, genderId, categoryId, active);
+        return teamRepository.findByFilters(clubId, genderId, categoryId, active)
+                .stream()
                 .map(entityMapper::toTeamDTO)
                 .collect(Collectors.toList());
     }

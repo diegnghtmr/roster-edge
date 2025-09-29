@@ -6,17 +6,28 @@ import co.edu.uniquindio.rosteredge.backend.service.CountryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class CountryServiceImpl extends SimpleCrudService<Country> implements CountryService {
 
+    private final CountryRepository countryRepository;
+
     public CountryServiceImpl(CountryRepository repository) {
         super(repository);
+        this.countryRepository = repository;
     }
 
     @Override
     protected String getEntityName() {
         return "Country";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Country> findByFilters(String name, Boolean active) {
+        return countryRepository.findByFilters(name, active);
     }
 }
 

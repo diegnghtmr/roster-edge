@@ -30,6 +30,15 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Match> findAllMatches(Long teamId, Long seasonId, Long matchdayId, Long stadiumId,
+                                      Boolean active, LocalDate dateFrom, LocalDate dateTo) {
+        log.debug("Finding matches with filters - teamId: {}, seasonId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                teamId, seasonId, matchdayId, stadiumId, active, dateFrom, dateTo);
+        return matchRepository.findByFilters(seasonId, matchdayId, stadiumId, teamId, active, dateFrom, dateTo);
+    }
+
+    @Override
     @Cacheable("matches")
     public List<Match> findByTeamId(Long teamId) {
         log.debug("Finding matches by team id: {}", teamId);

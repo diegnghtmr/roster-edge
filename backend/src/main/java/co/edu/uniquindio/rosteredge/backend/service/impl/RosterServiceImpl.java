@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -77,5 +79,15 @@ public class RosterServiceImpl extends SimpleCrudService<Roster> implements Rost
     @Override
     public void logout(String token) {
         sessionService.invalidate(token);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Roster> findByFilters(Long clubId, Long subscriptionId, Boolean active,
+                                      String name, String email,
+                                      LocalDate creationFrom, LocalDate creationTo,
+                                      LocalDate lastAccessFrom, LocalDate lastAccessTo) {
+        return repository.findByFilters(clubId, subscriptionId, active, name, email,
+                creationFrom, creationTo, lastAccessFrom, lastAccessTo);
     }
 }

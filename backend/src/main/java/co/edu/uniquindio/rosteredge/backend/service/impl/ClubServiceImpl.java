@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +43,10 @@ public class ClubServiceImpl extends AbstractBaseService<Club, Long> implements 
     }
 
     @Override
-    public List<ClubDTO> findAllClubs() {
-        log.info("Finding all clubs");
-        return clubRepository.findAll().stream()
+    public List<ClubDTO> findAllClubs(String name, Boolean active, LocalDate foundationFrom, LocalDate foundationTo) {
+        log.info("Finding clubs with filters - name: {}, active: {}, foundationFrom: {}, foundationTo: {}",
+                name, active, foundationFrom, foundationTo);
+        return clubRepository.findByFilters(name, active, foundationFrom, foundationTo).stream()
                 .map(mapper::toClubDTO)
                 .collect(Collectors.toList());
     }

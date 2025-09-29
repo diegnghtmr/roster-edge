@@ -22,9 +22,14 @@ public class UserController extends BaseController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
-        log.info("Request to get all users");
-        List<UserDTO> users = userService.findAllUsers();
+    public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers(
+            @RequestParam(required = false) Long cityId,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email) {
+        log.info("Request to get users with filters - cityId: {}, active: {}, name: {}, email: {}",
+                cityId, active, name, email);
+        List<UserDTO> users = userService.findAllUsers(cityId, active, name, email);
         return ResponseEntity.ok(ApiResponse.success(users));
     }
 

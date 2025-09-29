@@ -27,9 +27,13 @@ public class PlayerController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PlayerDTO>>> getAllPlayers() {
-        log.info("Request to get all players");
-        List<PlayerDTO> players = playerService.findAllPlayers();
+    public ResponseEntity<ApiResponse<List<PlayerDTO>>> getAllPlayers(
+            @RequestParam(required = false) Long teamId,
+            @RequestParam(required = false) Long primaryPositionId,
+            @RequestParam(required = false) Boolean active) {
+        log.info("Request to get players with filters - teamId: {}, primaryPositionId: {}, active: {}",
+                teamId, primaryPositionId, active);
+        List<PlayerDTO> players = playerService.findAllPlayers(teamId, primaryPositionId, active);
         return ResponseEntity.ok(ApiResponse.success(players));
     }
 

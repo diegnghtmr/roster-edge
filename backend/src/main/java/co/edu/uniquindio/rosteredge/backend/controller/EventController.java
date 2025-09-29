@@ -6,10 +6,12 @@ import co.edu.uniquindio.rosteredge.backend.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,9 +30,15 @@ public class EventController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<EventDTO>>> getAllEvents() {
-        log.info("Request to get all events");
-        List<EventDTO> events = eventService.findAllEvents();
+    public ResponseEntity<ApiResponse<List<EventDTO>>> getAllEvents(
+            @RequestParam(required = false) Long seasonId,
+            @RequestParam(required = false) Long venueId,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
+        log.info("Request to get events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                seasonId, venueId, active, dateFrom, dateTo);
+        List<EventDTO> events = eventService.findAllEvents(seasonId, venueId, active, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(events));
     }
 

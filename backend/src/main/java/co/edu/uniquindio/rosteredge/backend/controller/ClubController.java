@@ -6,10 +6,12 @@ import co.edu.uniquindio.rosteredge.backend.service.ClubService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,9 +30,14 @@ public class ClubController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ClubDTO>>> getAllClubs() {
-        log.info("Request to get all clubs");
-        List<ClubDTO> clubs = clubService.findAllClubs();
+    public ResponseEntity<ApiResponse<List<ClubDTO>>> getAllClubs(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationTo) {
+        log.info("Request to get clubs with filters - name: {}, active: {}, foundationFrom: {}, foundationTo: {}",
+                name, active, foundationFrom, foundationTo);
+        List<ClubDTO> clubs = clubService.findAllClubs(name, active, foundationFrom, foundationTo);
         return ResponseEntity.ok(ApiResponse.success(clubs));
     }
 

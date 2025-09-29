@@ -6,17 +6,28 @@ import co.edu.uniquindio.rosteredge.backend.service.MatchdayService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class MatchdayServiceImpl extends SimpleCrudService<Matchday> implements MatchdayService {
 
+    private final MatchdayRepository matchdayRepository;
+
     public MatchdayServiceImpl(MatchdayRepository repository) {
         super(repository);
+        this.matchdayRepository = repository;
     }
 
     @Override
     protected String getEntityName() {
         return "Matchday";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Matchday> findByFilters(String name, Boolean active) {
+        return matchdayRepository.findByFilters(name, active);
     }
 }
 

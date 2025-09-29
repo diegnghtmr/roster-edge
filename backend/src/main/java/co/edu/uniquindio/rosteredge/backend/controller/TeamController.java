@@ -28,9 +28,14 @@ public class TeamController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TeamDTO>>> getAllTeams() {
-        log.info("Request to get all teams");
-        List<TeamDTO> teams = teamService.findAllTeams();
+    public ResponseEntity<ApiResponse<List<TeamDTO>>> getAllTeams(
+            @RequestParam(required = false) Long clubId,
+            @RequestParam(required = false) Long genderId,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Boolean active) {
+        log.info("Request to get teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}",
+                clubId, genderId, categoryId, active);
+        List<TeamDTO> teams = teamService.findAllTeams(clubId, genderId, categoryId, active);
         return ResponseEntity.ok(ApiResponse.success(teams));
     }
 

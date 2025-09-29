@@ -16,7 +16,7 @@ public interface UserService extends BaseService<User, Long> {
 
     UserDTO register(UserDTO userDTO);
 
-    List<UserDTO> findAllUsers();
+    List<UserDTO> findAllUsers(Long cityId, Boolean active, String name, String email);
 
     UserDTO findUserById(Long id);
 

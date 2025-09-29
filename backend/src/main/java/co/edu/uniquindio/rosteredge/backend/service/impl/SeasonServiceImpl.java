@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +43,12 @@ public class SeasonServiceImpl extends AbstractBaseService<Season, Long> impleme
     }
 
     @Override
-    public List<SeasonDTO> findAllSeasons() {
-        log.info("Finding all seasons");
-        return seasonRepository.findAll().stream()
+    public List<SeasonDTO> findAllSeasons(Long clubId, String name, Boolean active,
+                                          LocalDate startDateFrom, LocalDate startDateTo,
+                                          LocalDate endDateFrom, LocalDate endDateTo) {
+        log.info("Finding seasons with filters - clubId: {}, name: {}, active: {}, startDateFrom: {}, startDateTo: {}, endDateFrom: {}, endDateTo: {}",
+                clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
+        return seasonRepository.findByFilters(clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo).stream()
                 .map(mapper::toSeasonDTO)
                 .collect(Collectors.toList());
     }

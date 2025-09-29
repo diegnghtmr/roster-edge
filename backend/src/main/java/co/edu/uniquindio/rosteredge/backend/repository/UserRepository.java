@@ -30,4 +30,14 @@ public interface UserRepository extends BaseRepository<User, Long> {
      * Check if a user exists with the given email
      */
     boolean existsByEmail(@Param("email") String email);
+
+    @Query("SELECT * FROM \"User\" WHERE (:cityId IS NULL OR city_id = :cityId) " +
+           "AND (:active IS NULL OR active = :active) " +
+           "AND (:name IS NULL OR (LOWER(name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+           "OR LOWER(last_name) LIKE LOWER(CONCAT('%', :name, '%')))) " +
+           "AND (:email IS NULL OR LOWER(email) LIKE LOWER(CONCAT('%', :email, '%')))")
+    List<User> findByFilters(@Param("cityId") Long cityId,
+                             @Param("active") Boolean active,
+                             @Param("name") String name,
+                             @Param("email") String email);
 }

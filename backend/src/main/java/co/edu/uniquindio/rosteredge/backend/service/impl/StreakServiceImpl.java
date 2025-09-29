@@ -6,17 +6,31 @@ import co.edu.uniquindio.rosteredge.backend.service.StreakService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @Transactional
 public class StreakServiceImpl extends SimpleCrudService<Streak> implements StreakService {
 
+    private final StreakRepository streakRepository;
+
     public StreakServiceImpl(StreakRepository repository) {
         super(repository);
+        this.streakRepository = repository;
     }
 
     @Override
     protected String getEntityName() {
         return "Streak";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Streak> findByFilters(Long teamId, Boolean active,
+                                      LocalDate startDateFrom, LocalDate startDateTo,
+                                      LocalDate endDateFrom, LocalDate endDateTo) {
+        return streakRepository.findByFilters(teamId, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
     }
 }
 

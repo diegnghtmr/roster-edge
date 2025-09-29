@@ -6,17 +6,28 @@ import co.edu.uniquindio.rosteredge.backend.service.TeamGenderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class TeamGenderServiceImpl extends SimpleCrudService<TeamGender> implements TeamGenderService {
 
+    private final TeamGenderRepository teamGenderRepository;
+
     public TeamGenderServiceImpl(TeamGenderRepository repository) {
         super(repository);
+        this.teamGenderRepository = repository;
     }
 
     @Override
     protected String getEntityName() {
         return "TeamGender";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeamGender> findByFilters(String name, Boolean active) {
+        return teamGenderRepository.findByFilters(name, active);
     }
 }
 
