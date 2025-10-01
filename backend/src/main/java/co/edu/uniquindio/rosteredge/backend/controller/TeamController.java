@@ -27,7 +27,7 @@ public class TeamController extends BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createdTeam, "Team created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<TeamDTO>>> getAllTeams(
             @RequestParam(required = false) Long clubId,
             @RequestParam(required = false) Long genderId,

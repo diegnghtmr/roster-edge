@@ -1,22 +1,17 @@
 export interface ILoginResponse {
-  error?: {
-    message: string;
-    code: string;
-    errors: [];
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
   };
-  token: string;
-  token_type: string;
+  errorCode: string | null;
+  timestamp: number;
 }
 
 export interface ILoginUser {
   id: number;
-  username: string;
   email: string;
   name: string;
-  lastName: string;
-  phone: string | undefined;
-  cityId: string;
-  birthDate: string;
-  createdAt: string;
-  updatedAt: string;
+  clubId: string;
+  subscriptionId: string;
 }

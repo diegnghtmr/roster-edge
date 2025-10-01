@@ -31,7 +31,7 @@ public class RosterController {
         this.rosterService = rosterService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login/")
     public ResponseEntity<ApiResponse<RosterLoginResponse>> login(@Valid @RequestBody RosterLoginRequest request) {
         String token = rosterService.authenticate(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(ApiResponse.success(new RosterLoginResponse(token), "Login successful"));
