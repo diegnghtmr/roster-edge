@@ -1,40 +1,66 @@
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Home, Search, ArrowLeft } from "lucide-react";
 
 export default function ErrorPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white bg-fixed bg-cover bg-bottom error-bg">
-      <div className="container">
-        <div className="row">
-          <div className="col-sm-8 offset-sm-2 text-gray-50 text-center -mt-52">
-            <img
-              src="https://ordenes.issa.com.co/public/assets/images/logo-default.png"
-              alt="logo"
-              className="mx-auto mb-20"
-              style={{ height: 30 }}
-            />
-            <div className="relative ">
-              <h1 className="relative text-9xl tracking-tighter-less text-blue-500 text-shadow font-sans font-bold">
-                <span>4</span>
-                <span>0</span>
-                <span>4</span>
-              </h1>
-              <span className="absolute top-0   -ml-12 text-gray-500 font-semibold">
-                Oops!
-              </span>
-            </div>
-            <h5 className="text-gray-500 font-semibold -mr-10 -mt-3">
-              Página no encontrada
-            </h5>
-            <p className="text-gray-500 mt-2 mb-6">
-              Lo sentimos, la pagina a la que intentas acceder no existe
-            </p>
-            <Link
-              to={"/"}
-              className="bg-orange-400 cursor-pointer px-5 py-3 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg"
-            >
-              Ir a inicio
-            </Link>
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-white overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center px-4">
+        {/* 404 illustration */}
+        <div className="mb-8 relative">
+          <h1 className="text-9xl md:text-[12rem] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-red-600 select-none">
+            404
+          </h1>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Search className="w-16 h-16 md:w-20 md:h-20 text-rose-400 opacity-40 animate-bounce" />
           </div>
+        </div>
+
+        {/* Error message */}
+        <div className="text-center mb-12 max-w-md">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            Página no encontrada
+          </h2>
+          <p className="text-gray-600 text-lg mb-2">
+            Oops, parece que esta página se perdió en el espacio.
+          </p>
+          <p className="text-gray-500 text-sm">
+            La página que buscas no existe o ha sido movida.
+          </p>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button
+            asChild
+            className="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-base"
+          >
+            <a href="/" className="flex items-center gap-2">
+              <Home className="w-5 h-5" />
+              Volver al inicio
+            </a>
+          </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            className="border-2 border-gray-300 hover:border-rose-500 hover:bg-rose-50 transition-all duration-300 px-8 py-6 text-base"
+          >
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Página anterior
+            </button>
+          </Button>
         </div>
       </div>
     </div>
