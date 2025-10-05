@@ -33,6 +33,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Database ###
+.bd_data/
+
 ### HSQLDB Files ###
 roster.properties
 roster.script
