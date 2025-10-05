@@ -199,10 +199,10 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
             variant="outline"
             size="sm"
             onClick={clearAllFilters}
-            className="flex items-center gap-2 text-white"
+            className="flex items-center gap-2"
           >
             <X className="h-4 w-4" />
-            Limpiar filtros
+            Clear filters
           </Button>
         )}
       </div>

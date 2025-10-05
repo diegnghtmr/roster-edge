@@ -17,8 +17,11 @@ const ContentLogout = memo(() => {
   };
 
   return (
-    <div className="flex flex-col">
-      <Button className="text-red-500 cursor-pointer" onClick={handleLogout}>
+    <div className="flex flex-col space-y-2">
+      <Button className="text-white cursor-pointer" onClick={handleLogout}>
+        Ver perfil
+      </Button>
+      <Button className="text-white cursor-pointer" onClick={handleLogout}>
         Cerrar Sesión
       </Button>
     </div>

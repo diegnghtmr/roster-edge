@@ -54,7 +54,7 @@ export const Layout = () => {
             <MenuIcon />
           </div>
           <div className="py-2">
-            <img src="roster-logo.jpeg" className="h-[32px]" alt="Abbi" />
+            <img src="roster-logo.jpeg" className="h-[32px]" alt="roster" />
           </div>
           <Popover>
             <PopoverTrigger asChild>

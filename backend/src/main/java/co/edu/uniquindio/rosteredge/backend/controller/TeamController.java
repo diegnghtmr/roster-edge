@@ -20,7 +20,7 @@ public class TeamController extends BaseController {
 
     private final TeamService teamService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<TeamDTO>> createTeam(@Valid @RequestBody TeamDTO teamDTO) {
         log.info("Request to create team: {}", teamDTO.getName());
         TeamDTO createdTeam = teamService.createTeam(teamDTO);
@@ -39,14 +39,14 @@ public class TeamController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(teams));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<TeamDTO>> getTeamById(@PathVariable Long id) {
         log.info("Request to get team by id: {}", id);
         TeamDTO team = teamService.findTeamById(id);
         return ResponseEntity.ok(ApiResponse.success(team));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<TeamDTO>> updateTeam(@PathVariable Long id, @Valid @RequestBody TeamDTO teamDTO) {
         log.info("Request to update team with id: {}", id);
         TeamDTO updatedTeam = teamService.updateTeam(id, teamDTO);

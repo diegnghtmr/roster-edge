@@ -25,10 +25,10 @@ public class TeamCategoryController extends SimpleCrudController<TeamCategory> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<TeamCategory>>> findAll() {
         HttpServletRequest request = currentRequest();
-        
+
         String name = trimToNull(request.getParameter("name"));
         Boolean active = parseBoolean(request.getParameter("active"));
 

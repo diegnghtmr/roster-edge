@@ -7,7 +7,7 @@ export interface Team {
   genderId: number;
   categoryId: number;
   mascot: string;
-  foundation: [number, number, number]; // [year, month, day]
+  foundation: [number, number, number];
   clubId: number;
   genderName: string | null;
   categoryName: string | null;

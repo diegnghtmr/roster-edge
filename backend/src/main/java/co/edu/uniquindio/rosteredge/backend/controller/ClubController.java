@@ -1,6 +1,6 @@
 package co.edu.uniquindio.rosteredge.backend.controller;
 
-import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
+
 import co.edu.uniquindio.rosteredge.backend.dto.ClubDTO;
 import co.edu.uniquindio.rosteredge.backend.service.ClubService;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class ClubController extends BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createdClub, "Club created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<ClubDTO>>> getAllClubs(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Boolean active,

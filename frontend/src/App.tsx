@@ -10,7 +10,6 @@ export default function App() {
   return (
     <CookiesProvider>
       <QueryClientProvider client={queryClient}>
-        {/* <Toaster richColors position="top-center" /> */}
         <RouterProvider router={useRouterApp()} />
       </QueryClientProvider>
     </CookiesProvider>
