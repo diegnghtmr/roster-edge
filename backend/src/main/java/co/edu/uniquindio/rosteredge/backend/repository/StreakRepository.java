@@ -13,10 +13,10 @@ public interface StreakRepository extends BaseRepository<Streak, Long> {
 
     @Query("SELECT * FROM \"Streak\" WHERE (:teamId IS NULL OR team_id = :teamId) " +
            "AND (:active IS NULL OR active = :active) " +
-           "AND (:startFrom IS NULL OR start_date >= :startFrom) " +
-           "AND (:startTo IS NULL OR start_date <= :startTo) " +
-           "AND (:endFrom IS NULL OR end_date >= :endFrom) " +
-           "AND (:endTo IS NULL OR end_date <= :endTo)")
+           "AND (CAST(:startFrom AS DATE) IS NULL OR start_date >= CAST(:startFrom AS DATE)) " +
+           "AND (CAST(:startTo AS DATE) IS NULL OR start_date <= CAST(:startTo AS DATE)) " +
+           "AND (CAST(:endFrom AS DATE) IS NULL OR end_date >= CAST(:endFrom AS DATE)) " +
+           "AND (CAST(:endTo AS DATE) IS NULL OR end_date <= CAST(:endTo AS DATE))")
     List<Streak> findByFilters(@Param("teamId") Long teamId,
                                @Param("active") Boolean active,
                                @Param("startFrom") LocalDate startFrom,

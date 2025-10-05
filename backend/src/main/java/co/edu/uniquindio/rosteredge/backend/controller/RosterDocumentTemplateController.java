@@ -25,7 +25,7 @@ public class RosterDocumentTemplateController extends SimpleCrudController<Roste
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<RosterDocumentTemplate>>> findAll() {
         HttpServletRequest request = currentRequest();
         

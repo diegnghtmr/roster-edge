@@ -25,7 +25,7 @@ public class SubscriptionStatusController extends SimpleCrudController<Subscript
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<SubscriptionStatus>>> findAll() {
         HttpServletRequest request = currentRequest();
         

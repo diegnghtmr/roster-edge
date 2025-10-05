@@ -26,7 +26,7 @@ public class RosterCrudController extends SimpleCrudController<Roster> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Roster>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long clubId = parseLong(request.getParameter("clubId"));

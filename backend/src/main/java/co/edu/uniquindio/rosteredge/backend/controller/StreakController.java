@@ -26,7 +26,7 @@ public class StreakController extends SimpleCrudController<Streak> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Streak>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long teamId = parseLong(request.getParameter("teamId"));

@@ -25,7 +25,7 @@ public class NotificationClubEventController extends SimpleCrudController<Notifi
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<NotificationClubEvent>>> findAll() {
         HttpServletRequest request = currentRequest();
         

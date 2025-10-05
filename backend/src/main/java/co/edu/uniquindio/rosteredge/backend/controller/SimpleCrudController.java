@@ -35,7 +35,7 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<T>> create(@Valid @RequestBody T entity) {
         log.info("Creating {}", entity.getClass().getSimpleName());
         T created = service.save(entity);
@@ -43,25 +43,25 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
                 .body(ApiResponse.success(created, "Resource created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<T>>> findAll() {
         List<T> items = service.findAll();
         return ResponseEntity.ok(ApiResponse.success(items));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<T>> findById(@PathVariable Long id) {
         T item = service.findByIdOrThrow(id);
         return ResponseEntity.ok(ApiResponse.success(item));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<T>> update(@PathVariable Long id, @Valid @RequestBody T entity) {
         T updated = service.update(id, entity);
         return ResponseEntity.ok(ApiResponse.success(updated, "Resource updated successfully"));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         service.deleteById(id);
         return ResponseEntity.ok(ApiResponse.<Void>success(null, "Resource deleted successfully"));

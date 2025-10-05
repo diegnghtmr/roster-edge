@@ -25,7 +25,7 @@ public class StaffController extends SimpleCrudController<Staff> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Staff>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long teamId = parseLong(request.getParameter("teamId"));

@@ -22,7 +22,7 @@ public class ClubController extends BaseController {
 
     private final ClubService clubService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<ClubDTO>> createClub(@Valid @RequestBody ClubDTO clubDTO) {
         log.info("Request to create club: {}", clubDTO.getName());
         ClubDTO createdClub = clubService.createClub(clubDTO);
@@ -41,21 +41,21 @@ public class ClubController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(clubs));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<ClubDTO>> getClubById(@PathVariable Long id) {
         log.info("Request to get club by id: {}", id);
         ClubDTO club = clubService.findClubById(id);
         return ResponseEntity.ok(ApiResponse.success(club));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<ClubDTO>> updateClub(@PathVariable Long id, @Valid @RequestBody ClubDTO clubDTO) {
         log.info("Request to update club with id: {}", id);
         ClubDTO updatedClub = clubService.updateClub(id, clubDTO);
         return ResponseEntity.ok(ApiResponse.success(updatedClub, "Club updated successfully"));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/")
     public ResponseEntity<ApiResponse<Void>> deleteClub(@PathVariable Long id) {
         log.info("Request to delete club with id: {}", id);
         clubService.deleteClub(id);

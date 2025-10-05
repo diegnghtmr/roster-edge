@@ -25,7 +25,7 @@ public class PlanBenefitController extends SimpleCrudController<PlanBenefit> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PlanBenefit>>> findAll() {
         HttpServletRequest request = currentRequest();
         

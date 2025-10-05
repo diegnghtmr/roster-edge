@@ -27,7 +27,7 @@ public class StadiumController extends SimpleCrudController<Stadium> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Stadium>>> findAll() {
         HttpServletRequest request = currentRequest();
 

@@ -26,7 +26,7 @@ public class NotificationController extends SimpleCrudController<Notification> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Notification>>> findAll() {
         HttpServletRequest request = currentRequest();
         String message = trimToNull(request.getParameter("message"));

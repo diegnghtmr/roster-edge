@@ -25,7 +25,7 @@ public class ColorController extends SimpleCrudController<Color> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Color>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));

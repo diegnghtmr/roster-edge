@@ -25,7 +25,7 @@ public class TeamGenderController extends SimpleCrudController<TeamGender> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<TeamGender>>> findAll() {
         HttpServletRequest request = currentRequest();
         

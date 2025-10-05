@@ -21,7 +21,7 @@ public class HealthController {
      * 
      * @return Message indicating that the server is running
      */
-    @GetMapping
+    @GetMapping("/")
     public Map<String, String> checkHealth() {
         Map<String, String> response = new HashMap<>();
         response.put("status", "UP");
@@ -36,7 +36,7 @@ public class HealthController {
      * 
      * @return Version information
      */
-    @GetMapping("/version")
+    @GetMapping("/version/")
     public Map<String, String> getVersion() {
         Map<String, String> response = new HashMap<>();
         response.put("version", "1.0.0");

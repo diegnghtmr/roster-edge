@@ -25,7 +25,7 @@ public class ClubEventController extends SimpleCrudController<ClubEvent> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<ClubEvent>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long clubId = parseLong(request.getParameter("clubId"));

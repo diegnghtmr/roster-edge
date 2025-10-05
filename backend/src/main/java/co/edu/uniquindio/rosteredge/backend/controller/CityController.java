@@ -25,7 +25,7 @@ public class CityController extends SimpleCrudController<City> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<City>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long countryId = parseLong(request.getParameter("countryId"));

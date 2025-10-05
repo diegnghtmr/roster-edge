@@ -25,7 +25,7 @@ public class MatchAwayTeamController extends SimpleCrudController<MatchAwayTeam>
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<MatchAwayTeam>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long matchId = parseLong(request.getParameter("matchId"));

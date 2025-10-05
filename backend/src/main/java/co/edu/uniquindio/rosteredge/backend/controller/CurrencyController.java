@@ -25,7 +25,7 @@ public class CurrencyController extends SimpleCrudController<Currency> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Currency>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));

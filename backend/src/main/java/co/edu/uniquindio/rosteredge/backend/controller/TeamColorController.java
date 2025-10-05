@@ -25,7 +25,7 @@ public class TeamColorController extends SimpleCrudController<TeamColor> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<TeamColor>>> findAll() {
         HttpServletRequest request = currentRequest();
         

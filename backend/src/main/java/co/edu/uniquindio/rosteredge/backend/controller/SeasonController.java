@@ -22,14 +22,14 @@ public class SeasonController extends BaseController {
 
     private final SeasonService seasonService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<SeasonDTO>> createSeason(@Valid @RequestBody SeasonDTO seasonDTO) {
         log.info("Request to create season: {}", seasonDTO.getName());
         SeasonDTO createdSeason = seasonService.createSeason(seasonDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createdSeason, "Season created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<SeasonDTO>>> getAllSeasons(
             @RequestParam(required = false) Long clubId,
             @RequestParam(required = false) String name,
@@ -44,21 +44,21 @@ public class SeasonController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(seasons));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<SeasonDTO>> getSeasonById(@PathVariable Long id) {
         log.info("Request to get season by id: {}", id);
         SeasonDTO season = seasonService.findSeasonById(id);
         return ResponseEntity.ok(ApiResponse.success(season));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<SeasonDTO>> updateSeason(@PathVariable Long id, @Valid @RequestBody SeasonDTO seasonDTO) {
         log.info("Request to update season with id: {}", id);
         SeasonDTO updatedSeason = seasonService.updateSeason(id, seasonDTO);
         return ResponseEntity.ok(ApiResponse.success(updatedSeason, "Season updated successfully"));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/")
     public ResponseEntity<ApiResponse<Void>> deleteSeason(@PathVariable Long id) {
         log.info("Request to delete season with id: {}", id);
         seasonService.deleteSeason(id);

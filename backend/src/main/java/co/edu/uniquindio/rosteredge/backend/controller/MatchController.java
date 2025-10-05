@@ -22,7 +22,7 @@ public class MatchController extends BaseController {
 
     private final MatchService matchService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<Match>> createMatch(@Valid @RequestBody Match match) {
         log.info("Request to create match on date: {}", match.getDate());
         Match createdMatch = matchService.save(match);
@@ -30,7 +30,7 @@ public class MatchController extends BaseController {
                 .body(ApiResponse.success(createdMatch, "Match created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Match>>> getMatches(
             @RequestParam(required = false) Long teamId,
             @RequestParam(required = false) Long seasonId,
@@ -45,21 +45,21 @@ public class MatchController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(matches));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<Match>> getMatchById(@PathVariable Long id) {
         log.info("Request to get match by id: {}", id);
         Match match = matchService.findByIdOrThrow(id);
         return ResponseEntity.ok(ApiResponse.success(match));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<Match>> updateMatch(@PathVariable Long id, @Valid @RequestBody Match match) {
         log.info("Request to update match with id: {}", id);
         Match updatedMatch = matchService.update(id, match);
         return ResponseEntity.ok(ApiResponse.success(updatedMatch, "Match updated successfully"));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/")
     public ResponseEntity<ApiResponse<Void>> deleteMatch(@PathVariable Long id) {
         log.info("Request to delete match with id: {}", id);
         matchService.deleteById(id);

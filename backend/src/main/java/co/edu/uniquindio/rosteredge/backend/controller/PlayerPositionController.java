@@ -25,7 +25,7 @@ public class PlayerPositionController extends SimpleCrudController<PlayerPositio
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PlayerPosition>>> findAll() {
         HttpServletRequest request = currentRequest();
         

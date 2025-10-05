@@ -16,8 +16,8 @@ public interface StadiumRepository extends BaseRepository<Stadium, Long> {
            "AND (:active IS NULL OR active = :active) " +
            "AND (:capacityFrom IS NULL OR total_capacity >= :capacityFrom) " +
            "AND (:capacityTo IS NULL OR total_capacity <= :capacityTo) " +
-           "AND (:foundationFrom IS NULL OR foundation >= :foundationFrom) " +
-           "AND (:foundationTo IS NULL OR foundation <= :foundationTo) " +
+           "AND (CAST(:foundationFrom AS DATE) IS NULL OR foundation >= CAST(:foundationFrom AS DATE)) " +
+           "AND (CAST(:foundationTo AS DATE) IS NULL OR foundation <= CAST(:foundationTo AS DATE)) " +
            "AND (:areaFrom IS NULL OR area >= :areaFrom) " +
            "AND (:areaTo IS NULL OR area <= :areaTo)")
     List<Stadium> findByFilters(@Param("venueId") Long venueId,

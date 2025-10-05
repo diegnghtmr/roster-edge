@@ -25,7 +25,7 @@ public class StaffRoleController extends SimpleCrudController<StaffRole> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<StaffRole>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = request.getParameter("name");

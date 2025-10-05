@@ -25,7 +25,7 @@ public class DocumentFormatController extends SimpleCrudController<DocumentForma
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<DocumentFormat>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));

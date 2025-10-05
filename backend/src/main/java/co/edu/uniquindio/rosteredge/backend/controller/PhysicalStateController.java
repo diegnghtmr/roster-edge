@@ -25,7 +25,7 @@ public class PhysicalStateController extends SimpleCrudController<PhysicalState>
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PhysicalState>>> findAll() {
         HttpServletRequest request = currentRequest();
         

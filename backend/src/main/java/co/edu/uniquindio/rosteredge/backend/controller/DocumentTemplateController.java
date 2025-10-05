@@ -26,7 +26,7 @@ public class DocumentTemplateController extends SimpleCrudController<DocumentTem
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<DocumentTemplate>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));

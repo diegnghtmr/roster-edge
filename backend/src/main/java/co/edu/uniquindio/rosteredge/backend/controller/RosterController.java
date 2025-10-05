@@ -37,7 +37,7 @@ public class RosterController {
         return ResponseEntity.ok(ApiResponse.success(new RosterLoginResponse(token), "Login successful"));
     }
 
-    @GetMapping("/me")
+    @GetMapping("/me/")
     public ResponseEntity<ApiResponse<RosterSessionResponse>> currentRoster(
             @RequestHeader(value = "Authorization", required = false) String authorization) {
         String token = resolveToken(authorization);
@@ -54,7 +54,7 @@ public class RosterController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/logout/")
     public ResponseEntity<ApiResponse<Void>> logout(
             @RequestHeader(value = "Authorization", required = false) String authorization) {
         String token = resolveToken(authorization);

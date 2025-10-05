@@ -26,7 +26,7 @@ public class VenueController extends SimpleCrudController<Venue> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Venue>>> findAll() {
         HttpServletRequest request = currentRequest();
 

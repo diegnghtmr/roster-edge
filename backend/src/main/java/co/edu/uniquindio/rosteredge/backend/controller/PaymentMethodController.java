@@ -25,7 +25,7 @@ public class PaymentMethodController extends SimpleCrudController<PaymentMethod>
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PaymentMethod>>> findAll() {
         HttpServletRequest request = currentRequest();
         

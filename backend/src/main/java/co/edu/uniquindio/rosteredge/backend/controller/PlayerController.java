@@ -19,14 +19,14 @@ public class PlayerController extends BaseController {
 
     private final PlayerService playerService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<PlayerDTO>> createPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         log.info("Request to create player: {}", playerDTO.getName());
         PlayerDTO createdPlayer = playerService.createPlayer(playerDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createdPlayer, "Player created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PlayerDTO>>> getAllPlayers(
             @RequestParam(required = false) Long teamId,
             @RequestParam(required = false) Long primaryPositionId,
@@ -37,21 +37,21 @@ public class PlayerController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(players));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<PlayerDTO>> getPlayerById(@PathVariable Long id) {
         log.info("Request to get player by id: {}", id);
         PlayerDTO player = playerService.findPlayerById(id);
         return ResponseEntity.ok(ApiResponse.success(player));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<PlayerDTO>> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerDTO playerDTO) {
         log.info("Request to update player with id: {}", id);
         PlayerDTO updatedPlayer = playerService.updatePlayer(id, playerDTO);
         return ResponseEntity.ok(ApiResponse.success(updatedPlayer, "Player updated successfully"));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/")
     public ResponseEntity<ApiResponse<Void>> deletePlayer(@PathVariable Long id) {
         log.info("Request to delete player with id: {}", id);
         playerService.deletePlayer(id);
