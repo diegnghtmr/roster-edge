@@ -36,7 +36,8 @@ public class TeamServiceImpl implements TeamService {
     @Transactional(readOnly = true)
     public List<TeamDTO> findAllTeams(Long clubId, Long genderId, Long categoryId, Boolean active) {
         log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}", clubId, genderId, categoryId, active);
-        return teamRepository.findByFilters(clubId, genderId, categoryId, active)
+        Boolean effectiveActive = active != null ? active : Boolean.TRUE;
+        return teamRepository.findByFilters(clubId, genderId, categoryId, effectiveActive)
                 .stream()
                 .map(entityMapper::toTeamDTO)
                 .collect(Collectors.toList());
@@ -72,9 +73,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void deleteTeam(Long id) {
         log.info("Deleting team with id: {}", id);
-        if (!teamRepository.existsById(id)) {
-            throw new EntityNotFoundException("Team not found with id: " + id);
-        }
-        teamRepository.deleteById(id);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
+        team.softDelete();
+        teamRepository.save(team);
     }
 }
+
+
