@@ -8,6 +8,7 @@ import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
 import co.edu.uniquindio.rosteredge.backend.model.Player;
 import co.edu.uniquindio.rosteredge.backend.repository.PlayerRepository;
 import co.edu.uniquindio.rosteredge.backend.service.PlayerService;
+import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class PlayerServiceImpl implements PlayerService {
     private final PlayerRepository playerRepository;
     private final EntityMapper entityMapper;
     private final PasswordHasher passwordHasher;
+    private final CascadeDeleteManager cascadeDeleteManager;
 
     @Override
     public PlayerDTO createPlayer(PlayerDTO playerDTO) {
@@ -102,12 +104,8 @@ public class PlayerServiceImpl implements PlayerService {
         if (!playerRepository.existsById(id)) {
             throw new EntityNotFoundException("Player not found with id: " + id);
         }
+        cascadeDeleteManager.clearAssociations("Player", id);
         playerRepository.deleteById(id);
     }
 }
-
-
-
-
-
 

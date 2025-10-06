@@ -6,6 +6,7 @@ import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Event;
 import co.edu.uniquindio.rosteredge.backend.repository.EventRepository;
 import co.edu.uniquindio.rosteredge.backend.service.EventService;
+import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final EntityMapper entityMapper;
+    private final CascadeDeleteManager cascadeDeleteManager;
 
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
@@ -76,6 +78,8 @@ public class EventServiceImpl implements EventService {
         if (!eventRepository.existsById(id)) {
             throw new EntityNotFoundException("Event not found with id: " + id);
         }
+        cascadeDeleteManager.clearAssociations("Event", id);
         eventRepository.deleteById(id);
     }
 }
+

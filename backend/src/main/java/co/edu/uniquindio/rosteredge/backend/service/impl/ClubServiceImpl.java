@@ -76,9 +76,7 @@ public class ClubServiceImpl extends AbstractBaseService<Club, Long> implements 
     @Override
     public void deleteClub(Long id) {
         log.info("Deleting club with id: {}", id);
-        if (!clubRepository.existsById(id)) {
-            throw new EntityNotFoundException(getEntityName(), id);
-        }
-        clubRepository.deleteById(id);
+        super.deleteById(id);
     }
 }
+

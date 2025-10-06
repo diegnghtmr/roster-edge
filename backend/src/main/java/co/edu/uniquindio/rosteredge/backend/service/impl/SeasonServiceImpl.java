@@ -79,9 +79,7 @@ public class SeasonServiceImpl extends AbstractBaseService<Season, Long> impleme
     @Override
     public void deleteSeason(Long id) {
         log.info("Deleting season with id: {}", id);
-        if (!seasonRepository.existsById(id)) {
-            throw new EntityNotFoundException(getEntityName(), id);
-        }
-        seasonRepository.deleteById(id);
+        super.deleteById(id);
     }
 }
+

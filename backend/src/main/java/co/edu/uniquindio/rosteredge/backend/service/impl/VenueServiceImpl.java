@@ -79,9 +79,7 @@ public class VenueServiceImpl extends AbstractBaseService<Venue, Long> implement
     @Override
     public void deleteVenue(Long id) {
         log.info("Deleting venue with id: {}", id);
-        if (!venueRepository.existsById(id)) {
-            throw new EntityNotFoundException(getEntityName(), id);
-        }
-        venueRepository.deleteById(id);
+        super.deleteById(id);
     }
 }
+

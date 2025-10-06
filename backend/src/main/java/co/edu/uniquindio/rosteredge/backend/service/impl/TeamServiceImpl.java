@@ -6,6 +6,7 @@ import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Team;
 import co.edu.uniquindio.rosteredge.backend.repository.TeamRepository;
 import co.edu.uniquindio.rosteredge.backend.service.TeamService;
+import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
     private final EntityMapper entityMapper;
+    private final CascadeDeleteManager cascadeDeleteManager;
 
     @Override
     public TeamDTO createTeam(TeamDTO teamDTO) {
@@ -36,8 +38,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional(readOnly = true)
     public List<TeamDTO> findAllTeams(Long clubId, Long genderId, Long categoryId, Boolean active) {
         log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}", clubId, genderId, categoryId, active);
-        Boolean effectiveActive = active != null ? active : Boolean.TRUE;
-        return teamRepository.findByFilters(clubId, genderId, categoryId, effectiveActive)
+        return teamRepository.findByFilters(clubId, genderId, categoryId, active)
                 .stream()
                 .map(entityMapper::toTeamDTO)
                 .collect(Collectors.toList());
@@ -73,11 +74,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void deleteTeam(Long id) {
         log.info("Deleting team with id: {}", id);
-        Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
-        team.softDelete();
-        teamRepository.save(team);
+        if (!teamRepository.existsById(id)) {
+            throw new EntityNotFoundException("Team not found with id: " + id);
+        }
+        cascadeDeleteManager.clearAssociations("Team", id);
+        teamRepository.deleteById(id);
     }
 }
-
 
