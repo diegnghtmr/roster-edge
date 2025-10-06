@@ -1,23 +1,32 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
+import co.edu.uniquindio.rosteredge.backend.dto.VenueDTO;
+import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
+import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Venue;
 import co.edu.uniquindio.rosteredge.backend.repository.VenueRepository;
+import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.VenueService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class VenueServiceImpl extends SimpleCrudService<Venue> implements VenueService {
+@Slf4j
+public class VenueServiceImpl extends AbstractBaseService<Venue, Long> implements VenueService {
 
     private final VenueRepository venueRepository;
+    private final EntityMapper mapper;
 
-    public VenueServiceImpl(VenueRepository repository) {
-        super(repository);
-        this.venueRepository = repository;
+    public VenueServiceImpl(VenueRepository venueRepository, EntityMapper mapper) {
+        super(venueRepository);
+        this.venueRepository = venueRepository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -26,12 +35,53 @@ public class VenueServiceImpl extends SimpleCrudService<Venue> implements VenueS
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Venue> findByFilters(Long clubId, Long cityId, Boolean active,
-                                     String name, String email,
-                                     LocalDate foundationFrom, LocalDate foundationTo) {
-        return venueRepository.findByFilters(clubId, cityId, active, name, email, foundationFrom, foundationTo);
+    public VenueDTO createVenue(VenueDTO venueDTO) {
+        log.info("Creating venue: {}", venueDTO.getName());
+        Venue venue = mapper.toVenueEntity(venueDTO);
+        Venue savedVenue = save(venue);
+        return mapper.toVenueDTO(savedVenue);
+    }
+
+    @Override
+    public List<VenueDTO> findAllVenues(String name, String email, Long cityId, Long clubId, Boolean active, LocalDate foundationFrom, LocalDate foundationTo) {
+        log.info("Finding venues with filters - name: {}, email: {}, cityId: {}, clubId: {}, active: {}, foundationFrom: {}, foundationTo: {}",
+                name, email, cityId, clubId, active, foundationFrom, foundationTo);
+        return venueRepository.findByFilters(name, email, cityId, clubId, active, foundationFrom, foundationTo).stream()
+                .map(mapper::toVenueDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public VenueDTO findVenueById(Long id) {
+        log.info("Finding venue with id: {}", id);
+        return venueRepository.findById(id)
+                .map(mapper::toVenueDTO)
+                .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+    }
+
+    @Override
+    public VenueDTO updateVenue(Long id, VenueDTO venueDTO) {
+        log.info("Updating venue with id: {}", id);
+        Venue existingVenue = venueRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        existingVenue.setName(venueDTO.getName());
+        existingVenue.setEmail(venueDTO.getEmail());
+        existingVenue.setCityId(venueDTO.getCityId());
+        existingVenue.setFoundation(venueDTO.getFoundation());
+        existingVenue.setPhone(venueDTO.getPhone());
+        existingVenue.setClubId(venueDTO.getClubId());
+
+        Venue updatedVenue = save(existingVenue);
+        return mapper.toVenueDTO(updatedVenue);
+    }
+
+    @Override
+    public void deleteVenue(Long id) {
+        log.info("Deleting venue with id: {}", id);
+        if (!venueRepository.existsById(id)) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
+        venueRepository.deleteById(id);
     }
 }
-
-

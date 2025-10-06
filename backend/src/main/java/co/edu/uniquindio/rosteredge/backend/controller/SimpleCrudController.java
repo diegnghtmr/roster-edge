@@ -61,7 +61,7 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
         return ResponseEntity.ok(ApiResponse.success(updated, "Resource updated successfully"));
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         service.deleteById(id);
         return ResponseEntity.ok(ApiResponse.<Void>success(null, "Resource deleted successfully"));

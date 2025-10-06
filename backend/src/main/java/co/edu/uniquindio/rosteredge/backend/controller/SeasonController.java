@@ -58,7 +58,7 @@ public class SeasonController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(updatedSeason, "Season updated successfully"));
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSeason(@PathVariable Long id) {
         log.info("Request to delete season with id: {}", id);
         seasonService.deleteSeason(id);

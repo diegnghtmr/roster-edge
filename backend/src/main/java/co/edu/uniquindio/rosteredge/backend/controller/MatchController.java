@@ -59,7 +59,7 @@ public class MatchController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(updatedMatch, "Match updated successfully"));
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteMatch(@PathVariable Long id) {
         log.info("Request to delete match with id: {}", id);
         matchService.deleteById(id);

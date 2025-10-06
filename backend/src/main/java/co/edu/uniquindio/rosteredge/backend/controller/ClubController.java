@@ -55,7 +55,7 @@ public class ClubController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(updatedClub, "Club updated successfully"));
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteClub(@PathVariable Long id) {
         log.info("Request to delete club with id: {}", id);
         clubService.deleteClub(id);

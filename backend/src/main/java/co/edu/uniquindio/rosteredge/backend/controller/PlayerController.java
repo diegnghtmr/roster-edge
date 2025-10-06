@@ -51,7 +51,7 @@ public class PlayerController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(updatedPlayer, "Player updated successfully"));
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePlayer(@PathVariable Long id) {
         log.info("Request to delete player with id: {}", id);
         playerService.deletePlayer(id);

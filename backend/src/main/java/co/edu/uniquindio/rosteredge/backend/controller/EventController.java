@@ -56,7 +56,7 @@ public class EventController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(updatedEvent, "Event updated successfully"));
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteEvent(@PathVariable Long id) {
         log.info("Request to delete event with id: {}", id);
         eventService.deleteEvent(id);
