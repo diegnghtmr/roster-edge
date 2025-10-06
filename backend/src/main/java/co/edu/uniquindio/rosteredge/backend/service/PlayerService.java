@@ -1,7 +1,8 @@
 package co.edu.uniquindio.rosteredge.backend.service;
 
 import co.edu.uniquindio.rosteredge.backend.dto.PlayerDTO;
-
+import co.edu.uniquindio.rosteredge.backend.dto.filter.PlayerOverviewFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.response.PlayerResponse;
 import java.util.List;
 
 public interface PlayerService {
@@ -10,4 +11,6 @@ public interface PlayerService {
     PlayerDTO findPlayerById(Long id);
     PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO);
     void deletePlayer(Long id);
+
+    List<PlayerResponse> findPlayersOverview(PlayerOverviewFilter filter);
 }

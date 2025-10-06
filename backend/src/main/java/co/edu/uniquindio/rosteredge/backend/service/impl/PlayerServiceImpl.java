@@ -1,22 +1,24 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
 import co.edu.uniquindio.rosteredge.backend.dto.PlayerDTO;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.PlayerOverviewFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.response.PlayerResponse;
 import co.edu.uniquindio.rosteredge.backend.exception.BusinessException;
 import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
 import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
-import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
 import co.edu.uniquindio.rosteredge.backend.model.Player;
 import co.edu.uniquindio.rosteredge.backend.repository.PlayerRepository;
+import co.edu.uniquindio.rosteredge.backend.repository.view.PlayerOverviewQueryRepository;
+import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
 import co.edu.uniquindio.rosteredge.backend.service.PlayerService;
 import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,6 +30,7 @@ public class PlayerServiceImpl implements PlayerService {
     private final EntityMapper entityMapper;
     private final PasswordHasher passwordHasher;
     private final CascadeDeleteManager cascadeDeleteManager;
+    private final PlayerOverviewQueryRepository playerOverviewQueryRepository;
 
     @Override
     public PlayerDTO createPlayer(PlayerDTO playerDTO) {
@@ -54,6 +57,14 @@ public class PlayerServiceImpl implements PlayerService {
                 .stream()
                 .map(entityMapper::toPlayerDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlayerResponse> findPlayersOverview(PlayerOverviewFilter filter) {
+        PlayerOverviewFilter effectiveFilter = filter != null ? filter : new PlayerOverviewFilter();
+        log.info("Finding player overview with filter: {}", effectiveFilter);
+        return playerOverviewQueryRepository.findPlayers(effectiveFilter);
     }
 
     @Override
@@ -108,4 +119,3 @@ public class PlayerServiceImpl implements PlayerService {
         playerRepository.deleteById(id);
     }
 }
-

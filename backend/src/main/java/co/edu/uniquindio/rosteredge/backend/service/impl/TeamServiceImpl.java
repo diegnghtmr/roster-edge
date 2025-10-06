@@ -1,19 +1,21 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
 import co.edu.uniquindio.rosteredge.backend.dto.TeamDTO;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.TeamInsightsFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.response.TeamInsightsResponse;
 import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
 import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Team;
 import co.edu.uniquindio.rosteredge.backend.repository.TeamRepository;
+import co.edu.uniquindio.rosteredge.backend.repository.view.TeamInsightsQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.TeamService;
 import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,6 +26,7 @@ public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
     private final EntityMapper entityMapper;
     private final CascadeDeleteManager cascadeDeleteManager;
+    private final TeamInsightsQueryRepository teamInsightsQueryRepository;
 
     @Override
     public TeamDTO createTeam(TeamDTO teamDTO) {
@@ -42,6 +45,14 @@ public class TeamServiceImpl implements TeamService {
                 .stream()
                 .map(entityMapper::toTeamDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeamInsightsResponse> findTeamInsights(TeamInsightsFilter filter) {
+        TeamInsightsFilter effectiveFilter = filter != null ? filter : new TeamInsightsFilter();
+        log.info("Finding team insights with filter: {}", effectiveFilter);
+        return teamInsightsQueryRepository.findTeams(effectiveFilter);
     }
 
     @Override
@@ -81,4 +92,3 @@ public class TeamServiceImpl implements TeamService {
         teamRepository.deleteById(id);
     }
 }
-

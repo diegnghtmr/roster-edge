@@ -1,16 +1,15 @@
 package co.edu.uniquindio.rosteredge.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 /**
- * Response DTO for Player entity
+ * Response DTO for Player entity enriched with join results.
  */
 @Data
 @NoArgsConstructor
@@ -20,53 +19,44 @@ import java.time.LocalDateTime;
 public class PlayerResponse {
 
     private Long id;
-
     private String email;
-
     private String name;
-
     private String lastName;
-
     private String fullName; // Computed field: name + " " + lastName
 
     private Long cityId;
-
     private String cityName;
 
+    private Long countryId;
+    private String countryName;
+
+    private Long clubId;
+    private String clubName;
+
     private String phone;
-
     private LocalDate birthDate;
-
     private Integer age; // Computed field based on birthDate
 
     private Long physicalStateId;
-
     private String physicalStateName;
 
     private String jerseyNumber;
-
     private String height;
-
     private String dominantFoot;
-
     private String weight;
 
     private Long primaryPositionId;
-
     private String primaryPositionName;
 
     private Long teamId;
-
     private String teamName;
 
     private Boolean active;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
     /**
-     * Team summary for consistent display
+     * Team summary for consistent display.
      */
     @Data
     @NoArgsConstructor
@@ -75,6 +65,8 @@ public class PlayerResponse {
     public static class TeamSummary {
         private Long id;
         private String name;
+        private Long clubId;
+        private String clubName;
     }
 
     private TeamSummary team;

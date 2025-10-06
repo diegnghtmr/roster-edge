@@ -1,16 +1,18 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
+import co.edu.uniquindio.rosteredge.backend.dto.filter.MatchScheduleFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.response.MatchResponse;
 import co.edu.uniquindio.rosteredge.backend.model.Match;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchRepository;
+import co.edu.uniquindio.rosteredge.backend.repository.view.MatchScheduleQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchService;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @Transactional
@@ -18,10 +20,13 @@ import java.util.List;
 public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchService {
 
     private final MatchRepository matchRepository;
+    private final MatchScheduleQueryRepository matchScheduleQueryRepository;
 
-    public MatchServiceImpl(MatchRepository matchRepository) {
+    public MatchServiceImpl(MatchRepository matchRepository,
+                            MatchScheduleQueryRepository matchScheduleQueryRepository) {
         super(matchRepository);
         this.matchRepository = matchRepository;
+        this.matchScheduleQueryRepository = matchScheduleQueryRepository;
     }
 
     @Override
@@ -36,6 +41,14 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
         log.debug("Finding matches with filters - teamId: {}, seasonId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
                 teamId, seasonId, matchdayId, stadiumId, active, dateFrom, dateTo);
         return matchRepository.findByFilters(seasonId, matchdayId, stadiumId, teamId, active, dateFrom, dateTo);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MatchResponse> findMatchSchedule(MatchScheduleFilter filter) {
+        MatchScheduleFilter effectiveFilter = filter != null ? filter : new MatchScheduleFilter();
+        log.debug("Finding match schedule with filter: {}", effectiveFilter);
+        return matchScheduleQueryRepository.findMatches(effectiveFilter);
     }
 
     @Override
