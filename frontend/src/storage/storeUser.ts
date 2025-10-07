@@ -1,6 +1,8 @@
-import useSecureLocalStorage from "@/hooks/useSecureLocalStorage";
 import type { ILoginUser } from "@/interface/ILogin";
 import { create } from "zustand";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+import StringCrypto from "string-crypto";
 
 // Define the state and actions for the store
 interface UserStore {
@@ -10,10 +12,32 @@ interface UserStore {
   clearUser: () => void;
 }
 
+// Setup crypto outside of the store
+const options = {
+  salt: import.meta.env.VITE_SECURE_LOCAL_STORAGE_SALT,
+};
+const sc = new StringCrypto(options);
+
+const getSecureLocalStorage = (key: string) => {
+  const value = localStorage.getItem(key);
+  if (value)
+    return sc.decryptString(
+      value,
+      import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD
+    );
+  return "";
+};
+
+const setObjectSecureLocalStorage = (key: string, value: object) => {
+  const encryptedValue = sc.encryptString(
+    JSON.stringify(value),
+    import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD
+  );
+  localStorage.setItem(key, encryptedValue);
+};
+
 // Create the store
 const useUserStore = create<UserStore>((set) => {
-  const { getSecureLocalStorage, setObjectSecureLocalStorage } =
-    useSecureLocalStorage();
   // Initialize state from localStorage if available
   const storedUser = getSecureLocalStorage("user");
   const initialUser = storedUser ? JSON.parse(storedUser) : null;

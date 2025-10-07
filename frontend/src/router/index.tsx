@@ -10,7 +10,7 @@ import Login from "@/page/login/Login";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 export default function useRouterApp() {
-  const isUserLoggedIn = Boolean(localStorage.getItem("user"));
+  const isUserLoggedIn = Boolean(localStorage.getItem("token"));
 
   return createBrowserRouter([
     {

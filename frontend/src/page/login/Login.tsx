@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import useUserStore from "../../storage/storeUser";
 import { useMutateService } from "../../api/services/useMutation";
-import type { ILoginResponse, ILoginUser } from "../../interface/ILogin";
+import type { ILoginResponse } from "../../interface/ILogin";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 
@@ -25,13 +24,39 @@ const Login = () => {
     setError("");
 
     mutate(credentials, {
-      onSuccess: (response: ILoginResponse) => {
+      onSuccess: async (response: ILoginResponse) => {
         if (response?.data?.token) {
-          // Decode and store user data
-          const decodedToken: ILoginUser = jwtDecode(response.data.token);
           localStorage.setItem("token", response.data.token);
-          setUser(decodedToken);
-          navigate("/dashboard");
+          
+          // Fetch full roster data using /roster/me/ endpoint
+          try {
+            const rosterResponse = await fetch(
+              "http://localhost:8081/api/roster/me/",
+              {
+                headers: {
+                  Authorization: `Bearer ${response.data.token}`,
+                },
+              }
+            );
+            
+            if (rosterResponse.ok) {
+              const rosterData = await rosterResponse.json();
+              // Set user with all data from /roster/me/ response
+              setUser({
+                id: rosterData.data.id,
+                email: rosterData.data.email,
+                name: rosterData.data.name || "Usuario",
+                clubId: rosterData.data.clubId,
+                subscriptionId: rosterData.data.subscriptionId,
+              });
+              navigate("/dashboard");
+            } else {
+              setError("Failed to fetch user profile");
+            }
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
+            setError("Failed to fetch user profile");
+          }
         } else {
           setError("Login failed");
         }
