@@ -1,4 +1,4 @@
-import { Layout } from "@/components/layout/Layaout";
+import { Layout } from "@/components/layout/Layout";
 
 import Dashboard from "@/modules/dashboard/Dashboard";
 import TeamCategoriesModule from "@/modules/team-categories";
@@ -31,6 +31,8 @@ import StadiumUpdateModule from "@/modules/stadiums/update";
 import { VenuesModule } from "@/modules/venues";
 import { CreateVenue } from "@/modules/venues/create";
 import { UpdateVenue } from "@/modules/venues/update";
+import Contact from "@/modules/contact/Contact";
+import Support from "@/modules/support/Support";
 import ErrorPage from "@/page/ErrorPage";
 import Login from "@/page/login/Login";
 import { createBrowserRouter, Navigate } from "react-router-dom";
@@ -183,6 +185,14 @@ export default function useRouterApp() {
             {
               path: "/venues/:id/edit",
               element: <UpdateVenue />,
+            },
+            {
+              path: "/contact",
+              element: <Contact />,
+            },
+            {
+              path: "/support",
+              element: <Support />,
             },
           ]
         : [],
