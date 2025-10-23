@@ -7,15 +7,6 @@ import { toast } from "sonner";
 import type { IStadium } from "@/interface/IStadium";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { StadiumForm, type INewStadium } from "./components/Form";
 
 interface IField {
@@ -27,7 +18,7 @@ export const StadiumUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [stadium, setStadium] = useState<INewStadium>({
     area: 0,
     surface: "",
@@ -82,21 +73,16 @@ export const StadiumUpdateModule = () => {
       mutate(stadiumData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar el estadio"
-            );
+            toast.error(response.error.message || "Error al actualizar el stadiums");
           } else {
-            // Only redirect on success
-            toast.success("Estadio actualizado exitosamente");
+            toast.success("Stadiums actualizado exitosamente");
             navigate("/stadiums");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar el estadio. Por favor, intenta nuevamente."
+              "Error al actualizar el stadiums. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -144,22 +130,7 @@ export const StadiumUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar el estadio</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

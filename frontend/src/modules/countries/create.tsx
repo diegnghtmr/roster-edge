@@ -5,15 +5,6 @@ import { useMutateService } from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -23,7 +14,7 @@ interface IField {
 export const CountryCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [country, setCountry] = useState<INewCountry>({
     name: "",
   });
@@ -45,19 +36,16 @@ export const CountryCreateModule = () => {
       mutate(countryData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(response.error.message || "Error al crear el país");
+            toast.error(response.error.message || "Error al crear el countries");
           } else {
-            // Only redirect on success
-            toast.success("País creado exitosamente");
+            toast.success("Countries creado exitosamente");
             navigate("/countries");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear el país. Por favor, intenta nuevamente."
+              "Error al crear el countries. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -92,22 +80,7 @@ export const CountryCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear el país</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

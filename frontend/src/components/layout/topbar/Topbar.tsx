@@ -70,7 +70,7 @@ export const Topbar = ({ toggleDrawer }: TopbarProps) => {
           </div>
           <div className="flex items-center gap-6">
             <div className="py-2">
-              <img src="roster-logo.jpeg" className="h-[32px]" alt="roster" />
+              <img src="roster-logo.webp" className="h-[46px]" alt="roster" />
             </div>
           </div>
           <div className="hidden md:flex items-center gap-4">

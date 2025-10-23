@@ -10,6 +10,7 @@ import TeamGenderUpdateModule from "@/modules/team-genders/update";
 import { TeamsModule } from "@/modules/teams";
 import TeamCreateModule from "@/modules/teams/create";
 import TeamUpdateModule from "@/modules/teams/update";
+
 import { StaffModule } from "@/modules/staff";
 import StaffCreateModule from "@/modules/staff/create";
 import StaffUpdateModule from "@/modules/staff/update";
@@ -69,6 +70,7 @@ export default function useRouterApp() {
               path: "/teams/:id/edit",
               element: <TeamUpdateModule />,
             },
+
             {
               path: "/staff",
               element: <StaffModule />,

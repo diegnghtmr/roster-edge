@@ -7,15 +7,6 @@ import { toast } from "sonner";
 import type { StaffRole } from "@/interface/IStaffRole";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -26,7 +17,7 @@ export const StaffRoleUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [staffRole, setStaffRole] = useState<INewStaffRole>({
     name: "",
   });
@@ -74,21 +65,16 @@ export const StaffRoleUpdateModule = () => {
       mutate(staffRoleData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar el rol de personal"
-            );
+            toast.error(response.error.message || "Error al actualizar el staff-roles");
           } else {
-            // Only redirect on success
-            toast.success("Rol de personal actualizado exitosamente");
+            toast.success("Staff-roles actualizado exitosamente");
             navigate("/staff-roles");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar el rol de personal. Por favor, intenta nuevamente."
+              "Error al actualizar el staff-roles. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -136,24 +122,7 @@ export const StaffRoleUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Error al actualizar el rol de personal
-            </AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

@@ -9,15 +9,6 @@ import type { City } from "@/interface/ICity";
 import type { Club } from "@/interface/IClub";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -28,7 +19,7 @@ export const UpdateVenue = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [venue, setVenue] = useState<INewVenue>({
     name: "",
     cityId: 0,
@@ -118,21 +109,16 @@ export const UpdateVenue = () => {
       mutate(venueData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar la sede"
-            );
+            toast.error(response.error.message || "Error al actualizar el venues");
           } else {
-            // Only redirect on success
-            toast.success("Sede actualizada exitosamente");
+            toast.success("Venues actualizado exitosamente");
             navigate("/venues");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar la sede. Por favor, intenta nuevamente."
+              "Error al actualizar el venues. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -184,22 +170,7 @@ export const UpdateVenue = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar la sede</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

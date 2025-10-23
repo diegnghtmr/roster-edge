@@ -5,15 +5,6 @@ import { useMutateService } from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -23,7 +14,7 @@ interface IField {
 export const StaffRoleCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [staffRole, setStaffRole] = useState<INewStaffRole>({
     name: "",
   });
@@ -51,21 +42,16 @@ export const StaffRoleCreateModule = () => {
       mutate(staffRoleData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear el rol de personal"
-            );
+            toast.error(response.error.message || "Error al crear el staff-roles");
           } else {
-            // Only redirect on success
-            toast.success("Rol de personal creado exitosamente");
+            toast.success("Staff-roles creado exitosamente");
             navigate("/staff-roles");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear el rol de personal. Por favor, intenta nuevamente."
+              "Error al crear el staff-roles. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -100,24 +86,7 @@ export const StaffRoleCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Error al crear el rol de personal
-            </AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

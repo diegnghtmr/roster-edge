@@ -1,19 +1,10 @@
+import { useMutateService } from "@/api/services/useMutation";
+import { InternalHeader } from "@/components/layout/InternalHeader";
+import { BookmarkCheck } from "lucide-react";
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TeamGenderForm, type INewTeamGender } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
 import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { TeamGenderForm, type INewTeamGender } from "./components/Form";
 
 interface IField {
   name: string;
@@ -23,7 +14,7 @@ interface IField {
 export const TeamGenderCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [gender, setGender] = useState<INewTeamGender>({
     name: "",
   });
@@ -52,21 +43,16 @@ export const TeamGenderCreateModule = () => {
       mutate(genderData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear el género"
-            );
+            toast.error(response.error.message || "Error al crear el team-genders");
           } else {
-            // Only redirect on success
-            toast.success("Género creado exitosamente");
+            toast.success("Team-genders creado exitosamente");
             navigate("/team-genders");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear el género. Por favor, intenta nuevamente."
+              "Error al crear el team-genders. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -101,22 +87,7 @@ export const TeamGenderCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear el género</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

@@ -1,23 +1,14 @@
+import useGetList from "@/api/services/getServices/useGetList";
+import { useMutateService } from "@/api/services/useMutation";
+import { InternalHeader } from "@/components/layout/InternalHeader";
+import { Spinner } from "@/components/ui/spinner";
+import type { Club } from "@/interface/IClub";
+import type { TeamCategory } from "@/interface/ITeamCategory";
+import { BookmarkCheck } from "lucide-react";
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TeamForm, type INewTeam } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import type { TeamCategory } from "@/interface/ITeamCategory";
-import type { Club } from "@/interface/IClub";
-import { Spinner } from "@/components/ui/spinner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { TeamForm, type INewTeam } from "./components/Form";
 
 interface IField {
   name: string;
@@ -27,7 +18,7 @@ interface IField {
 export const TeamCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [team, setTeam] = useState<INewTeam>({
     name: "",
     mascot: "",
@@ -84,21 +75,16 @@ export const TeamCreateModule = () => {
       mutate(teamData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear el equipo"
-            );
+            toast.error(response.error.message || "Error al crear el teams");
           } else {
-            // Only redirect on success
-            toast.success("Equipo creado exitosamente");
+            toast.success("Teams creado exitosamente");
             navigate("/teams");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear el equipo. Por favor, intenta nuevamente."
+              "Error al crear el teams. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -144,22 +130,7 @@ export const TeamCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear el equipo</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

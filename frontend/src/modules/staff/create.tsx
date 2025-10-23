@@ -10,15 +10,6 @@ import type { StaffRole } from "@/interface/IStaffRole";
 import type { Team } from "@/interface/ITeam";
 import type { City } from "@/interface/ICity";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -28,7 +19,7 @@ interface IField {
 export const StaffCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [staff, setStaff] = useState<INewStaff>({
     name: "",
     lastName: "",
@@ -101,21 +92,16 @@ export const StaffCreateModule = () => {
       mutate(staffData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear el personal"
-            );
+            toast.error(response.error.message || "Error al crear el staff");
           } else {
-            // Only redirect on success
-            toast.success("Personal creado exitosamente");
+            toast.success("Staff creado exitosamente");
             navigate("/staff");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear el personal. Por favor, intenta nuevamente."
+              "Error al crear el staff. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -162,22 +148,7 @@ export const StaffCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear el personal</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

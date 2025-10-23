@@ -8,16 +8,6 @@ import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { Spinner } from "@/components/ui/spinner";
 import type { Country } from "@/interface/ICountry";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { type INewCity, CityForm } from "./components/Form";
 
 interface IField {
@@ -28,7 +18,6 @@ interface IField {
 export const CityCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [city, setCity] = useState<INewCity>({
     name: "",
     countryId: 0,
@@ -69,21 +58,16 @@ export const CityCreateModule = () => {
       mutate(cityData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear la ciudad"
-            );
+            toast.error(response.error.message || "Error al crear la ciudad");
           } else {
-            // Only redirect on success
             toast.success("Ciudad creada exitosamente");
             navigate("/cities");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear la ciudad. Por favor, intenta nuevamente."
+              "Error al crear la ciudad. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -91,7 +75,7 @@ export const CityCreateModule = () => {
         },
       });
     },
-    [city, mutate, navigate]
+    [city, mutate, navigate],
   );
 
   // Set the values after field changes
@@ -111,7 +95,7 @@ export const CityCreateModule = () => {
   return (
     <div className="w-full">
       <InternalHeader
-        title="Ciudades"
+        title="Crear Ciudad"
         description="Completa todos los campos para crear una nueva ciudad"
         buttonText="Ver ciudades"
         buttonIcon={<BookmarkCheck className="h-4 w-4" />}
@@ -127,23 +111,6 @@ export const CityCreateModule = () => {
           countries={countries}
         />
       </div>
-
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear la ciudad</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };

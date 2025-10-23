@@ -8,15 +8,6 @@ import type { TeamGender } from "@/interface/ITeamGender";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -27,7 +18,7 @@ export const TeamGenderUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [gender, setGender] = useState<INewTeamGender>({
     name: "",
     active: true,
@@ -78,21 +69,16 @@ export const TeamGenderUpdateModule = () => {
       mutate(genderData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar el género"
-            );
+            toast.error(response.error.message || "Error al actualizar el team-genders");
           } else {
-            // Only redirect on success
-            toast.success("Género actualizado exitosamente");
-            navigate("/team-genders");
+            toast.success("Team-genders actualizado exitosamente");
+            navigate("/team-genderss");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar el género. Por favor, intenta nuevamente."
+              "Error al actualizar el team-genders. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -139,22 +125,7 @@ export const TeamGenderUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar el género</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

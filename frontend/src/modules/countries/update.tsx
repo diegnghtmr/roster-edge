@@ -7,15 +7,6 @@ import { toast } from "sonner";
 import type { Country } from "@/interface/ICountry";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -26,7 +17,7 @@ export const CountryUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [country, setCountry] = useState<INewCountry>({
     name: "",
   });
@@ -66,21 +57,16 @@ export const CountryUpdateModule = () => {
       mutate(countryData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar el país"
-            );
+            toast.error(response.error.message || "Error al actualizar el countries");
           } else {
-            // Only redirect on success
-            toast.success("País actualizado exitosamente");
+            toast.success("Countries actualizado exitosamente");
             navigate("/countries");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar el país. Por favor, intenta nuevamente."
+              "Error al actualizar el countries. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -128,22 +114,7 @@ export const CountryUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar el país</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

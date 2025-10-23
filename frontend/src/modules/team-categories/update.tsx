@@ -8,15 +8,6 @@ import type { TeamCategory } from "@/interface/ITeamCategory";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -27,7 +18,7 @@ export const TeamCategoryUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [category, setCategory] = useState<INewTeamCategory>({
     name: "",
     active: true,
@@ -78,21 +69,16 @@ export const TeamCategoryUpdateModule = () => {
       mutate(categoryData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar la categoría"
-            );
+            toast.error(response.error.message || "Error al actualizar el team-categories");
           } else {
-            // Only redirect on success
-            toast.success("Categoría actualizada exitosamente");
+            toast.success("Team-categories actualizado exitosamente");
             navigate("/team-categories");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar la categoría. Por favor, intenta nuevamente."
+              "Error al actualizar el team-categories. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -139,22 +125,7 @@ export const TeamCategoryUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar la categoría</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

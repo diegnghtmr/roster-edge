@@ -5,15 +5,6 @@ import { useMutateService } from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -23,7 +14,7 @@ interface IField {
 export const TeamCategoryCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [category, setCategory] = useState<INewTeamCategory>({
     name: "",
   });
@@ -52,21 +43,16 @@ export const TeamCategoryCreateModule = () => {
       mutate(categoryData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear la categoría"
-            );
+            toast.error(response.error.message || "Error al crear el team-categories");
           } else {
-            // Only redirect on success
-            toast.success("Categoría creada exitosamente");
+            toast.success("Team-categories creado exitosamente");
             navigate("/team-categories");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear la categoría. Por favor, intenta nuevamente."
+              "Error al crear el team-categories. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -101,22 +87,7 @@ export const TeamCategoryCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear la categoría</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

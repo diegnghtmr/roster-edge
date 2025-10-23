@@ -1,13 +1,12 @@
 import PeopleIcon from "@mui/icons-material/People";
 import EventIcon from "@mui/icons-material/Event";
-import BarChartIcon from "@mui/icons-material/BarChart";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import PublicIcon from "@mui/icons-material/Public";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import StadiumIcon from "@mui/icons-material/Stadium";
 import PlaceIcon from "@mui/icons-material/Place";
+import GroupsIcon from "@mui/icons-material/Groups";
 import BadgeIcon from "@mui/icons-material/Badge";
-import WorkIcon from "@mui/icons-material/Work";
 import type { INavigationList } from "../Sidebar";
 
 export const navigationList: INavigationList[] = [
@@ -28,21 +27,7 @@ export const navigationList: INavigationList[] = [
   {
     name: "Equipos",
     path: "teams",
-    icon: <BarChartIcon />,
-    permissions: [],
-    childrens: [],
-  },
-  {
-    name: "Categorias de Equipo",
-    path: "team-categories",
-    icon: <BarChartIcon />,
-    permissions: [],
-    childrens: [],
-  },
-  {
-    name: "Géneros de Equipo",
-    path: "team-genders",
-    icon: <BarChartIcon />,
+    icon: <GroupsIcon />,
     permissions: [],
     childrens: [],
   },
@@ -50,13 +35,6 @@ export const navigationList: INavigationList[] = [
     name: "Personal",
     path: "staff",
     icon: <BadgeIcon />,
-    permissions: [],
-    childrens: [],
-  },
-  {
-    name: "Roles de Personal",
-    path: "staff-roles",
-    icon: <WorkIcon />,
     permissions: [],
     childrens: [],
   },

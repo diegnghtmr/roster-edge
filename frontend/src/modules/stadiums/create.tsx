@@ -4,15 +4,6 @@ import { useMutateService } from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { StadiumForm, type INewStadium } from "./components/Form";
 
 interface IField {
@@ -23,7 +14,7 @@ interface IField {
 export const StadiumCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [stadium, setStadium] = useState<INewStadium>({
     area: 0,
     surface: "",
@@ -55,21 +46,16 @@ export const StadiumCreateModule = () => {
       mutate(stadiumData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al crear el estadio"
-            );
+            toast.error(response.error.message || "Error al crear el stadiums");
           } else {
-            // Only redirect on success
-            toast.success("Estadio creado exitosamente");
+            toast.success("Stadiums creado exitosamente");
             navigate("/stadiums");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear el estadio. Por favor, intenta nuevamente."
+              "Error al crear el stadiums. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -104,22 +90,7 @@ export const StadiumCreateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear el estadio</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

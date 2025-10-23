@@ -9,15 +9,6 @@ import { InternalHeader } from "@/components/layout/InternalHeader";
 import type { City } from "@/interface/ICity";
 import type { Club } from "@/interface/IClub";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -27,7 +18,7 @@ interface IField {
 export const CreateVenue = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [venue, setVenue] = useState<INewVenue>({
     name: "",
     email: "",
@@ -91,19 +82,16 @@ export const CreateVenue = () => {
       mutate(venueData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(response.error.message || "Error al crear la sede");
+            toast.error(response.error.message || "Error al crear el venues");
           } else {
-            // Only redirect on success
-            toast.success("Sede creada exitosamente");
+            toast.success("Venues creado exitosamente");
             navigate("/venues");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al crear la sede. Por favor, intenta nuevamente."
+              "Error al crear el venues. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -149,22 +137,7 @@ export const CreateVenue = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al crear la sede</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

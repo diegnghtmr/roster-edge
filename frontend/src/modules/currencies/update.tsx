@@ -7,15 +7,6 @@ import { toast } from "sonner";
 import type { Currency } from "@/interface/ICurrency";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { CurrencyForm, type INewCurrency } from "./components/Form";
 
 interface IField {
@@ -27,7 +18,7 @@ export const CurrencyUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [currency, setCurrency] = useState<INewCurrency>({
     name: "",
     symbol: "",
@@ -70,21 +61,16 @@ export const CurrencyUpdateModule = () => {
       mutate(currencyData, {
         onSuccess: (response: any) => {
           if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar la moneda"
-            );
+            toast.error(response.error.message || "Error al actualizar el currencies");
           } else {
-            // Only redirect on success
-            toast.success("Moneda actualizada exitosamente");
+            toast.success("Currencies actualizado exitosamente");
             navigate("/currencies");
           }
         },
         onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+          toast.error(
             error?.message ||
-              "Error al actualizar la moneda. Por favor, intenta nuevamente."
+              "Error al actualizar el currencies. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -132,22 +118,7 @@ export const CurrencyUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar la moneda</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };
