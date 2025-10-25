@@ -31,7 +31,8 @@ public class MatchScheduleQueryRepository {
             .append("       stadium.venue_id, venue.name AS venue_name, \n")
             .append("       venue.city_id, city.name AS city_name, \n")
             .append("       country.id AS country_id, country.name AS country_name, \n")
-            .append("       m.season_id, season.name AS season_name, \n")
+            .append("       m.event_id, event.name AS event_name, \n")
+            .append("       event.season_id AS season_id, season.name AS season_name, \n")
             .append("       home.team_id AS home_team_id, homeTeam.name AS home_team_name, home.score AS home_score, \n")
             .append("       homeClub.id AS home_club_id, homeClub.name AS home_club_name, \n")
             .append("       away.team_id AS away_team_id, awayTeam.name AS away_team_name, away.score AS away_score, \n")
@@ -43,7 +44,8 @@ public class MatchScheduleQueryRepository {
             .append("       m.active, m.created_at, m.updated_at \n")
             .append("FROM \"Match\" m \n")
             .append("LEFT JOIN \"Matchday\" md ON m.matchday_id = md.id \n")
-            .append("LEFT JOIN \"Season\" season ON m.season_id = season.id \n")
+            .append("LEFT JOIN \"Event\" event ON m.event_id = event.id \n")
+            .append("LEFT JOIN \"Season\" season ON event.season_id = season.id \n")
             .append("LEFT JOIN \"Stadium\" stadium ON m.stadium_id = stadium.id \n")
             .append("LEFT JOIN \"Venue\" venue ON stadium.venue_id = venue.id \n")
             .append("LEFT JOIN \"City\" city ON venue.city_id = city.id \n")
@@ -56,8 +58,12 @@ public class MatchScheduleQueryRepository {
             .append("LEFT JOIN \"Club\" awayClub ON awayTeam.club_id = awayClub.id \n")
             .append("WHERE 1 = 1");
 
+        if (filter.getEventId() != null) {
+            sql.append(" AND m.event_id = :eventId");
+            parameters.addValue("eventId", filter.getEventId());
+        }
         if (filter.getSeasonId() != null) {
-            sql.append(" AND m.season_id = :seasonId");
+            sql.append(" AND event.season_id = :seasonId");
             parameters.addValue("seasonId", filter.getSeasonId());
         }
         if (filter.getMatchdayId() != null) {
@@ -120,6 +126,8 @@ public class MatchScheduleQueryRepository {
             .cityName(rs.getString("city_name"))
             .countryId(rs.getObject("country_id", Long.class))
             .countryName(rs.getString("country_name"))
+            .eventId(rs.getObject("event_id", Long.class))
+            .eventName(rs.getString("event_name"))
             .seasonId(rs.getObject("season_id", Long.class))
             .seasonName(rs.getString("season_name"))
             .homeTeamId(rs.getObject("home_team_id", Long.class))

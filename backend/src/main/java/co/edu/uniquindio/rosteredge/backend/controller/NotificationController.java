@@ -30,14 +30,15 @@ public class NotificationController extends SimpleCrudController<Notification> {
     public ResponseEntity<ApiResponse<List<Notification>>> findAll() {
         HttpServletRequest request = currentRequest();
         String message = trimToNull(request.getParameter("message"));
+        String status = trimToNull(request.getParameter("status"));
         Boolean active = parseBoolean(request.getParameter("active"));
         LocalDateTime sendFrom = parseDateTime(request.getParameter("sendFrom"));
         LocalDateTime sendTo = parseDateTime(request.getParameter("sendTo"));
 
-        log.info("Request to get notifications with filters - message: {}, active: {}, sendFrom: {}, sendTo: {}",
-                message, active, sendFrom, sendTo);
+        log.info("Request to get notifications with filters - message: {}, status: {}, active: {}, sendFrom: {}, sendTo: {}",
+                message, status, active, sendFrom, sendTo);
 
-        List<Notification> notifications = notificationService.findByFilters(message, active, sendFrom, sendTo);
+        List<Notification> notifications = notificationService.findByFilters(message, status, active, sendFrom, sendTo);
         return ResponseEntity.ok(ApiResponse.success(notifications));
     }
 }

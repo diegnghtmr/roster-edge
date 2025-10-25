@@ -275,12 +275,12 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 -- Insert payments related to plans
-INSERT INTO "Payment" (payment_date, payment_method_id, description, amount, discount, currency_id, plan_id) VALUES
-    ('2024-01-01 09:30:00', 1, 'Monthly payment Professional Plan', 150000.00, 0, 1, 2),
-    ('2024-02-01 10:15:00', 2, 'Monthly payment Professional Plan with discount', 150000.00, 15000.00, 1, 2),
-    ('2024-03-01 14:30:00', 3, 'Basic Plan payment', 50000.00, 0, 1, 1),
-    ('2025-08-05 09:45:00', 1, 'Premium Plan quarterly payment', 300000.00, 0, 2, 3),
-    ('2025-09-10 11:20:00', 2, 'Professional Plan renewal', 150000.00, 10000.00, 1, 2)
+INSERT INTO "Payment" (payment_date, payment_method_id, description, amount, discount, currency_id, plan_id, roster_id) VALUES
+    ('2024-01-01 09:30:00', 1, 'Monthly payment Professional Plan', 150000.00, 0, 1, 2, 1),
+    ('2024-02-01 10:15:00', 2, 'Monthly payment Professional Plan with discount', 150000.00, 15000.00, 1, 2, 1),
+    ('2024-03-01 14:30:00', 3, 'Basic Plan payment', 50000.00, 0, 1, 1, 1),
+    ('2025-08-05 09:45:00', 1, 'Premium Plan quarterly payment', 300000.00, 0, 2, 3, 1),
+    ('2025-09-10 11:20:00', 2, 'Professional Plan renewal', 150000.00, 10000.00, 1, 2, 1)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -294,16 +294,20 @@ INSERT INTO "Event" (season_id, venue_id, name, description, date, created_at, u
     (1, 1, 'Technical Meeting', 'Pre-match tactical analysis', '2024-01-18', NOW(), NOW(), TRUE),
     (3, 2, 'Valle Preseason Camp', 'High-altitude training microcycle', '2024-02-10', NOW(), NOW(), TRUE),
     (4, 2, 'Condor Strategy Workshop', 'Season planning workshop', '2025-07-20', NOW(), NOW(), TRUE),
-    (5, 3, 'Toro Norte Fitness Test', 'Start of Apertura physical evaluations', '2024-01-20', NOW(), NOW(), TRUE)
+    (5, 3, 'Toro Norte Fitness Test', 'Start of Apertura physical evaluations', '2024-01-20', NOW(), NOW(), TRUE),
+    (1, 1, 'Legends Charity Match', 'Exhibition match in benefit of the academy', '2099-05-15', NOW(), NOW(), TRUE),
+    (4, 2, 'Condor Valle Semifinal', 'Semi-final leg for Condor Valle campaign', '2025-09-25', NOW(), NOW(), TRUE),
+    (4, 2, 'Condor Valle Final', 'Season finale appearance for Condor Valle', '2025-11-05', NOW(), NOW(), TRUE),
+    (5, 3, 'Toro Norte Apertura Debut', 'Opening fixture for Toro Norte', '2024-03-12', NOW(), NOW(), TRUE)
 ON CONFLICT DO NOTHING;
 
 -- Insert match
-INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, season_id) VALUES
-    (1, 1, '20:00:00', '22:00:00', '2024-01-20', 1, 1),
-    (2, 1, '18:00:00', '20:00:00', '2099-05-15', 1, 1),
-    (3, 2, '18:30:00', '20:30:00', '2025-09-25', 2, 4),
-    (4, 3, '19:30:00', '21:30:00', '2025-11-05', 2, 4),
-    (5, 2, '16:00:00', '18:00:00', '2024-03-12', 3, 5)
+INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, event_id) VALUES
+    (1, 1, '20:00:00', '22:00:00', '2024-01-20', 1, 2),
+    (2, 1, '18:00:00', '20:00:00', '2099-05-15', 1, 7),
+    (3, 2, '18:30:00', '20:30:00', '2025-09-25', 2, 8),
+    (4, 3, '19:30:00', '21:30:00', '2025-11-05', 2, 9),
+    (5, 2, '16:00:00', '18:00:00', '2024-03-12', 3, 10)
 ON CONFLICT DO NOTHING;
 
 -- Insert participating teams in the match
@@ -330,7 +334,11 @@ INSERT INTO "ClubEvent" (club_id, event_id) VALUES
     (1, 3),
     (2, 4),
     (2, 5),
-    (3, 6)
+    (3, 6),
+    (1, 7),
+    (2, 8),
+    (2, 9),
+    (3, 10)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -338,13 +346,13 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 -- Insert notifications
-INSERT INTO "Notification" (message, send_date) VALUES
-    ('Reminder: Preparatory training scheduled for tomorrow at 4:00 PM at the club facilities.', '2024-01-14 09:00:00'),
-    ('Confirmation: Match against Deportivo Cali this Saturday January 20 at 8:00 PM. Please confirm squad attendance.', '2024-01-18 10:00:00'),
-    ('Summons: Mandatory technical meeting for all technical staff and starting players.', '2024-01-17 08:00:00'),
-    ('Recordatorio: Campamento de pretemporada Condor Valle inicia el 10 de febrero.', '2024-02-05 09:30:00'),
-    ('Alerta: Taller estratégico Condor Valle programado para el 20 de julio.', '2025-07-10 08:45:00'),
-    ('Aviso: Evaluaciones físicas Toro Norte comienzan el 20 de enero.', '2024-01-15 07:15:00')
+INSERT INTO "Notification" (message, status, send_date) VALUES
+    ('Reminder: Preparatory training scheduled for tomorrow at 4:00 PM at the club facilities.', 'SENT', '2024-01-14 09:00:00'),
+    ('Confirmation: Match against Deportivo Cali this Saturday January 20 at 8:00 PM. Please confirm squad attendance.', 'SENT', '2024-01-18 10:00:00'),
+    ('Summons: Mandatory technical meeting for all technical staff and starting players.', 'PUBLISHED', '2024-01-17 08:00:00'),
+    ('Recordatorio: Campamento de pretemporada Condor Valle inicia el 10 de febrero.', 'PENDING', '2024-02-05 09:30:00'),
+    ('Alerta: Taller estratégico Condor Valle programado para el 20 de julio.', 'PENDING', '2025-07-10 08:45:00'),
+    ('Aviso: Evaluaciones físicas Toro Norte comienzan el 20 de enero.', 'SCHEDULED', '2024-01-15 07:15:00')
 ON CONFLICT DO NOTHING;
 
 -- Insert notification-club event relationships
@@ -358,7 +366,7 @@ INSERT INTO "NotificationClubEvent" (notification_id, club_event_id) VALUES
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- STREAKS AND DOCUMENT TEMPLATES
+-- STREAKS
 -- ========================================
 
 -- Insert team streak
@@ -366,18 +374,4 @@ INSERT INTO "Streak" (team_id, start_date, end_date) VALUES
     (1, '2024-01-01', null),
     (4, '2024-08-01', '2024-09-20'),
     (6, '2024-10-01', null)
-ON CONFLICT DO NOTHING;
-
--- Insert document templates
-INSERT INTO "DocumentTemplate" (name, description, document_format_id, document_type_id, content, creation) VALUES
-    ('Match Summons', 'Template for summoning players', 1, 1, 'Dear player, you are summoned for the match...', '2024-01-01 10:00:00'),
-    ('Medical Report', 'Template for medical reports', 1, 2, 'Medical report of player: [NAME]...', '2024-01-01 10:00:00'),
-    ('Scouting Report', 'Template for scouting observations', 1, 3, 'Scouting notes for rival club: [CLUB]...', '2024-05-10 14:30:00')
-ON CONFLICT DO NOTHING;
-
--- Insert roster-document template relationships
-INSERT INTO "RosterDocumentTemplate" (roster_id, document_template_id) VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3)
 ON CONFLICT DO NOTHING;

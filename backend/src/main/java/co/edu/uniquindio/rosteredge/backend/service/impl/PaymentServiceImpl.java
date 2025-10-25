@@ -28,10 +28,10 @@ public class PaymentServiceImpl extends SimpleCrudService<Payment> implements Pa
 
     @Override
     @Transactional(readOnly = true)
-    public List<Payment> findByFilters(Long paymentMethodId, Long currencyId, Long planId, Boolean active,
+    public List<Payment> findByFilters(Long paymentMethodId, Long currencyId, Long planId, Long rosterId, Boolean active,
                                        LocalDateTime paymentDateFrom, LocalDateTime paymentDateTo,
                                        BigDecimal amountFrom, BigDecimal amountTo) {
-        return paymentRepository.findByFilters(paymentMethodId, currencyId, planId, active,
+        return paymentRepository.findByFilters(paymentMethodId, currencyId, planId, rosterId, active,
                 paymentDateFrom, paymentDateTo, amountFrom, amountTo);
     }
 }

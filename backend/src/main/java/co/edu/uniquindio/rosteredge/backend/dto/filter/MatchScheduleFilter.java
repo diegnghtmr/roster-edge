@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class MatchScheduleFilter {
 
+    private Long eventId;
     private Long seasonId;
     private Long matchdayId;
     private Long teamId;

@@ -1,6 +1,7 @@
 package co.edu.uniquindio.rosteredge.backend.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,13 @@ public class Notification extends BaseEntity {
      */
     @NotBlank(message = "Message is required")
     private String message;
+
+    /**
+     * Notification status
+     */
+    @NotBlank(message = "Status is required")
+    @Size(max = 30, message = "Status cannot exceed 30 characters")
+    private String status;
 
     /**
      * Send date

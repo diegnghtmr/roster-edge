@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS "Event" (
   "created_at" timestamp DEFAULT (now()),
   "updated_at" timestamp DEFAULT (now()),
   "active" boolean DEFAULT true,
-  "season_id" bigint,
+  "season_id" bigint NOT NULL,
   "venue_id" bigint,
   "name" varchar(150) NOT NULL,
   "description" text,
@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS "Match" (
   "end_time" time NOT NULL,
   "date" date NOT NULL,
   "stadium_id" bigint,
-  "season_id" bigint
+  "event_id" bigint NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "MatchHomeTeam" (
@@ -335,7 +335,8 @@ CREATE TABLE IF NOT EXISTS "Payment" (
   "amount" decimal(12,2) NOT NULL,
   "discount" decimal(12,2) DEFAULT 0,
   "currency_id" bigint,
-  "plan_id" bigint
+  "plan_id" bigint,
+  "roster_id" bigint NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "ClubEvent" (
@@ -354,6 +355,7 @@ CREATE TABLE IF NOT EXISTS "Notification" (
   "updated_at" timestamp DEFAULT (now()),
   "active" boolean DEFAULT true,
   "message" text NOT NULL,
+  "status" varchar(30) DEFAULT 'PENDING' NOT NULL,
   "send_date" timestamp DEFAULT (now())
 );
 
@@ -364,28 +366,6 @@ CREATE TABLE IF NOT EXISTS "NotificationClubEvent" (
   "notification_id" bigint NOT NULL,
   "club_event_id" bigint NOT NULL,
   PRIMARY KEY ("notification_id", "club_event_id")
-);
-
-CREATE TABLE IF NOT EXISTS "DocumentTemplate" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now()),
-  "active" boolean DEFAULT true,
-  "name" varchar(120) NOT NULL,
-  "description" varchar(120) NOT NULL,
-  "document_format_id" bigint,
-  "document_type_id" bigint,
-  "content" text NOT NULL,
-  "creation" timestamp DEFAULT (now())
-);
-
-CREATE TABLE IF NOT EXISTS "RosterDocumentTemplate" (
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now()),
-  "active" boolean DEFAULT true,
-  "roster_id" bigint NOT NULL,
-  "document_template_id" bigint NOT NULL,
-  PRIMARY KEY ("roster_id", "document_template_id")
 );
 
 -- ========================================
@@ -436,8 +416,6 @@ COMMENT ON TABLE "ClubEvent" IS 'Relationship of clubs participating in sports e
 
 COMMENT ON TABLE "Notification" IS 'Notifications about specific club participations in events';
 
-COMMENT ON TABLE "DocumentTemplate" IS 'Document templates. Types: INVOICE, PERMIT, RECEIPT';
-
 COMMENT ON TABLE "Color" IS 'Catalog of colors used by teams';
 
 COMMENT ON TABLE "TeamColor" IS 'Relationship between teams and their colors';
@@ -478,21 +456,13 @@ ALTER TABLE "Roster" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 
 ALTER TABLE "Roster" ADD FOREIGN KEY ("subscription_id") REFERENCES "Subscription" ("id");
 
-ALTER TABLE "RosterDocumentTemplate" ADD FOREIGN KEY ("roster_id") REFERENCES "Roster" ("id");
-
-ALTER TABLE "RosterDocumentTemplate" ADD FOREIGN KEY ("document_template_id") REFERENCES "DocumentTemplate" ("id");
-
-ALTER TABLE "DocumentTemplate" ADD FOREIGN KEY ("document_type_id") REFERENCES "DocumentType" ("id");
-
-ALTER TABLE "DocumentTemplate" ADD FOREIGN KEY ("document_format_id") REFERENCES "DocumentFormat" ("id");
-
 ALTER TABLE "Event" ADD FOREIGN KEY ("season_id") REFERENCES "Season" ("id");
 
 ALTER TABLE "Event" ADD FOREIGN KEY ("venue_id") REFERENCES "Venue" ("id");
 
 ALTER TABLE "Match" ADD FOREIGN KEY ("stadium_id") REFERENCES "Stadium" ("id");
 
-ALTER TABLE "Match" ADD FOREIGN KEY ("season_id") REFERENCES "Season" ("id");
+ALTER TABLE "Match" ADD FOREIGN KEY ("event_id") REFERENCES "Event" ("id");
 
 ALTER TABLE "Match" ADD FOREIGN KEY ("matchday_id") REFERENCES "Matchday" ("id");
 
@@ -517,6 +487,8 @@ ALTER TABLE "Payment" ADD FOREIGN KEY ("plan_id") REFERENCES "Plan" ("id");
 ALTER TABLE "Payment" ADD FOREIGN KEY ("payment_method_id") REFERENCES "PaymentMethod" ("id");
 
 ALTER TABLE "Payment" ADD FOREIGN KEY ("currency_id") REFERENCES "Currency" ("id");
+
+ALTER TABLE "Payment" ADD FOREIGN KEY ("roster_id") REFERENCES "Roster" ("id");
 
 ALTER TABLE "ClubEvent" ADD FOREIGN KEY ("club_id") REFERENCES "Club" ("id");
 

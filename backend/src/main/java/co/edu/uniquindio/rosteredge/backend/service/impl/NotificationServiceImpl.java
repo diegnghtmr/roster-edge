@@ -27,9 +27,9 @@ public class NotificationServiceImpl extends SimpleCrudService<Notification> imp
 
     @Override
     @Transactional(readOnly = true)
-    public List<Notification> findByFilters(String message, Boolean active,
+    public List<Notification> findByFilters(String message, String status, Boolean active,
                                             LocalDateTime sendFrom, LocalDateTime sendTo) {
-        return notificationRepository.findByFilters(message, active, sendFrom, sendTo);
+        return notificationRepository.findByFilters(message, status, active, sendFrom, sendTo);
     }
 }
 

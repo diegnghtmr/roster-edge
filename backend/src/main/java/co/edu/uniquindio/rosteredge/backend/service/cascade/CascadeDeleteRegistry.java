@@ -55,8 +55,7 @@ public class CascadeDeleteRegistry {
                         rule("TeamColor", "team_id", DELETE)
                 )),
                 Map.entry("Season", List.of(
-                        rule("Event", "season_id", SET_NULL),
-                        rule("Match", "season_id", SET_NULL)
+                        rule("Event", "season_id", SET_NULL)
                 )),
                 Map.entry("Match", List.of(
                         rule("MatchHomeTeam", "match_id", DELETE),
@@ -72,16 +71,7 @@ public class CascadeDeleteRegistry {
                         rule("Staff", "staff_role_id", SET_NULL)
                 )),
                 Map.entry("Roster", List.of(
-                        rule("RosterDocumentTemplate", "roster_id", DELETE)
-                )),
-                Map.entry("DocumentTemplate", List.of(
-                        rule("RosterDocumentTemplate", "document_template_id", DELETE)
-                )),
-                Map.entry("DocumentType", List.of(
-                        rule("DocumentTemplate", "document_type_id", SET_NULL)
-                )),
-                Map.entry("DocumentFormat", List.of(
-                        rule("DocumentTemplate", "document_format_id", SET_NULL)
+                        rule("Payment", "roster_id", DELETE)
                 )),
                 Map.entry("Subscription", List.of(
                         rule("Roster", "subscription_id", SET_NULL)
@@ -101,7 +91,8 @@ public class CascadeDeleteRegistry {
                         rule("Subscription", "status_id", SET_NULL)
                 )),
                 Map.entry("Event", List.of(
-                        deleteWithChildren("ClubEvent", "event_id")
+                        deleteWithChildren("ClubEvent", "event_id"),
+                        rule("Match", "event_id", DELETE)
                 )),
                 Map.entry("ClubEvent", List.of(
                         rule("NotificationClubEvent", "club_event_id", DELETE)

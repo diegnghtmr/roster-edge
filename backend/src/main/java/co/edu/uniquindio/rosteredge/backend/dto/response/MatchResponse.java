@@ -39,6 +39,8 @@ public class MatchResponse {
     private Long countryId;
     private String countryName;
 
+    private Long eventId;
+    private String eventName;
     private Long seasonId;
     private String seasonName;
 
