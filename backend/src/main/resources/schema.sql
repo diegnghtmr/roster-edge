@@ -76,23 +76,6 @@ CREATE TABLE IF NOT EXISTS "Currency" (
   "symbol" varchar(10) UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "DocumentType" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now()),
-  "active" boolean DEFAULT true,
-  "name" varchar(50) UNIQUE NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "DocumentFormat" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now()),
-  "active" boolean DEFAULT true,
-  "name" varchar(50) UNIQUE NOT NULL
-
-);
-
 CREATE TABLE IF NOT EXISTS "Country" (
   "id" BIGSERIAL PRIMARY KEY,
   "created_at" timestamp DEFAULT (now()),

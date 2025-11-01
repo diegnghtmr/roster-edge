@@ -81,23 +81,6 @@ INSERT INTO "Currency" (name, symbol) VALUES
     ('Euro', 'EUR')
 ON CONFLICT DO NOTHING;
 
--- Document types
-INSERT INTO "DocumentType" (name) VALUES
-    ('SUMMONS'),
-    ('MEDICAL'),
-    ('INVOICE'),
-    ('PERMIT'),
-    ('RECEIPT')
-ON CONFLICT DO NOTHING;
-
--- Document formats
-INSERT INTO "DocumentFormat" (name) VALUES
-    ('PDF'),
-    ('DOCX'),
-    ('HTML'),
-    ('TXT')
-ON CONFLICT DO NOTHING;
-
 -- Countries
 INSERT INTO "Country" (name) VALUES
     ('Colombia'),
