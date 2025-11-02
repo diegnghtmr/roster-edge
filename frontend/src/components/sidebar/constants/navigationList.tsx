@@ -7,6 +7,7 @@ import StadiumIcon from "@mui/icons-material/Stadium";
 import PlaceIcon from "@mui/icons-material/Place";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BadgeIcon from "@mui/icons-material/Badge";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import type { INavigationList } from "../Sidebar";
 
 export const navigationList: INavigationList[] = [
@@ -70,6 +71,13 @@ export const navigationList: INavigationList[] = [
     name: "Sedes",
     path: "venues",
     icon: <PlaceIcon />,
+    permissions: [],
+    childrens: [],
+  },
+  {
+    name: "Reportes",
+    path: "reports",
+    icon: <AssessmentIcon />,
     permissions: [],
     childrens: [],
   },

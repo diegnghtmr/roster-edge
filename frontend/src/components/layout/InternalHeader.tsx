@@ -48,7 +48,6 @@ export const InternalHeader = ({
   const renderButton = (button: HeaderButton, index: number) => {
     const buttonContent = (
       <Button
-        key={index}
         className="flex items-center gap-2"
         variant={button.variant || "default"}
         onClick={button.onClick}
@@ -59,10 +58,14 @@ export const InternalHeader = ({
     );
 
     if (button.link) {
-      return <Link to={button.link}>{buttonContent}</Link>;
+      return (
+        <Link key={index} to={button.link}>
+          {buttonContent}
+        </Link>
+      );
     }
 
-    return buttonContent;
+    return <div key={index}>{buttonContent}</div>;
   };
 
   return (

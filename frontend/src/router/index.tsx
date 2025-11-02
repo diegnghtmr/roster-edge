@@ -34,6 +34,17 @@ import { CreateVenue } from "@/modules/venues/create";
 import { UpdateVenue } from "@/modules/venues/update";
 import Contact from "@/modules/contact/Contact";
 import Support from "@/modules/support/Support";
+import { ReportsModule } from "@/modules/reports";
+import { SeasonStandingsReport } from "@/modules/reports/season-standings";
+import { RosterProfileReport } from "@/modules/reports/roster-profile";
+import { ScoringRankingReport } from "@/modules/reports/scoring-ranking";
+import { PointsProgressReport } from "@/modules/reports/points-progress";
+import { MatchLoadReport } from "@/modules/reports/match-load";
+import { StaffRatioReport } from "@/modules/reports/staff-ratio";
+import { StaffImpactReport } from "@/modules/reports/staff-impact";
+import { SeasonAgendaReport } from "@/modules/reports/season-agenda";
+import { CategoryParticipationReport } from "@/modules/reports/category-participation";
+import { ScheduleDensityReport } from "@/modules/reports/schedule-density";
 import ErrorPage from "@/page/ErrorPage";
 import Login from "@/page/login/Login";
 import { createBrowserRouter, Navigate } from "react-router-dom";
@@ -195,6 +206,61 @@ export default function useRouterApp() {
             {
               path: "/support",
               element: <Support />,
+            },
+            {
+              path: "/reports",
+              element: <ReportsModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/season-standings",
+              element: <SeasonStandingsReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/roster-profile",
+              element: <RosterProfileReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/scoring-ranking",
+              element: <ScoringRankingReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/points-progress",
+              element: <PointsProgressReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/match-load",
+              element: <MatchLoadReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/staff-ratio",
+              element: <StaffRatioReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/staff-impact",
+              element: <StaffImpactReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/season-agenda",
+              element: <SeasonAgendaReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/category-participation",
+              element: <CategoryParticipationReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/schedule-density",
+              element: <ScheduleDensityReport />,
+              errorElement: <ErrorPage />,
             },
           ]
         : [],

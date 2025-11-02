@@ -56,10 +56,10 @@ public class AnalyticsReportQueryRepository {
 
     public List<TeamRosterProfileResponse> findTeamRosters(RosterProfileReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("teamId", filter.getTeamId())
-            .addValue("onlyActiveTeams", filter.getOnlyActiveTeams())
-            .addValue("onlyActivePlayers", filter.getOnlyActivePlayers());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("teamId", filter.getTeamId(), Types.BIGINT)
+            .addValue("onlyActiveTeams", filter.getOnlyActiveTeams(), Types.BOOLEAN)
+            .addValue("onlyActivePlayers", filter.getOnlyActivePlayers(), Types.BOOLEAN);
 
         String sql = """
             WITH stats AS (
@@ -122,8 +122,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<SeasonAgendaResponse> findSeasonAgenda(SeasonAgendaReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("seasonId", filter.getSeasonId())
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
             .addValue("fromDate", filter.getFromDate(), Types.DATE)
             .addValue("toDate", filter.getToDate(), Types.DATE)
             .addValue("horizonDays", filter.getHorizonDays(), Types.INTEGER);
@@ -188,9 +188,9 @@ public class AnalyticsReportQueryRepository {
 
     public List<TeamMatchLoadResponse> findMatchLoad(MatchLoadReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("seasonId", filter.getSeasonId())
-            .addValue("teamId", filter.getTeamId());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
+            .addValue("teamId", filter.getTeamId(), Types.BIGINT);
 
         String sql = """
             WITH participations AS (
@@ -253,8 +253,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<ScoringRankingResponse> findScoringRanking(ScoringRankingReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("seasonId", filter.getSeasonId());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
 
         String sql = """
             WITH team_matches AS (
@@ -326,8 +326,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<TeamStaffRatioResponse> findStaffRatios(StaffRatioReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("teamId", filter.getTeamId());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("teamId", filter.getTeamId(), Types.BIGINT);
 
         String sql = """
             WITH player_stats AS (
@@ -398,8 +398,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<TeamPointsProgressResponse> findPointsProgress(PointsProgressReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("seasonId", filter.getSeasonId())
-            .addValue("teamId", filter.getTeamId());
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
+            .addValue("teamId", filter.getTeamId(), Types.BIGINT);
 
         String sql = """
             WITH team_points AS (
@@ -494,8 +494,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<CategoryParticipationResponse> findCategoryParticipation(CategoryParticipationReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("seasonId", filter.getSeasonId());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
 
         String sql = """
             WITH club_matches AS (
@@ -568,8 +568,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<SeasonStandingResponse> findSeasonStandings(SeasonStandingsReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("seasonId", filter.getSeasonId());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
 
         String sql = """
             WITH team_results AS (
@@ -661,11 +661,11 @@ public class AnalyticsReportQueryRepository {
 
     public List<ScheduleDensityResponse> findScheduleDensity(ScheduleDensityReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("seasonId", filter.getSeasonId())
-            .addValue("teamId", filter.getTeamId())
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
+            .addValue("teamId", filter.getTeamId(), Types.BIGINT)
             .addValue("fromDate", filter.getFromDate(), Types.DATE)
             .addValue("toDate", filter.getToDate(), Types.DATE)
-            .addValue("alertThresholdDays", filter.getAlertThresholdDays());
+            .addValue("alertThresholdDays", filter.getAlertThresholdDays(), Types.INTEGER);
 
         String sql = """
             WITH team_calendar AS (
@@ -745,8 +745,8 @@ public class AnalyticsReportQueryRepository {
 
     public List<TeamStaffImpactDetail> findStaffImpactDetails(StaffImpactReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("clubId", filter.getClubId())
-            .addValue("seasonId", filter.getSeasonId());
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
 
         String sql = """
             WITH player_metrics AS (
