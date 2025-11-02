@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { TeamGenderForm, type INewTeamGender } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { TeamGender } from "@/interface/ITeamGender";
@@ -67,15 +71,18 @@ export const TeamGenderUpdateModule = () => {
       };
 
       mutate(genderData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al actualizar el team-genders");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al actualizar el team-genders",
+            );
           } else {
             toast.success("Team-genders actualizado exitosamente");
             navigate("/team-genderss");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al actualizar el team-genders. Por favor, intenta nuevamente.",

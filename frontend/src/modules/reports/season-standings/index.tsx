@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,24 +7,10 @@ import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { BarChartComponent } from "@/components/reports/charts/BarChartComponent";
 import { SeasonStandingsPDF } from "@/components/reports/pdf/SeasonStandingsPDF";
 import { useSeasonStandingsReport } from "@/api/services/reports/useReportsData";
+import { useSeasonsForFilter, useClubsForFilter } from "@/api/services/filters/useFilterOptions";
 import { ArrowLeft, Trophy, Target, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SeasonStandingResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Pos", key: "rankingPosition", className: "w-16" },
@@ -40,13 +26,42 @@ const tableHeaders: TableColumn[] = [
 ];
 
 export const SeasonStandingsReport = () => {
-  const [filters, setFilters] = useState<Record<string, any>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
+
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada",
+    },
+  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading]);
 
   const { data, isLoading } = useSeasonStandingsReport(appliedFilters, true);
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleFilterChange = (key: string, value: string | number | boolean) => {
+    // If changing club, clear dependent filters
+    if (key === "clubId") {
+      setFilters({ clubId: value });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -55,7 +70,17 @@ export const SeasonStandingsReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    // Convert string IDs to numbers for API
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const standings = (data || []) as SeasonStandingResponse[];
@@ -69,8 +94,8 @@ export const SeasonStandingsReport = () => {
     ? standings.reduce((max, team) => ((team.goalsFor || 0) > (max.goalsFor || 0) ? team : max), standings[0])
     : null;
 
-  const renderRow = (standing: SeasonStandingResponse) => (
-    <tr key={standing.teamId}>
+  const renderRow = (standing: SeasonStandingResponse, index: number) => (
+    <tr key={`${standing.teamId ?? "team"}-${standing.seasonId ?? "season"}-${standing.clubId ?? "club"}-${index}`}>
       <td className="px-4 py-3 text-center font-semibold">
         {standing.rankingPosition || "-"}
       </td>
@@ -171,27 +196,51 @@ export const SeasonStandingsReport = () => {
 
         {/* Charts */}
         {!isLoading && standings.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Distribución de Puntos por Equipo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BarChartComponent
-                data={standings.map(s => ({
-                  nombre: s.teamName || "Sin nombre",
-                  puntos: s.points || 0,
-                  victorias: s.wins || 0,
-                }))}
-                xKey="nombre"
-                bars={[
-                  { key: "puntos", name: "Puntos", color: "#3b82f6" },
-                  { key: "victorias", name: "Victorias", color: "#10b981" },
-                ]}
-                yAxisLabel="Cantidad"
-                height={400}
-              />
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Puntos por Equipo (Top 10)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BarChartComponent
+                  data={standings
+                    .slice(0, 10)
+                    .map(s => ({
+                      nombre: s.teamName || "Sin nombre",
+                      puntos: s.points || 0,
+                    }))}
+                  xKey="nombre"
+                  bars={[
+                    { key: "puntos", name: "Puntos", color: "#3b82f6" },
+                  ]}
+                  yAxisLabel="Puntos"
+                  height={400}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Victorias por Equipo (Top 10)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BarChartComponent
+                  data={standings
+                    .slice(0, 10)
+                    .map(s => ({
+                      nombre: s.teamName || "Sin nombre",
+                      victorias: s.wins || 0,
+                    }))}
+                  xKey="nombre"
+                  bars={[
+                    { key: "victorias", name: "Victorias", color: "#10b981" },
+                  ]}
+                  yAxisLabel="Victorias"
+                  height={400}
+                />
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Table */}
@@ -199,7 +248,7 @@ export const SeasonStandingsReport = () => {
           <DataTable
             data={standings}
             headers={tableHeaders}
-            renderRow={renderRow}
+            renderRow={(item, index) => renderRow(item, index)}
             loading={isLoading}
             emptyMessage="No se encontraron datos para la temporada seleccionada"
           />

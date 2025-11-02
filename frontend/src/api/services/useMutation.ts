@@ -1,17 +1,41 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationResult } from "@tanstack/react-query";
 import fetchMutation from "../endPoints/fetchMutation.ts";
-
 import { useNavigate } from "react-router-dom";
 import useUserStore from "@/storage/storeUser.ts";
 
-export const useMutateService: any = (
-  resource: any = "",
+type MutationVariables = Record<string, unknown>;
+type MutationResponse = Record<string, unknown> & {
+  error?: string | { message?: string };
+};
+
+export const extractErrorMessage = (
+  error: MutationResponse["error"],
+): string | undefined => {
+  if (!error) {
+    return undefined;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (typeof error === "object" && "message" in error) {
+    const message = error.message;
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+
+  return undefined;
+};
+
+export const useMutateService = (
+  resource: string[] = [],
   params: string = "",
-  method: string = "POST",
-  isFormData: boolean = false
-) => {
+  method = "POST",
+  isFormData = false,
+): UseMutationResult<MutationResponse, Error, MutationVariables> => {
   const queryClient = useQueryClient();
   const { clearUser } = useUserStore();
   const navigate = useNavigate();
@@ -29,8 +53,8 @@ export const useMutateService: any = (
     }
   };
 
-  const response = useMutation({
-    mutationFn: (data: { [key: string]: string | Blob }) => {
+  const response = useMutation<MutationResponse, Error, MutationVariables>({
+    mutationFn: (data) => {
       // Auto-detect if FormData is needed based on File objects in data
       const hasFiles =
         data &&
@@ -43,7 +67,7 @@ export const useMutateService: any = (
         params,
         method,
         isFormData: isFormData || hasFiles,
-      });
+      }) as Promise<MutationResponse>;
     },
   });
 
@@ -55,3 +79,5 @@ export const useMutateService: any = (
 
   return response;
 };
+
+export type { MutationResponse, MutationVariables };

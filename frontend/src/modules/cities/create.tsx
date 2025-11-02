@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
@@ -56,15 +60,16 @@ export const CityCreateModule = () => {
       };
 
       mutate(cityData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al crear la ciudad");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(errorMessage || "Error al crear la ciudad");
           } else {
             toast.success("Ciudad creada exitosamente");
             navigate("/cities");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al crear la ciudad. Por favor, intenta nuevamente.",

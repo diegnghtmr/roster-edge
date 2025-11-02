@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CountryForm, type INewCountry } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
@@ -34,15 +38,16 @@ export const CountryCreateModule = () => {
       };
 
       mutate(countryData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al crear el countries");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(errorMessage || "Error al crear el countries");
           } else {
             toast.success("Countries creado exitosamente");
             navigate("/countries");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al crear el countries. Por favor, intenta nuevamente.",

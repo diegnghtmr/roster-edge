@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,30 +7,10 @@ import { BarChartComponent } from "@/components/reports/charts/BarChartComponent
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { ScoringRankingPDF } from "@/components/reports/pdf/ScoringRankingPDF";
 import { useScoringRankingReport } from "@/api/services/reports/useReportsData";
+import { useSeasonsForFilter, useClubsForFilter } from "@/api/services/filters/useFilterOptions";
 import { ArrowLeft, Target, TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ScoringRankingResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-  {
-    key: "minMatches",
-    label: "Mínimo de partidos",
-    type: "number",
-    placeholder: "Ej: 5",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Equipo", key: "teamName" },
@@ -47,10 +27,44 @@ export const ScoringRankingReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
 
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
+    },
+    {
+      key: "minMatches",
+      label: "Mínimo de partidos",
+      type: "number",
+      placeholder: "Ej: 5 (opcional)",
+    },
+  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading]);
+
   const { data, isLoading } = useScoringRankingReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "clubId") {
+      setFilters({ ...filters, clubId: value, seasonId: undefined });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -59,7 +73,18 @@ export const ScoringRankingReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else if (key === "minMatches" && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const rankings = (data || []) as ScoringRankingResponse[];
@@ -74,14 +99,15 @@ export const ScoringRankingReport = () => {
     : null;
 
   // Chart data
-  const chartData = rankings.slice(0, 10).map((team) => ({
+  const chartData = rankings.slice(0, 10).map((team, index) => ({
+    id: `${team.teamId ?? "team"}-${team.seasonId ?? "season"}-${team.clubId ?? "club"}-${index}`,
     name: team.teamName || "Sin nombre",
     gf: team.goalsFor || 0,
     gc: team.goalsAgainst || 0,
   }));
 
-  const renderRow = (ranking: ScoringRankingResponse) => (
-    <tr key={ranking.teamId}>
+  const renderRow = (ranking: ScoringRankingResponse, index: number) => (
+    <tr key={`${ranking.teamId ?? "team"}-${ranking.seasonId ?? "season"}-${ranking.clubId ?? "club"}-${index}`}>
       <td className="px-4 py-3">
         <div className="font-medium">{ranking.teamName}</div>
       </td>
@@ -195,7 +221,7 @@ export const ScoringRankingReport = () => {
           <DataTable
             data={rankings}
             headers={tableHeaders}
-            renderRow={renderRow}
+            renderRow={(item, index) => renderRow(item, index)}
             loading={isLoading}
             emptyMessage="No se encontraron datos para los filtros seleccionados"
           />

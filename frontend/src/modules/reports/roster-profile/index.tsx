@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,51 +7,66 @@ import { PieChartComponent } from "@/components/reports/charts/PieChartComponent
 import { BarChartComponent } from "@/components/reports/charts/BarChartComponent";
 import { RosterProfilePDF } from "@/components/reports/pdf/RosterProfilePDF";
 import { useRosterProfileReport } from "@/api/services/reports/useReportsData";
+import { useClubsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
+import { translatePhysicalState } from "@/utils/translations";
 import { ArrowLeft, Users, Activity, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { TeamRosterProfileResponse } from "@/interface/IReports";
 
-const filterFields: FilterField[] = [
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-  {
-    key: "teamId",
-    label: "Equipo",
-    type: "number",
-    placeholder: "ID de equipo",
-  },
-  {
-    key: "onlyActiveTeams",
-    label: "Solo equipos activos",
-    type: "checkbox",
-    placeholder: "Mostrar solo equipos activos",
-  },
-  {
-    key: "onlyActivePlayers",
-    label: "Solo jugadores activos",
-    type: "checkbox",
-    placeholder: "Contar solo jugadores activos",
-  },
-];
-
 export const RosterProfileReport = () => {
-  const [filters, setFilters] = useState<Record<string, any>>({
+  const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({
     onlyActiveTeams: true,
     onlyActivePlayers: true,
   });
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({
     onlyActiveTeams: true,
     onlyActivePlayers: true,
   });
+
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: teamOptions, isLoading: teamsLoading } = useTeamsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "teamId",
+      label: "Equipo",
+      type: "select",
+      options: teamOptions,
+      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo (opcional)",
+    },
+    {
+      key: "onlyActiveTeams",
+      label: "Solo equipos activos",
+      type: "checkbox",
+      placeholder: "Mostrar solo equipos activos",
+    },
+    {
+      key: "onlyActivePlayers",
+      label: "Solo jugadores activos",
+      type: "checkbox",
+      placeholder: "Contar solo jugadores activos",
+    },
+  ], [clubOptions, clubsLoading, teamOptions, teamsLoading]);
 
   const { data, isLoading } = useRosterProfileReport(appliedFilters, true);
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleFilterChange = (key: string, value: string | number | boolean) => {
+    if (key === "clubId") {
+      setFilters({ ...filters, clubId: value, teamId: undefined });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -60,7 +75,16 @@ export const RosterProfileReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const profiles = (data || []) as TeamRosterProfileResponse[];
@@ -83,8 +107,9 @@ export const RosterProfileReport = () => {
   const physicalStatesMap = new Map<string, number>();
   profiles.forEach((team) => {
     team.physicalStates?.forEach((state) => {
-      const current = physicalStatesMap.get(state.physicalStateName || "Desconocido") || 0;
-      physicalStatesMap.set(state.physicalStateName || "Desconocido", current + (state.players || 0));
+      const translatedName = translatePhysicalState(state.physicalStateName);
+      const current = physicalStatesMap.get(translatedName) || 0;
+      physicalStatesMap.set(translatedName, current + (state.players || 0));
     });
   });
 

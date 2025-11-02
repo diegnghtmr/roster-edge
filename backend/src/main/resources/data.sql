@@ -169,7 +169,11 @@ INSERT INTO "Season" (club_id, name, start_date, end_date, created_at, updated_a
     (11, 'Brasileirão 2024', '2024-05-01', '2024-12-30', NOW(), NOW(), TRUE),
     (11, 'Brasileirão 2025', '2025-05-01', '2025-12-30', NOW(), NOW(), TRUE),
     (12, 'Liga MX Apertura 2024', '2024-07-15', '2024-12-22', NOW(), NOW(), TRUE),
-    (12, 'Liga MX Clausura 2025', '2025-01-10', '2025-06-30', NOW(), NOW(), TRUE)
+    (12, 'Liga MX Clausura 2025', '2025-01-10', '2025-06-30', NOW(), NOW(), TRUE),
+    (7, 'Liga Argentina 2025', '2025-02-20', '2025-12-05', NOW(), NOW(), TRUE),
+    (8, 'Torneo Rosario 2025', '2025-03-10', '2025-12-10', NOW(), NOW(), TRUE),
+    (9, 'La Liga 2025', '2025-08-01', '2026-05-31', NOW(), NOW(), TRUE),
+    (10, 'Copa Catalunya 2025', '2025-09-01', '2026-06-15', NOW(), NOW(), TRUE)
 ON CONFLICT DO NOTHING;
 
 -- Insert teams - Expanded (28 teams total, ~2-3 per club)
@@ -411,6 +415,53 @@ INSERT INTO "Player" (email, password_hash, name, last_name, city_id, phone, bir
     ('israel.reyes@aztecasmx.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831831c08c8fa822809f74c720a9', 'Israel', 'Reyes', 11, '+52556777888', '2007-12-05', 1, '4', '178', 'Right', '72', 4, 28)
 ON CONFLICT DO NOTHING;
 
+-- Mark some players as inactive to create more realistic data (about 10-15% inactive)
+UPDATE "Player" SET active = FALSE WHERE email IN (
+    'oscar.montoya@condorvalle.com',  -- Team 4 - Injured
+    'martin.guzman@toronorte.com',    -- Team 6 - In recovery
+    'javier.perez@leonesmontana.com', -- Team 12 - Suspended
+    'pablo.gomez@leonesmontana.com',  -- Team 12 - On loan
+    'nelson.vargas@tiburonespac.com', -- Team 13 - Resting
+    'lucas.gonzalez@dragonesba.com',  -- Team 15 - Injured
+    'martin.suarez@halconesrosario.com', -- Team 18 - In recovery
+    'karim.benzema@madridlegends.com',   -- Team 19 - Resting
+    'lionel.messi@bcnunidos.com',        -- Team 21 - Suspended
+    'andres.guardado@aztecasmx.com'      -- Team 26 - On loan
+);
+
+-- Update physical states for variety in reports (1=Available, 2=Injured, 3=In recovery, 4=Suspended, 5=Not available, 6=On loan, 7=Resting)
+UPDATE "Player" SET physical_state_id = 2 WHERE email IN (
+    'oscar.montoya@condorvalle.com',
+    'lucas.gonzalez@dragonesba.com',
+    'julio.castro@toronorte.com',
+    'mario.diaz@tiburonespac.com'
+);
+
+UPDATE "Player" SET physical_state_id = 3 WHERE email IN (
+    'martin.guzman@toronorte.com',
+    'martin.suarez@halconesrosario.com',
+    'felipe.ruiz@leonesmontana.com'
+);
+
+UPDATE "Player" SET physical_state_id = 4 WHERE email IN (
+    'javier.perez@leonesmontana.com',
+    'lionel.messi@bcnunidos.com'
+);
+
+UPDATE "Player" SET physical_state_id = 5 WHERE email IN (
+    'sergio.cardenas@condorvalle.com'
+);
+
+UPDATE "Player" SET physical_state_id = 6 WHERE email IN (
+    'pablo.gomez@leonesmontana.com',
+    'andres.guardado@aztecasmx.com'
+);
+
+UPDATE "Player" SET physical_state_id = 7 WHERE email IN (
+    'nelson.vargas@tiburonespac.com',
+    'karim.benzema@madridlegends.com'
+);
+
 -- ========================================
 -- PLANS AND SUBSCRIPTIONS
 -- ========================================
@@ -514,7 +565,20 @@ INSERT INTO "Event" (season_id, venue_id, name, description, date, created_at, u
     (19, 12, 'Liga MX Apertura MD1', 'First Liga MX match', '2024-07-22', NOW(), NOW(), TRUE),
     (19, 12, 'Liga MX Apertura MD2', 'Second Liga MX match', '2024-08-05', NOW(), NOW(), TRUE),
     (19, 12, 'Clásico Nacional', 'Mexican national classic', '2024-08-19', NOW(), NOW(), TRUE),
-    (20, 12, 'Liga MX Clausura MD1', 'First Clausura match', '2025-01-17', NOW(), NOW(), TRUE)
+    (20, 12, 'Liga MX Clausura MD1', 'First Clausura match', '2025-01-17', NOW(), NOW(), TRUE),
+    (10, 5, 'Mountain League MD10', 'Late-season clash at Mountain Fortress', '2025-10-04', NOW(), NOW(), TRUE),
+    (12, 6, 'Pacific Cup MD12', 'Decisive Pacific Cup fixture', '2025-10-18', NOW(), NOW(), TRUE),
+    (10, 5, 'Mountain League MD11', 'Penultimate Mountain League duel', '2025-11-02', NOW(), NOW(), TRUE),
+    (12, 6, 'Pacific Cup MD13', 'Pacific Cup semifinal push', '2025-11-16', NOW(), NOW(), TRUE),
+    (12, 6, 'Pacific Cup MD14', 'Final group stage night in Pacific Cup', '2025-12-07', NOW(), NOW(), TRUE),
+    (2, 1, 'Liga Femenina MD10', 'Key fixture featuring Aguilas Femenino vs Pumas Femenino', '2025-10-09', NOW(), NOW(), TRUE),
+    (4, 2, 'Valle Juvenil MD11', 'Condor Valle Juvenil hosts Leones Reserva in decisive clash', '2025-10-12', NOW(), NOW(), TRUE),
+    (8, 4, 'Caribe Sub20 MD12', 'Pumas Caribe Sub-20 fight for top spot versus Aztecas Sub-17', '2025-10-26', NOW(), NOW(), TRUE),
+    (12, 6, 'Pacific Cup Femenina MD12', 'Tiburones Femenino defend home waters against Madrid Legends', '2025-11-09', NOW(), NOW(), TRUE),
+    (21, 7, 'Liga Argentina MD15', 'Dragones BA Primera duel Halcones Rosario A for playoff hopes', '2025-11-23', NOW(), NOW(), TRUE),
+    (23, 9, 'La Liga 2025 Showcase', 'Madrid Legends receive Barcelona Unidos in penultimate round', '2025-12-01', NOW(), NOW(), TRUE),
+    (24, 10, 'Copa Catalunya Juvenil MD9', 'Barcelona Unidos Juvenil face Dragones Juvenil in showcase', '2025-12-05', NOW(), NOW(), TRUE),
+    (22, 8, 'Torneo Rosario Femenino Final', 'Halcones Femenino battle Barcelona Unidos Femenino for the crown', '2025-12-12', NOW(), NOW(), TRUE)
 ON CONFLICT DO NOTHING;
 
 -- Insert matches
@@ -538,7 +602,77 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (17, 2, '20:00:00', '22:00:00', '2024-03-29', 4, 25),
     (18, 1, '18:00:00', '20:00:00', '2024-05-15', 11, 35),
     (19, 2, '19:30:00', '21:30:00', '2024-05-29', 11, 36),
-    (20, 1, '20:30:00', '22:30:00', '2024-07-22', 12, 37)
+    (20, 1, '20:30:00', '22:30:00', '2024-07-22', 12, 37),
+    (21, 7, '19:30:00', '21:20:00', '2025-10-04', 5, 41),
+    (22, 7, '18:00:00', '20:00:00', '2025-10-18', 6, 42),
+    (23, 8, '19:00:00', '21:00:00', '2025-11-02', 5, 43),
+    (24, 8, '20:30:00', '22:30:00', '2025-11-16', 6, 44),
+    (25, 9, '19:00:00', '21:00:00', '2025-12-07', 6, 45),
+    (26, 7, '18:30:00', '20:30:00', '2025-10-09', 1, 46),
+    (27, 7, '17:00:00', '19:00:00', '2025-10-12', 2, 47),
+    (28, 8, '16:00:00', '18:00:00', '2025-10-26', 4, 48),
+    (29, 8, '19:00:00', '21:00:00', '2025-11-09', 6, 49),
+    (30, 8, '20:30:00', '22:30:00', '2025-11-23', 7, 50),
+    (31, 9, '21:00:00', '23:00:00', '2025-12-01', 9, 51),
+    (32, 9, '18:00:00', '20:00:00', '2025-12-05', 10, 52),
+    (33, 10, '17:30:00', '19:30:00', '2025-12-12', 8, 53),
+    -- Additional matches for schedule density testing (Team 1 - Aguilas First Division, Oct-Nov 2025)
+    (34, 1, '19:00:00', '21:00:00', '2025-10-18', 1, 2),
+    (35, 1, '20:00:00', '22:00:00', '2025-10-21', 1, 2),
+    (36, 1, '18:30:00', '20:30:00', '2025-10-24', 1, 2),
+    (37, 1, '19:30:00', '21:30:00', '2025-10-26', 1, 2),
+    (38, 1, '20:30:00', '22:30:00', '2025-10-29', 1, 2),
+    (39, 1, '19:00:00', '21:00:00', '2025-11-01', 1, 2),
+    (40, 1, '18:00:00', '20:00:00', '2025-11-03', 1, 2),
+    (41, 1, '20:00:00', '22:00:00', '2025-11-05', 1, 2),
+    (42, 1, '19:30:00', '21:30:00', '2025-11-08', 1, 2),
+    (43, 1, '18:30:00', '20:30:00', '2025-11-11', 1, 2),
+    (44, 1, '20:00:00', '22:00:00', '2025-11-14', 1, 2),
+    (45, 1, '19:00:00', '21:00:00', '2025-11-17', 1, 2),
+    -- Additional matches for Team 4 (Condor Valle A, Oct-Nov 2025)
+    (46, 2, '20:00:00', '22:00:00', '2025-10-19', 2, 8),
+    (47, 2, '19:00:00', '21:00:00', '2025-10-23', 2, 8),
+    (48, 2, '18:30:00', '20:30:00', '2025-10-27', 2, 8),
+    (49, 2, '20:30:00', '22:30:00', '2025-10-30', 2, 8),
+    (50, 2, '19:30:00', '21:30:00', '2025-11-02', 2, 8),
+    (51, 2, '18:00:00', '20:00:00', '2025-11-06', 2, 8),
+    (52, 2, '20:00:00', '22:00:00', '2025-11-09', 2, 8),
+    (53, 2, '19:00:00', '21:00:00', '2025-11-12', 2, 8),
+    (54, 2, '18:30:00', '20:30:00', '2025-11-16', 2, 8),
+    (55, 2, '20:30:00', '22:30:00', '2025-11-19', 2, 8),
+    -- Additional matches for Team 6 (Toro Norte Elite, Oct-Nov 2025)
+    (56, 2, '19:30:00', '21:30:00', '2025-10-20', 3, 10),
+    (57, 2, '20:00:00', '22:00:00', '2025-10-22', 3, 10),
+    (58, 2, '18:00:00', '20:00:00', '2025-10-25', 3, 10),
+    (59, 2, '19:00:00', '21:00:00', '2025-10-28', 3, 10),
+    (60, 2, '20:30:00', '22:30:00', '2025-10-31', 3, 10),
+    (61, 2, '18:30:00', '20:30:00', '2025-11-04', 3, 10),
+    (62, 2, '19:30:00', '21:30:00', '2025-11-07', 3, 10),
+    (63, 2, '20:00:00', '22:00:00', '2025-11-10', 3, 10),
+    (64, 2, '18:00:00', '20:00:00', '2025-11-13', 3, 10),
+    (65, 2, '19:00:00', '21:00:00', '2025-11-15', 3, 10),
+    -- Additional matches for Team 8 (Leones Elite, Oct-Nov 2025)
+    (66, 5, '20:00:00', '22:00:00', '2025-10-17', 4, 14),
+    (67, 5, '19:00:00', '21:00:00', '2025-10-20', 4, 14),
+    (68, 5, '18:30:00', '20:30:00', '2025-10-22', 4, 14),
+    (69, 5, '20:30:00', '22:30:00', '2025-10-25', 4, 14),
+    (70, 5, '19:30:00', '21:30:00', '2025-10-28', 4, 14),
+    (71, 5, '18:00:00', '20:00:00', '2025-10-31', 4, 14),
+    (72, 5, '20:00:00', '22:00:00', '2025-11-02', 4, 14),
+    (73, 5, '19:00:00', '21:00:00', '2025-11-06', 4, 14),
+    (74, 5, '18:30:00', '20:30:00', '2025-11-09', 4, 14),
+    (75, 5, '20:30:00', '22:30:00', '2025-11-12', 4, 14),
+    -- Additional matches for Team 11 (Leones Montana A, Oct-Nov 2025)
+    (76, 6, '19:00:00', '21:00:00', '2025-10-19', 5, 15),
+    (77, 6, '20:00:00', '22:00:00', '2025-10-23', 5, 15),
+    (78, 6, '18:30:00', '20:30:00', '2025-10-26', 5, 15),
+    (79, 6, '19:30:00', '21:30:00', '2025-10-29', 5, 15),
+    (80, 6, '20:30:00', '22:30:00', '2025-11-01', 5, 15),
+    (81, 6, '18:00:00', '20:00:00', '2025-11-05', 5, 15),
+    (82, 6, '20:00:00', '22:00:00', '2025-11-08', 5, 15),
+    (83, 6, '19:00:00', '21:00:00', '2025-11-11', 5, 15),
+    (84, 6, '18:30:00', '20:30:00', '2025-11-15', 5, 15),
+    (85, 6, '20:30:00', '22:30:00', '2025-11-18', 5, 15)
 ON CONFLICT DO NOTHING;
 
 -- Match Home Teams with realistic scores
@@ -546,14 +680,36 @@ INSERT INTO "MatchHomeTeam" (match_id, team_id, score) VALUES
     (1, 1, 2), (2, 1, 0), (3, 4, 1), (4, 4, 0), (5, 6, 3),
     (6, 1, 3), (7, 4, 2), (8, 6, 1), (9, 8, 2), (10, 11, 1),
     (11, 4, 3), (12, 4, 2), (13, 4, 4), (14, 6, 2), (15, 6, 1),
-    (16, 8, 3), (17, 8, 1), (18, 24, 2), (19, 24, 3), (20, 26, 2)
+    (16, 8, 3), (17, 8, 1), (18, 24, 2), (19, 24, 3), (20, 26, 2),
+    (21, 11, 3), (22, 13, 1), (23, 11, 2), (24, 13, 0), (25, 13, 1), (26, 3, 2), (27, 5, 1), (28, 9, 3), (29, 14, 0), (30, 15, 1), (31, 19, 2), (32, 22, 1), (33, 18, 2),
+    -- Additional matches for Team 1 (Aguilas First Division)
+    (34, 1, 2), (35, 1, 1), (36, 1, 3), (37, 1, 2), (38, 1, 1), (39, 1, 2), (40, 1, 0), (41, 1, 3), (42, 1, 2), (43, 1, 1), (44, 1, 2), (45, 1, 3),
+    -- Additional matches for Team 4 (Condor Valle A)
+    (46, 4, 1), (47, 4, 2), (48, 4, 1), (49, 4, 3), (50, 4, 2), (51, 4, 1), (52, 4, 2), (53, 4, 1), (54, 4, 3), (55, 4, 2),
+    -- Additional matches for Team 6 (Toro Norte Elite)
+    (56, 6, 2), (57, 6, 3), (58, 6, 1), (59, 6, 2), (60, 6, 1), (61, 6, 2), (62, 6, 3), (63, 6, 1), (64, 6, 2), (65, 6, 1),
+    -- Additional matches for Team 8 (Leones Elite)
+    (66, 8, 3), (67, 8, 2), (68, 8, 1), (69, 8, 2), (70, 8, 3), (71, 8, 1), (72, 8, 2), (73, 8, 3), (74, 8, 1), (75, 8, 2),
+    -- Additional matches for Team 11 (Leones Montana A)
+    (76, 11, 2), (77, 11, 1), (78, 11, 3), (79, 11, 2), (80, 11, 1), (81, 11, 2), (82, 11, 3), (83, 11, 1), (84, 11, 2), (85, 11, 3)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO "MatchAwayTeam" (match_id, team_id, score) VALUES
     (1, 2, 1), (2, 2, 0), (3, 6, 1), (4, 1, 0), (5, 7, 2),
     (6, 4, 1), (7, 1, 2), (8, 1, 1), (9, 11, 2), (10, 13, 3),
     (11, 6, 2), (12, 8, 1), (13, 1, 1), (14, 7, 1), (15, 1, 2),
-    (16, 11, 2), (17, 13, 1), (18, 25, 1), (19, 25, 2), (20, 27, 0)
+    (16, 11, 2), (17, 13, 1), (18, 25, 1), (19, 25, 2), (20, 27, 0),
+    (21, 13, 0), (22, 6, 4), (23, 13, 0), (24, 26, 3), (25, 1, 5), (26, 10, 0), (27, 12, 1), (28, 28, 1), (29, 20, 2), (30, 17, 3), (31, 21, 2), (32, 16, 4), (33, 23, 2),
+    -- Additional matches for Team 1 (Aguilas First Division)
+    (34, 2, 1), (35, 4, 2), (36, 6, 1), (37, 2, 1), (38, 4, 2), (39, 6, 2), (40, 2, 1), (41, 4, 1), (42, 6, 1), (43, 2, 2), (44, 4, 1), (45, 6, 2),
+    -- Additional matches for Team 4 (Condor Valle A)
+    (46, 1, 2), (47, 6, 1), (48, 8, 2), (49, 1, 2), (50, 6, 1), (51, 8, 2), (52, 1, 1), (53, 6, 2), (54, 8, 2), (55, 1, 1),
+    -- Additional matches for Team 6 (Toro Norte Elite)
+    (56, 4, 1), (57, 8, 2), (58, 11, 2), (59, 4, 1), (60, 8, 2), (61, 11, 1), (62, 4, 2), (63, 8, 2), (64, 11, 1), (65, 4, 2),
+    -- Additional matches for Team 8 (Leones Elite)
+    (66, 6, 2), (67, 11, 1), (68, 4, 2), (69, 6, 1), (70, 11, 2), (71, 4, 2), (72, 6, 1), (73, 11, 2), (74, 4, 2), (75, 6, 1),
+    -- Additional matches for Team 11 (Leones Montana A)
+    (76, 8, 1), (77, 4, 2), (78, 6, 2), (79, 8, 1), (80, 4, 2), (81, 6, 1), (82, 8, 2), (83, 4, 2), (84, 6, 1), (85, 8, 2)
 ON CONFLICT DO NOTHING;
 
 -- Insert club participation in events
@@ -570,7 +726,17 @@ INSERT INTO "ClubEvent" (club_id, event_id) VALUES
     (9, 33),
     (10, 34),
     (11, 35), (11, 36),
-    (12, 37), (12, 38), (12, 39), (12, 40)
+    (12, 37), (12, 38), (12, 39), (12, 40),
+    (5, 41), (6, 41), (6, 42), (3, 42), (5, 43),
+    (6, 43), (6, 44), (12, 44), (6, 45), (1, 45),
+    (1, 46), (4, 46),
+    (2, 47), (5, 47),
+    (4, 48), (12, 48),
+    (6, 49), (9, 49),
+    (7, 50), (8, 50),
+    (9, 51), (10, 51),
+    (10, 52), (7, 52),
+    (8, 53), (10, 53)
 ON CONFLICT DO NOTHING;
 
 -- ========================================
@@ -578,21 +744,40 @@ ON CONFLICT DO NOTHING;
 -- ========================================
 
 INSERT INTO "Notification" (message, status, send_date) VALUES
-    ('Recordatorio: Partido programado para mañana. Por favor, confirme la disponibilidad del equipo.', 'SENT', '2024-01-14 09:00:00'),
-    ('Confirmación: Partido contra Deportivo Cali este sábado 20 de enero a las 8:00 PM. Por favor, confirme la asistencia del equipo.', 'SENT', '2024-01-18 10:00:00'),
-    ('Convocatoria: Lista de jugadores convocados para el próximo partido ha sido publicada.', 'PUBLISHED', '2024-01-17 08:00:00'),
-    ('Recordatorio: Próximo partido de pretemporada el 10 de febrero. ¡Preparen al equipo!', 'PENDING', '2024-02-05 09:30:00'),
-    ('Alerta: Partido amistoso programado para el 20 de julio. Detalles en el calendario.', 'PENDING', '2025-07-10 08:45:00'),
-    ('Aviso: El primer partido de la temporada se acerca. La fecha es el 20 de enero.', 'SCHEDULED', '2024-01-15 07:15:00'),
-    ('Importante: Partido de liga el próximo sábado a las 7 PM. No olvide revisar la estrategia.', 'SENT', '2024-02-01 08:00:00'),
-    ('Recordatorio: Partido de la Jornada 2 del Apertura. ¡Vamos por la victoria!', 'SENT', '2024-03-13 09:00:00'),
-    ('Alerta: El próximo partido de la Pacific Cup ha sido confirmado. Revise los detalles.', 'PUBLISHED', '2024-03-29 18:00:00'),
-    ('Convocatoria: Lista de convocados para el debut en el Brasileirão ha sido enviada.', 'SENT', '2024-05-14 10:00:00')
+    ('Partido programado: Leones Elite recibe a Tiburones Pacifico A el 2025-10-04 a las 19:30.', 'SCHEDULED', '2025-09-30 09:00:00'),
+    ('Partido programado: Tiburones Pacifico A visita a Leones Elite el 2025-10-04 a las 19:30.', 'SCHEDULED', '2025-09-30 09:05:00'),
+    ('Partido programado: Tiburones Pacifico A recibe a Toro Norte Elite el 2025-10-18 a las 18:00.', 'SCHEDULED', '2025-10-14 09:00:00'),
+    ('Partido programado: Toro Norte Elite visita a Tiburones Pacifico A el 2025-10-18 a las 18:00.', 'SCHEDULED', '2025-10-14 09:05:00'),
+    ('Partido programado: Leones Elite recibe a Tiburones Pacifico A el 2025-11-02 a las 19:00.', 'SCHEDULED', '2025-10-29 09:00:00'),
+    ('Partido programado: Tiburones Pacifico A visita a Leones Elite el 2025-11-02 a las 19:00.', 'SCHEDULED', '2025-10-29 09:05:00'),
+    ('Partido programado: Tiburones Pacifico A recibe a Aztecas MX Primera el 2025-11-16 a las 20:30.', 'SCHEDULED', '2025-11-12 09:00:00'),
+    ('Partido programado: Aztecas MX Primera visita a Tiburones Pacifico A el 2025-11-16 a las 20:30.', 'SCHEDULED', '2025-11-12 09:05:00'),
+    ('Partido programado: Tiburones Pacifico A recibe a Aguilas First Division el 2025-12-07 a las 19:00.', 'SCHEDULED', '2025-12-03 09:00:00'),
+    ('Partido programado: Aguilas First Division visita a Tiburones Pacifico A el 2025-12-07 a las 19:00.', 'SCHEDULED', '2025-12-03 09:05:00'),
+    ('Partido programado: Aguilas Femenino recibe a Pumas Femenino el 2025-10-09 a las 18:30.', 'SCHEDULED', '2025-10-05 09:00:00'),
+    ('Partido programado: Pumas Femenino visita a Aguilas Femenino el 2025-10-09 a las 18:30.', 'SCHEDULED', '2025-10-05 09:05:00'),
+    ('Partido programado: Condor Valle Juvenil recibe a Leones Reserva el 2025-10-12 a las 17:00.', 'SCHEDULED', '2025-10-08 08:45:00'),
+    ('Partido programado: Leones Reserva visita a Condor Valle Juvenil el 2025-10-12 a las 17:00.', 'SCHEDULED', '2025-10-08 08:50:00'),
+    ('Partido programado: Pumas Caribe Sub-20 recibe a Aztecas MX Sub-17 el 2025-10-26 a las 16:00.', 'SCHEDULED', '2025-10-22 09:00:00'),
+    ('Partido programado: Aztecas MX Sub-17 visita a Pumas Caribe Sub-20 el 2025-10-26 a las 16:00.', 'SCHEDULED', '2025-10-22 09:05:00'),
+    ('Partido programado: Tiburones Femenino recibe a Madrid Legends Femenino el 2025-11-09 a las 19:00.', 'SCHEDULED', '2025-11-05 09:00:00'),
+    ('Partido programado: Madrid Legends Femenino visita a Tiburones Femenino el 2025-11-09 a las 19:00.', 'SCHEDULED', '2025-11-05 09:05:00'),
+    ('Partido programado: Dragones BA Primera recibe a Halcones Rosario A el 2025-11-23 a las 20:30.', 'SCHEDULED', '2025-11-19 08:30:00'),
+    ('Partido programado: Halcones Rosario A visita a Dragones BA Primera el 2025-11-23 a las 20:30.', 'SCHEDULED', '2025-11-19 08:35:00'),
+    ('Partido programado: Madrid Legends Primera recibe a Barcelona Unidos A el 2025-12-01 a las 21:00.', 'SCHEDULED', '2025-11-27 09:00:00'),
+    ('Partido programado: Barcelona Unidos A visita a Madrid Legends Primera el 2025-12-01 a las 21:00.', 'SCHEDULED', '2025-11-27 09:05:00'),
+    ('Partido programado: Barcelona Unidos Juvenil recibe a Dragones Juvenil el 2025-12-05 a las 18:00.', 'SCHEDULED', '2025-12-01 09:00:00'),
+    ('Partido programado: Dragones Juvenil visita a Barcelona Unidos Juvenil el 2025-12-05 a las 18:00.', 'SCHEDULED', '2025-12-01 09:05:00'),
+    ('Partido programado: Halcones Femenino recibe a Barcelona Unidos Femenino el 2025-12-12 a las 17:30.', 'SCHEDULED', '2025-12-08 09:00:00'),
+    ('Partido programado: Barcelona Unidos Femenino visita a Halcones Femenino el 2025-12-12 a las 17:30.', 'SCHEDULED', '2025-12-08 09:05:00')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO "NotificationClubEvent" (notification_id, club_event_id) VALUES
-    (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6),
-    (7, 11), (8, 19), (9, 28), (10, 35)
+    (1, 41), (2, 42), (3, 43), (4, 44), (5, 45), (6, 46),
+    (7, 47), (8, 48), (9, 49), (10, 50),
+    (11, 51), (12, 52), (13, 53), (14, 54), (15, 55), (16, 56),
+    (17, 57), (18, 58), (19, 59), (20, 60), (21, 61), (22, 62),
+    (23, 63), (24, 64), (25, 65), (26, 66)
 ON CONFLICT DO NOTHING;
 
 -- ========================================

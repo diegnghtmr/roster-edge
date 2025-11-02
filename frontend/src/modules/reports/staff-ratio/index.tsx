@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,30 +7,11 @@ import { BarChartComponent } from "@/components/reports/charts/BarChartComponent
 import { PieChartComponent } from "@/components/reports/charts/PieChartComponent";
 import { StaffRatioPDF } from "@/components/reports/pdf/StaffRatioPDF";
 import { useStaffRatioReport } from "@/api/services/reports/useReportsData";
+import { useClubsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
+import { translateStaffRole } from "@/utils/translations";
 import { ArrowLeft, Users, UserCheck, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { TeamStaffRatioResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-  {
-    key: "teamId",
-    label: "Equipo",
-    type: "number",
-    placeholder: "ID de equipo",
-  },
-  {
-    key: "onlyActive",
-    label: "Solo activos",
-    type: "checkbox",
-    placeholder: "Mostrar solo personal y jugadores activos",
-  },
-];
 
 export const StaffRatioReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({
@@ -40,10 +21,44 @@ export const StaffRatioReport = () => {
     onlyActive: true,
   });
 
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: teamOptions, isLoading: teamsLoading } = useTeamsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "teamId",
+      label: "Equipo",
+      type: "select",
+      options: teamOptions,
+      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo (opcional)",
+    },
+    {
+      key: "onlyActive",
+      label: "Solo activos",
+      type: "checkbox",
+      placeholder: "Mostrar solo personal y jugadores activos",
+    },
+  ], [clubOptions, clubsLoading, teamOptions, teamsLoading]);
+
   const { data, isLoading } = useStaffRatioReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "clubId") {
+      setFilters({ ...filters, clubId: value, teamId: undefined });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -52,7 +67,16 @@ export const StaffRatioReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const ratios = (data || []) as TeamStaffRatioResponse[];
@@ -75,8 +99,9 @@ export const StaffRatioReport = () => {
   const rolesMap = new Map<string, number>();
   ratios.forEach((team) => {
     team.roleBreakdown?.forEach((role) => {
-      const current = rolesMap.get(role.roleName || "Desconocido") || 0;
-      rolesMap.set(role.roleName || "Desconocido", current + (role.staffCount || 0));
+      const translatedRole = translateStaffRole(role.roleName);
+      const current = rolesMap.get(translatedRole) || 0;
+      rolesMap.set(translatedRole, current + (role.staffCount || 0));
     });
   });
 

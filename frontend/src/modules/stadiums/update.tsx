@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { IStadium } from "@/interface/IStadium";
@@ -71,15 +75,18 @@ export const StadiumUpdateModule = () => {
       };
 
       mutate(stadiumData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al actualizar el stadiums");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al actualizar el stadiums",
+            );
           } else {
             toast.success("Stadiums actualizado exitosamente");
             navigate("/stadiums");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al actualizar el stadiums. Por favor, intenta nuevamente.",

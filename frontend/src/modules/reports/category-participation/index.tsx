@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -8,36 +8,11 @@ import { PieChartComponent } from "@/components/reports/charts/PieChartComponent
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { CategoryParticipationPDF } from "@/components/reports/pdf/CategoryParticipationPDF";
 import { useCategoryParticipationReport } from "@/api/services/reports/useReportsData";
+import { useClubsForFilter, useSeasonsForFilter, useCategoriesForFilter, useGendersForFilter } from "@/api/services/filters/useFilterOptions";
+import { translateGender } from "@/utils/translations";
 import { ArrowLeft, BarChart3, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CategoryParticipationResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "categoryId",
-    label: "Categoría",
-    type: "number",
-    placeholder: "ID de categoría",
-  },
-  {
-    key: "genderId",
-    label: "Género",
-    type: "number",
-    placeholder: "ID de género",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Club", key: "clubName" },
@@ -51,10 +26,54 @@ export const CategoryParticipationReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
 
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+  const { options: categoryOptions, isLoading: categoriesLoading } = useCategoriesForFilter();
+  const { options: genderOptions, isLoading: gendersLoading } = useGendersForFilter();
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
+    },
+    {
+      key: "categoryId",
+      label: "Categoría",
+      type: "select",
+      options: categoryOptions,
+      placeholder: categoriesLoading ? "Cargando..." : "Seleccionar categoría (opcional)",
+    },
+    {
+      key: "genderId",
+      label: "Género",
+      type: "select",
+      options: genderOptions,
+      placeholder: gendersLoading ? "Cargando..." : "Seleccionar género (opcional)",
+    },
+  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading, categoryOptions, categoriesLoading, genderOptions, gendersLoading]);
+
   const { data, isLoading } = useCategoryParticipationReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "clubId") {
+      setFilters({ ...filters, clubId: value, seasonId: undefined });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -63,7 +82,16 @@ export const CategoryParticipationReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const participation = (data || []) as CategoryParticipationResponse[];
@@ -85,32 +113,42 @@ export const CategoryParticipationReport = () => {
   }, [] as { name: string; partidos: number }[]);
 
   const genderChart = participation.reduce((acc, item) => {
-    const existing = acc.find(x => x.name === item.genderName);
+    const translatedGender = translateGender(item.genderName);
+    const existing = acc.find(x => x.name === translatedGender);
     if (existing) {
       existing.value += item.matchesCount || 0;
     } else {
-      acc.push({ name: item.genderName || "Sin género", value: item.matchesCount || 0 });
+      acc.push({ name: translatedGender, value: item.matchesCount || 0 });
     }
     return acc;
   }, [] as { name: string; value: number }[]);
 
-  const renderRow = (item: CategoryParticipationResponse) => (
-    <tr key={`${item.categoryId}-${item.genderId}-${item.clubId}`}>
-      <td className="px-4 py-3 font-medium">{item.clubName}</td>
-      <td className="px-4 py-3 text-gray-700">{item.categoryName}</td>
-      <td className="px-4 py-3">
-        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-          {item.genderName}
-        </span>
-      </td>
-      <td className="px-4 py-3 text-center font-semibold text-blue-600">
-        {item.matchesCount || 0}
-      </td>
-      <td className="px-4 py-3 text-center font-semibold text-green-600">
-        {item.participationPercentage ? `${item.participationPercentage.toFixed(1)}%` : "0.0%"}
-      </td>
-    </tr>
-  );
+  const renderRow = (item: CategoryParticipationResponse) => {
+    const keyParts = [
+      item.categoryId ?? "category",
+      item.genderId ?? "gender",
+      item.clubId ?? "club",
+      item.seasonId ?? "season",
+    ];
+
+    return (
+      <tr key={keyParts.join("-")}>
+        <td className="px-4 py-3 font-medium">{item.clubName}</td>
+        <td className="px-4 py-3 text-gray-700">{item.categoryName}</td>
+        <td className="px-4 py-3">
+          <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+            {item.genderName}
+          </span>
+        </td>
+        <td className="px-4 py-3 text-center font-semibold text-blue-600">
+          {item.matchesCount || 0}
+        </td>
+        <td className="px-4 py-3 text-center font-semibold text-green-600">
+          {item.participationPercentage ? `${item.participationPercentage.toFixed(1)}%` : "0.0%"}
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div className="w-full">

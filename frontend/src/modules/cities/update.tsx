@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { City } from "@/interface/ICity";
@@ -78,17 +82,18 @@ export const CityUpdateModule = () => {
       };
 
       mutate(cityData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
             toast.error(
-              response.error.message || "Error al actualizar la ciudad",
+              errorMessage || "Error al actualizar la ciudad",
             );
           } else {
             toast.success("Ciudad actualizada exitosamente");
             navigate("/cities");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al actualizar la ciudad. Por favor, intenta nuevamente.",

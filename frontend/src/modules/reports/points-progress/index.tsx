@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,24 +7,10 @@ import { LineChartComponent } from "@/components/reports/charts/LineChartCompone
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { PointsProgressPDF } from "@/components/reports/pdf/PointsProgressPDF";
 import { usePointsProgressReport } from "@/api/services/reports/useReportsData";
+import { useSeasonsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
 import { ArrowLeft, TrendingUp, Trophy, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { TeamPointsProgressResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "teamId",
-    label: "Equipo",
-    type: "number",
-    placeholder: "ID de equipo",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Jornada", key: "matchdayName" },
@@ -40,6 +26,28 @@ export const PointsProgressReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
 
+  // Fetch filter options
+  const { options: teamOptions, isLoading: teamsLoading } = useTeamsForFilter();
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter();
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "teamId",
+      label: "Equipo (Requerido)",
+      type: "select",
+      options: teamOptions,
+      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
+    },
+  ], [teamOptions, teamsLoading, seasonOptions, seasonsLoading]);
+
   const { data, isLoading } = usePointsProgressReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
@@ -52,7 +60,17 @@ export const PointsProgressReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    // Convert string IDs to numbers for API
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const progress = (data || []) as TeamPointsProgressResponse[];
@@ -64,13 +82,14 @@ export const PointsProgressReport = () => {
 
   // Chart data
   const chartData = progress.map((match, index) => ({
+    id: `${match.matchId ?? "match"}-${match.seasonId ?? "season"}-${match.teamId ?? "team"}-${index}`,
     name: match.matchdayName || `J${match.matchNumber || index + 1}`,
     puntos: match.cumulativePoints || 0,
     fecha: match.matchDate || "",
   }));
 
-  const renderRow = (match: TeamPointsProgressResponse) => (
-    <tr key={match.matchId}>
+  const renderRow = (match: TeamPointsProgressResponse, index: number) => (
+    <tr key={`${match.matchId ?? "match"}-${match.seasonId ?? "season"}-${match.teamId ?? "team"}-${index}`}>
       <td className="px-4 py-3">{match.matchdayName || `Jornada ${match.matchNumber}`}</td>
       <td className="px-4 py-3 text-gray-600">{match.matchDate}</td>
       <td className="px-4 py-3 text-center text-green-600 font-medium">
@@ -182,7 +201,7 @@ export const PointsProgressReport = () => {
           <DataTable
             data={progress}
             headers={tableHeaders}
-            renderRow={renderRow}
+            renderRow={(item, index) => renderRow(item, index)}
             loading={isLoading}
             emptyMessage="No se encontraron datos para los filtros seleccionados"
           />

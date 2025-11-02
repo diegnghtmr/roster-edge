@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { StaffForm, type INewStaff } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { Staff } from "@/interface/IStaff";
@@ -118,7 +122,7 @@ export const StaffUpdateModule = () => {
       }
 
       // Prepare data for update (exclude password if empty)
-      const staffData: any = {
+      const staffData: Record<string, unknown> = {
         name: staff.name,
         lastName: staff.lastName,
         email: staff.email,
@@ -136,15 +140,16 @@ export const StaffUpdateModule = () => {
       }
 
       mutate(staffData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al actualizar el staff");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(errorMessage || "Error al actualizar el staff");
           } else {
             toast.success("Staff actualizado exitosamente");
             navigate("/staffs");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al actualizar el staff. Por favor, intenta nuevamente.",

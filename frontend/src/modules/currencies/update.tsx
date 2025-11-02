@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { Currency } from "@/interface/ICurrency";
@@ -59,15 +63,18 @@ export const CurrencyUpdateModule = () => {
       };
 
       mutate(currencyData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al actualizar el currencies");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al actualizar el currencies",
+            );
           } else {
             toast.success("Currencies actualizado exitosamente");
             navigate("/currencies");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al actualizar el currencies. Por favor, intenta nuevamente.",

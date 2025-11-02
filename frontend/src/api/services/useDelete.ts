@@ -1,11 +1,15 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UseMutationResult } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { fetchDelete } from "../endPoints/fetchDelete.ts";
 import useUserStore from "@/storage/storeUser.ts";
 
-export const useMutateDeleteService: any = (resource: any) => {
+type DeleteVariables = string | number;
+type DeleteResponse = { data: unknown; status: number };
+
+export const useMutateDeleteService = (
+  resource: string[],
+): UseMutationResult<DeleteResponse, Error, DeleteVariables> => {
   const queryClient = useQueryClient();
   const { clearUser } = useUserStore();
   const navigate = useNavigate();
@@ -24,8 +28,8 @@ export const useMutateDeleteService: any = (resource: any) => {
     }
   };
 
-  const response = useMutation({
-    mutationFn: (id: string | number) => fetchDelete({ id, resource }),
+  const response = useMutation<DeleteResponse, Error, DeleteVariables>({
+    mutationFn: (id) => fetchDelete({ id, resource }),
   });
 
   if (response?.data) {

@@ -1,4 +1,8 @@
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
 import React, { useCallback, useState } from "react";
@@ -41,15 +45,18 @@ export const TeamGenderCreateModule = () => {
       };
 
       mutate(genderData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al crear el team-genders");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al crear el team-genders",
+            );
           } else {
             toast.success("Team-genders creado exitosamente");
             navigate("/team-genders");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al crear el team-genders. Por favor, intenta nuevamente.",

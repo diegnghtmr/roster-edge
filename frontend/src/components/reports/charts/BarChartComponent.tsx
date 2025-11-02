@@ -88,6 +88,7 @@ export const BarChartComponent = ({
           tick={{ fill: "#666" }}
           tickLine={{ stroke: "#666" }}
           label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: 'insideLeft' } : undefined}
+          domain={[0, 'auto']}
         />
         <Tooltip content={<CustomTooltip />} />
         <Legend wrapperStyle={{ paddingTop: '10px' }} />

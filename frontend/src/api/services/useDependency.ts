@@ -1,11 +1,12 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation } from "@tanstack/react-query";
+import type { UseMutationResult } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { fetchGet } from "../endPoints/fetchGet.ts";
 import useUserStore from "@/storage/storeUser.ts";
 
-export const useDependencyService: any = (resource: string[]) => {
+export const useDependencyService = (
+  resource: string[],
+): UseMutationResult<unknown, Error, string> => {
   const { clearUser } = useUserStore();
   const navigate = useNavigate();
   // In case there's a problem with the token it will take the user to login page
@@ -20,8 +21,8 @@ export const useDependencyService: any = (resource: string[]) => {
       navigate("/login?error=session");
     }
   };
-  const response = useMutation({
-    mutationFn: (params: string) => fetchGet({ resource, params }),
+  const response = useMutation<unknown, Error, string>({
+    mutationFn: (params) => fetchGet({ resource, params }),
   });
 
   if (response.data) {

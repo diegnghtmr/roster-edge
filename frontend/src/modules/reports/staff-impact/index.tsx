@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,24 +7,10 @@ import { BarChartComponent } from "@/components/reports/charts/BarChartComponent
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { StaffImpactPDF } from "@/components/reports/pdf/StaffImpactPDF";
 import { useStaffImpactReport } from "@/api/services/reports/useReportsData";
+import { useClubsForFilter, useSeasonsForFilter } from "@/api/services/filters/useFilterOptions";
 import { ArrowLeft, TrendingUp, Zap, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { StaffImpactResponse, TeamStaffImpactDetail } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Equipo", key: "teamName" },
@@ -40,10 +26,38 @@ export const StaffImpactReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
 
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
+    },
+  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading]);
+
   const { data, isLoading } = useStaffImpactReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "clubId") {
+      setFilters({ ...filters, clubId: value, seasonId: undefined });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -52,7 +66,16 @@ export const StaffImpactReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const impact = data as StaffImpactResponse;
@@ -66,7 +89,7 @@ export const StaffImpactReport = () => {
   }));
 
   const renderRow = (team: TeamStaffImpactDetail) => (
-    <tr key={team.teamId}>
+    <tr key={`${team.teamId ?? "team"}-${team.clubId ?? "club"}-${team.seasonId ?? "season"}`}>
       <td className="px-4 py-3 font-medium">{team.teamName}</td>
       <td className="px-4 py-3 text-center">
         {team.staffToPlayerRatio ? team.staffToPlayerRatio.toFixed(2) : "-"}
@@ -145,23 +168,40 @@ export const StaffImpactReport = () => {
         </div>
 
         {!isLoading && teams.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Ratio Staff vs % Victorias (Top 10)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BarChartComponent
-                data={chartData}
-                xKey="name"
-                bars={[
-                  { key: "ratio", name: "Ratio Staff/Jugador", color: "#f97316" },
-                  { key: "winRate", name: "% Victorias", color: "#10b981" },
-                ]}
-                yAxisLabel="Valor"
-                height={400}
-              />
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ratio Staff/Jugador por Equipo (Top 10)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BarChartComponent
+                  data={chartData}
+                  xKey="name"
+                  bars={[
+                    { key: "ratio", name: "Ratio Staff/Jugador", color: "#f97316" },
+                  ]}
+                  yAxisLabel="Ratio"
+                  height={400}
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Porcentaje de Victorias por Equipo (Top 10)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BarChartComponent
+                  data={chartData}
+                  xKey="name"
+                  bars={[
+                    { key: "winRate", name: "% Victorias", color: "#10b981" },
+                  ]}
+                  yAxisLabel="Porcentaje (%)"
+                  height={400}
+                />
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         <div className="overflow-x-auto">

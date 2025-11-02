@@ -1,6 +1,10 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
@@ -36,15 +40,18 @@ export const CurrencyCreateModule = () => {
       };
 
       mutate(currencyData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al crear el currencies");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al crear el currencies",
+            );
           } else {
             toast.success("Currencies creado exitosamente");
             navigate("/currencies");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al crear el currencies. Por favor, intenta nuevamente.",

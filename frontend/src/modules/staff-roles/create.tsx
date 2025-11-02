@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { StaffRoleForm, type INewStaffRole } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import { toast } from "sonner";
 import { BookmarkCheck } from "lucide-react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
@@ -40,15 +44,18 @@ export const StaffRoleCreateModule = () => {
       };
 
       mutate(staffRoleData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al crear el staff-roles");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al crear el staff-roles",
+            );
           } else {
             toast.success("Staff-roles creado exitosamente");
             navigate("/staff-roles");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al crear el staff-roles. Por favor, intenta nuevamente.",

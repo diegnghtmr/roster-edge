@@ -316,19 +316,20 @@ export const PDFMultiBarChart = ({ data, bars, title, height = 200 }: PDFMultiBa
             .stroke();
 
           // Draw legend
-          let legendX = 10;
+          const legendX = 10;
+          let legendY = 5;
           bars.forEach((bar) => {
             painter
               .fillColor(bar.color)
-              .rect(legendX, 5, 8, 8)
+              .rect(legendX, legendY, 8, 8)
               .fill();
 
             painter
               .fillColor('#374151')
               .fontSize(8)
-              .text(bar.name, legendX + 12, 5);
+              .text(bar.name, legendX + 12, legendY - 1);
 
-            legendX += painter.widthOfString(bar.name) + 30;
+            legendY += 12;
           });
 
           return null;
@@ -503,21 +504,21 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
           });
 
           // Draw legend
-          let legendX = padding.left;
+          let legendY = 10;
           lines.forEach((line) => {
             painter
               .strokeColor(line.color)
               .lineWidth(2)
-              .moveTo(legendX, 10)
-              .lineTo(legendX + 15, 10)
+              .moveTo(padding.left, legendY)
+              .lineTo(padding.left + 15, legendY)
               .stroke();
 
             painter
               .fillColor('#374151')
               .fontSize(8)
-              .text(line.name, legendX + 20, 7);
+              .text(line.name, padding.left + 20, legendY - 3);
 
-            legendX += painter.widthOfString(line.name) + 40;
+            legendY += 12;
           });
 
           return null;

@@ -2,7 +2,7 @@ import { toast } from "sonner";
 
 interface IParamsType {
   resource: string[] | undefined;
-  params?: string | undefined;
+  params?: Record<string, string> | URLSearchParams | string;
 }
 
 export const fetchGet = async ({ resource, params }: IParamsType) => {

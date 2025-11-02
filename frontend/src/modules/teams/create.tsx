@@ -1,5 +1,9 @@
 import useGetList from "@/api/services/getServices/useGetList";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { Spinner } from "@/components/ui/spinner";
 import type { Club } from "@/interface/IClub";
@@ -73,15 +77,16 @@ export const TeamCreateModule = () => {
       };
 
       mutate(teamData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            toast.error(response.error.message || "Error al crear el teams");
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(errorMessage || "Error al crear el teams");
           } else {
             toast.success("Teams creado exitosamente");
             navigate("/teams");
           }
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           toast.error(
             error?.message ||
               "Error al crear el teams. Por favor, intenta nuevamente.",

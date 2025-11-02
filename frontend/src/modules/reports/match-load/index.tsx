@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -7,30 +7,10 @@ import { BarChartComponent } from "@/components/reports/charts/BarChartComponent
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { MatchLoadPDF } from "@/components/reports/pdf/MatchLoadPDF";
 import { useMatchLoadReport } from "@/api/services/reports/useReportsData";
+import { useSeasonsForFilter, useClubsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
 import { ArrowLeft, Home, Plane, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { TeamMatchLoadResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-  {
-    key: "teamId",
-    label: "Equipo",
-    type: "number",
-    placeholder: "ID de equipo",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Equipo", key: "teamName" },
@@ -45,10 +25,48 @@ export const MatchLoadReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
 
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: teamOptions, isLoading: teamsLoading } = useTeamsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
+    },
+    {
+      key: "teamId",
+      label: "Equipo",
+      type: "select",
+      options: teamOptions,
+      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo (opcional)",
+    },
+  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading, teamOptions, teamsLoading]);
+
   const { data, isLoading } = useMatchLoadReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "clubId") {
+      setFilters({ clubId: value });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -57,7 +75,16 @@ export const MatchLoadReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const matchLoad = (data || []) as TeamMatchLoadResponse[];
@@ -69,7 +96,8 @@ export const MatchLoadReport = () => {
   const homePercentage = totalMatches > 0 ? ((totalHomeMatches / totalMatches) * 100).toFixed(1) : "0.0";
 
   // Chart data
-  const barChartData = matchLoad.map((team) => ({
+  const barChartData = matchLoad.map((team, index) => ({
+    id: `${team.teamId ?? "team"}-${team.seasonId ?? "season"}-${team.clubId ?? "club"}-${index}`,
     name: team.teamName || "Sin nombre",
     local: team.homeMatches || 0,
     visitante: team.awayMatches || 0,
@@ -78,7 +106,7 @@ export const MatchLoadReport = () => {
   const renderRow = (team: TeamMatchLoadResponse) => {
     const homePerc = team.totalMatches ? ((team.homeMatches || 0) / team.totalMatches * 100).toFixed(1) : "0.0";
     return (
-      <tr key={team.teamId}>
+      <tr key={`${team.teamId ?? "team"}-${team.seasonId ?? "season"}-${team.clubId ?? "club"}`}>
         <td className="px-4 py-3 font-medium">{team.teamName}</td>
         <td className="px-4 py-3 text-gray-600">{team.clubName}</td>
         <td className="px-4 py-3 text-center font-semibold text-blue-600">

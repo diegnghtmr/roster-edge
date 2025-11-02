@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
@@ -6,34 +6,10 @@ import { StatCard } from "@/components/reports/StatCard";
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import { SeasonAgendaPDF } from "@/components/reports/pdf/SeasonAgendaPDF";
 import { useSeasonAgendaReport } from "@/api/services/reports/useReportsData";
+import { useSeasonsForFilter, useClubsForFilter } from "@/api/services/filters/useFilterOptions";
 import { ArrowLeft, Calendar, MapPin, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SeasonAgendaResponse } from "@/interface/IReports";
-
-const filterFields: FilterField[] = [
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "number",
-    placeholder: "ID de temporada",
-  },
-  {
-    key: "clubId",
-    label: "Club",
-    type: "number",
-    placeholder: "ID de club",
-  },
-  {
-    key: "startDate",
-    label: "Fecha Inicio",
-    type: "date",
-  },
-  {
-    key: "endDate",
-    label: "Fecha Fin",
-    type: "date",
-  },
-];
 
 const tableHeaders: TableColumn[] = [
   { title: "Evento", key: "eventName" },
@@ -48,10 +24,50 @@ export const SeasonAgendaReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
 
+  // Fetch filter options
+  const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
+  const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter(
+    filters.clubId ? Number(filters.clubId) : undefined
+  );
+
+  // Dynamic filter fields with loaded options
+  const filterFields: FilterField[] = useMemo(() => [
+    {
+      key: "clubId",
+      label: "Club",
+      type: "select",
+      options: clubOptions,
+      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
+    },
+    {
+      key: "seasonId",
+      label: "Temporada",
+      type: "select",
+      options: seasonOptions,
+      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
+    },
+    {
+      key: "startDate",
+      label: "Fecha Inicio",
+      type: "date",
+      placeholder: "Fecha de inicio (opcional)",
+    },
+    {
+      key: "endDate",
+      label: "Fecha Fin",
+      type: "date",
+      placeholder: "Fecha de fin (opcional)",
+    },
+  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading]);
+
   const { data, isLoading } = useSeasonAgendaReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "clubId") {
+      setFilters({ ...filters, clubId: value, seasonId: undefined });
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -60,7 +76,16 @@ export const SeasonAgendaReport = () => {
   };
 
   const handleApplyFilters = () => {
-    setAppliedFilters(filters);
+    const processedFilters: Record<string, string | number | boolean | undefined> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) return;
+      if (key.endsWith("Id") && typeof value === "string") {
+        processedFilters[key] = Number(value);
+      } else {
+        processedFilters[key] = value;
+      }
+    });
+    setAppliedFilters(processedFilters);
   };
 
   const agenda = (data || []) as SeasonAgendaResponse[];

@@ -1,4 +1,14 @@
-import { BarChart3, Calendar, TrendingUp, Users, Trophy, Activity, Zap, Target } from "lucide-react";
+import {
+  BarChart3,
+  Calendar,
+  TrendingUp,
+  Users,
+  Trophy,
+  Activity,
+  Zap,
+  Target,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { ReportMetadata } from "@/interface/IReports";
 
 export const reportsData: ReportMetadata[] = [
@@ -85,7 +95,7 @@ export const reportsData: ReportMetadata[] = [
 ];
 
 export const getIconComponent = (iconName: string) => {
-  const icons: Record<string, any> = {
+  const icons: Record<string, LucideIcon> = {
     Trophy,
     Users,
     Target,

@@ -1,12 +1,12 @@
 import { toast } from "sonner";
 
+interface MutationPayload {
+  resource?: string[];
+  [key: string]: unknown;
+}
+
 interface IProps {
-  data: {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    resource?: string[];
-    [key: string]: string | Blob;
-  };
+  data: MutationPayload;
   resource: string[];
   params?: string | undefined;
   method?: string;
@@ -14,13 +14,15 @@ interface IProps {
 }
 
 const fetchMutation = async ({
-  data,
+  data: payload,
   resource,
   params,
   method = "POST",
   isFormData = false,
 }: IProps) => {
-  if (data?.resource) {
+  const data = { ...payload };
+
+  if (Array.isArray(data.resource)) {
     resource = data.resource;
     delete data.resource;
   }
@@ -33,20 +35,19 @@ const fetchMutation = async ({
     body = new FormData();
 
     // loop through the object keys to be added to the form data
-    if (data && typeof data === "object") {
+    if (data && typeof data === "object" && !Array.isArray(data)) {
       Object.entries(data).forEach(([key, value]) => {
         if (body instanceof FormData) {
-          // Convert complex values like arrays or objects to JSON strings
-          if (
-            typeof value === "object" &&
-            value !== null &&
-            !("lastModified" in value)
-          ) {
-            body.append(key, JSON.stringify(value));
-          } else {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
+          if (value instanceof File || value instanceof Blob) {
             body.append(key, value);
+          } else if (typeof value === "string") {
+            body.append(key, value);
+          } else if (typeof value === "number" || typeof value === "boolean") {
+            body.append(key, String(value));
+          } else if (value === null || value === undefined) {
+            body.append(key, "");
+          } else {
+            body.append(key, JSON.stringify(value));
           }
         }
       });
