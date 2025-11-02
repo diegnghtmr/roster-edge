@@ -1,4 +1,5 @@
 import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFMultiBarChart, PDFPieChart } from "./PDFDocument";
+import { REPORT_COLORS } from "@/constants/reportColors";
 import type { TeamStaffRatioResponse } from "@/interface/IReports";
 
 interface StaffRatioPDFProps {
@@ -63,8 +64,8 @@ export const StaffRatioPDF = ({ data }: StaffRatioPDFProps) => {
         <PDFMultiBarChart
           data={chartData}
           bars={[
-            { key: "staff", name: "Personal", color: "#f97316" },
-            { key: "jugadores", name: "Jugadores", color: "#3b82f6" },
+            { key: "staff", name: "Personal", color: REPORT_COLORS.primary.main },
+            { key: "jugadores", name: "Jugadores", color: REPORT_COLORS.chart.blue },
           ]}
           height={180}
         />

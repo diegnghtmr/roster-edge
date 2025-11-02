@@ -1,11 +1,4 @@
 -- ========================================
--- EXPANDED SAMPLE DATA FOR ROSTER EDGE (4x)
--- ========================================
--- Default password for all users: password123
--- Hash: 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
--- ========================================
-
--- ========================================
 -- CATALOGS (replacement for ENUMs)
 -- ========================================
 
@@ -176,7 +169,7 @@ INSERT INTO "Season" (club_id, name, start_date, end_date, created_at, updated_a
     (10, 'Copa Catalunya 2025', '2025-09-01', '2026-06-15', NOW(), NOW(), TRUE)
 ON CONFLICT DO NOTHING;
 
--- Insert teams - Expanded (28 teams total, ~2-3 per club)
+-- Insert teams 
 INSERT INTO "Team" (name, gender_id, category_id, mascot, foundation, club_id, created_at, updated_at, active) VALUES
     -- Original teams (1-7)
     ('Aguilas First Division', 1, 1, 'Golden Eagle', '2010-03-15', 1, NOW(), NOW(), TRUE),
@@ -227,12 +220,11 @@ INSERT INTO "Color" (name) VALUES
     ('Silver')
 ON CONFLICT DO NOTHING;
 
--- Team-color relationships - Expanded
+-- Team-color relationships
 INSERT INTO "TeamColor" (team_id, color_id) VALUES
     -- Original
     (1, 1), (1, 2), (2, 3), (3, 1), (3, 3), (4, 4), (4, 5),
     (5, 4), (6, 5), (6, 6), (7, 3), (7, 6),
-    -- New teams
     (8, 9), (8, 2), (9, 9), (9, 3), (10, 7), (10, 3),
     (11, 6), (11, 9), (12, 6), (12, 2), (13, 4), (13, 10),
     (14, 4), (14, 3), (15, 5), (15, 2), (16, 4), (16, 5),
@@ -242,7 +234,7 @@ INSERT INTO "TeamColor" (team_id, color_id) VALUES
     (26, 5), (26, 6), (27, 5), (27, 3), (28, 5), (28, 9)
 ON CONFLICT DO NOTHING;
 
--- Insert venues - Expanded (12 venues)
+-- Insert venues 
 INSERT INTO "Venue" (email, city_id, foundation, name, phone, club_id) VALUES
     ('venue@aguilasdoradas.com', 1, '2010-03-15', 'Main Venue Aguilas', '+57044123456', 1),
     ('contacto@condorvalle.com', 4, '2012-06-20', 'Condor Arena', '+57044222333', 2),
@@ -258,7 +250,7 @@ INSERT INTO "Venue" (email, city_id, foundation, name, phone, club_id) VALUES
     ('estadio@aztecasmx.com', 11, '2017-06-14', 'Azteca Stadium', '+52555666777', 12)
 ON CONFLICT DO NOTHING;
 
--- Insert stadiums - Expanded (12 stadiums)
+-- Insert stadiums 
 INSERT INTO "Stadium" (area, surface, total_capacity, foundation, venue_id) VALUES
     (7500.50, 'Natural grass', 25000, '2010-04-01', 1),
     (6800.00, 'Hybrid grass', 18000, '2013-02-01', 2),
@@ -315,7 +307,7 @@ INSERT INTO "Staff" (email, password_hash, name, last_name, city_id, phone, birt
 ON CONFLICT DO NOTHING;
 
 -- ========================================
--- PLAYERS - EXPANDED (88 players total, ~3-4 per team)
+-- PLAYERS 
 -- ========================================
 
 INSERT INTO "Player" (email, password_hash, name, last_name, city_id, phone, birth_date, physical_state_id, jersey_number, height, dominant_foot, weight, primary_position_id, team_id) VALUES
@@ -616,7 +608,6 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (31, 9, '21:00:00', '23:00:00', '2025-12-01', 9, 51),
     (32, 9, '18:00:00', '20:00:00', '2025-12-05', 10, 52),
     (33, 10, '17:30:00', '19:30:00', '2025-12-12', 8, 53),
-    -- Additional matches for schedule density testing (Team 1 - Aguilas First Division, Oct-Nov 2025)
     (34, 1, '19:00:00', '21:00:00', '2025-10-18', 1, 2),
     (35, 1, '20:00:00', '22:00:00', '2025-10-21', 1, 2),
     (36, 1, '18:30:00', '20:30:00', '2025-10-24', 1, 2),
@@ -629,7 +620,6 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (43, 1, '18:30:00', '20:30:00', '2025-11-11', 1, 2),
     (44, 1, '20:00:00', '22:00:00', '2025-11-14', 1, 2),
     (45, 1, '19:00:00', '21:00:00', '2025-11-17', 1, 2),
-    -- Additional matches for Team 4 (Condor Valle A, Oct-Nov 2025)
     (46, 2, '20:00:00', '22:00:00', '2025-10-19', 2, 8),
     (47, 2, '19:00:00', '21:00:00', '2025-10-23', 2, 8),
     (48, 2, '18:30:00', '20:30:00', '2025-10-27', 2, 8),
@@ -640,7 +630,6 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (53, 2, '19:00:00', '21:00:00', '2025-11-12', 2, 8),
     (54, 2, '18:30:00', '20:30:00', '2025-11-16', 2, 8),
     (55, 2, '20:30:00', '22:30:00', '2025-11-19', 2, 8),
-    -- Additional matches for Team 6 (Toro Norte Elite, Oct-Nov 2025)
     (56, 2, '19:30:00', '21:30:00', '2025-10-20', 3, 10),
     (57, 2, '20:00:00', '22:00:00', '2025-10-22', 3, 10),
     (58, 2, '18:00:00', '20:00:00', '2025-10-25', 3, 10),
@@ -651,7 +640,6 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (63, 2, '20:00:00', '22:00:00', '2025-11-10', 3, 10),
     (64, 2, '18:00:00', '20:00:00', '2025-11-13', 3, 10),
     (65, 2, '19:00:00', '21:00:00', '2025-11-15', 3, 10),
-    -- Additional matches for Team 8 (Leones Elite, Oct-Nov 2025)
     (66, 5, '20:00:00', '22:00:00', '2025-10-17', 4, 14),
     (67, 5, '19:00:00', '21:00:00', '2025-10-20', 4, 14),
     (68, 5, '18:30:00', '20:30:00', '2025-10-22', 4, 14),
@@ -662,7 +650,6 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (73, 5, '19:00:00', '21:00:00', '2025-11-06', 4, 14),
     (74, 5, '18:30:00', '20:30:00', '2025-11-09', 4, 14),
     (75, 5, '20:30:00', '22:30:00', '2025-11-12', 4, 14),
-    -- Additional matches for Team 11 (Leones Montana A, Oct-Nov 2025)
     (76, 6, '19:00:00', '21:00:00', '2025-10-19', 5, 15),
     (77, 6, '20:00:00', '22:00:00', '2025-10-23', 5, 15),
     (78, 6, '18:30:00', '20:30:00', '2025-10-26', 5, 15),
@@ -675,22 +662,17 @@ INSERT INTO "Match" (id, matchday_id, start_time, end_time, date, stadium_id, ev
     (85, 6, '20:30:00', '22:30:00', '2025-11-18', 5, 15)
 ON CONFLICT DO NOTHING;
 
--- Match Home Teams with realistic scores
+-- Match Home Teams 
 INSERT INTO "MatchHomeTeam" (match_id, team_id, score) VALUES
     (1, 1, 2), (2, 1, 0), (3, 4, 1), (4, 4, 0), (5, 6, 3),
     (6, 1, 3), (7, 4, 2), (8, 6, 1), (9, 8, 2), (10, 11, 1),
     (11, 4, 3), (12, 4, 2), (13, 4, 4), (14, 6, 2), (15, 6, 1),
     (16, 8, 3), (17, 8, 1), (18, 24, 2), (19, 24, 3), (20, 26, 2),
     (21, 11, 3), (22, 13, 1), (23, 11, 2), (24, 13, 0), (25, 13, 1), (26, 3, 2), (27, 5, 1), (28, 9, 3), (29, 14, 0), (30, 15, 1), (31, 19, 2), (32, 22, 1), (33, 18, 2),
-    -- Additional matches for Team 1 (Aguilas First Division)
     (34, 1, 2), (35, 1, 1), (36, 1, 3), (37, 1, 2), (38, 1, 1), (39, 1, 2), (40, 1, 0), (41, 1, 3), (42, 1, 2), (43, 1, 1), (44, 1, 2), (45, 1, 3),
-    -- Additional matches for Team 4 (Condor Valle A)
     (46, 4, 1), (47, 4, 2), (48, 4, 1), (49, 4, 3), (50, 4, 2), (51, 4, 1), (52, 4, 2), (53, 4, 1), (54, 4, 3), (55, 4, 2),
-    -- Additional matches for Team 6 (Toro Norte Elite)
     (56, 6, 2), (57, 6, 3), (58, 6, 1), (59, 6, 2), (60, 6, 1), (61, 6, 2), (62, 6, 3), (63, 6, 1), (64, 6, 2), (65, 6, 1),
-    -- Additional matches for Team 8 (Leones Elite)
     (66, 8, 3), (67, 8, 2), (68, 8, 1), (69, 8, 2), (70, 8, 3), (71, 8, 1), (72, 8, 2), (73, 8, 3), (74, 8, 1), (75, 8, 2),
-    -- Additional matches for Team 11 (Leones Montana A)
     (76, 11, 2), (77, 11, 1), (78, 11, 3), (79, 11, 2), (80, 11, 1), (81, 11, 2), (82, 11, 3), (83, 11, 1), (84, 11, 2), (85, 11, 3)
 ON CONFLICT DO NOTHING;
 
@@ -700,15 +682,10 @@ INSERT INTO "MatchAwayTeam" (match_id, team_id, score) VALUES
     (11, 6, 2), (12, 8, 1), (13, 1, 1), (14, 7, 1), (15, 1, 2),
     (16, 11, 2), (17, 13, 1), (18, 25, 1), (19, 25, 2), (20, 27, 0),
     (21, 13, 0), (22, 6, 4), (23, 13, 0), (24, 26, 3), (25, 1, 5), (26, 10, 0), (27, 12, 1), (28, 28, 1), (29, 20, 2), (30, 17, 3), (31, 21, 2), (32, 16, 4), (33, 23, 2),
-    -- Additional matches for Team 1 (Aguilas First Division)
     (34, 2, 1), (35, 4, 2), (36, 6, 1), (37, 2, 1), (38, 4, 2), (39, 6, 2), (40, 2, 1), (41, 4, 1), (42, 6, 1), (43, 2, 2), (44, 4, 1), (45, 6, 2),
-    -- Additional matches for Team 4 (Condor Valle A)
     (46, 1, 2), (47, 6, 1), (48, 8, 2), (49, 1, 2), (50, 6, 1), (51, 8, 2), (52, 1, 1), (53, 6, 2), (54, 8, 2), (55, 1, 1),
-    -- Additional matches for Team 6 (Toro Norte Elite)
     (56, 4, 1), (57, 8, 2), (58, 11, 2), (59, 4, 1), (60, 8, 2), (61, 11, 1), (62, 4, 2), (63, 8, 2), (64, 11, 1), (65, 4, 2),
-    -- Additional matches for Team 8 (Leones Elite)
     (66, 6, 2), (67, 11, 1), (68, 4, 2), (69, 6, 1), (70, 11, 2), (71, 4, 2), (72, 6, 1), (73, 11, 2), (74, 4, 2), (75, 6, 1),
-    -- Additional matches for Team 11 (Leones Montana A)
     (76, 8, 1), (77, 4, 2), (78, 6, 2), (79, 8, 1), (80, 4, 2), (81, 6, 1), (82, 8, 2), (83, 4, 2), (84, 6, 1), (85, 8, 2)
 ON CONFLICT DO NOTHING;
 

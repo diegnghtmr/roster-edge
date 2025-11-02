@@ -1,18 +1,25 @@
 import { PDFDocument, PDFTable, PDFSection, PDFStatCards } from "./PDFDocument";
-import { Text, Canvas, StyleSheet } from "@react-pdf/renderer";
+import { Text, Canvas, StyleSheet, View } from "@react-pdf/renderer";
+import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING } from "@/constants/reportColors";
 import type { TeamPointsProgressResponse } from "@/interface/IReports";
 
 const styles = StyleSheet.create({
   chartTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#374151",
-    marginBottom: 10,
+    fontSize: PDF_TYPOGRAPHY.fontSize.h4,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+    color: REPORT_COLORS.neutral.gray800,
+    marginBottom: PDF_SPACING.sm,
   },
   chartDescription: {
-    fontSize: 10,
-    color: "#6b7280",
-    marginBottom: 10,
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    color: REPORT_COLORS.neutral.gray600,
+    marginBottom: PDF_SPACING.md,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.oblique,
+  },
+  chartContainer: {
+    marginTop: PDF_SPACING.sm,
+    marginBottom: PDF_SPACING.md,
   },
 });
 
@@ -69,69 +76,74 @@ export const PointsProgressPDF = ({ data, teamName }: PointsProgressPDFProps) =>
         <Text style={styles.chartDescription}>
           Este gráfico muestra cómo se acumulan los puntos del equipo jornada tras jornada.
         </Text>
-        <Canvas
-          style={{ width: '100%', height: 180 }}
-          paint={(painter, availableWidth, availableHeight) => {
-            const padding = { left: 40, right: 20, top: 20, bottom: 30 };
-            const chartWidth = availableWidth - padding.left - padding.right;
-            const chartHeight = availableHeight - padding.top - padding.bottom;
-            const pointSpacing = chartWidth / Math.max(data.length - 1, 1);
+        <View style={styles.chartContainer}>
+          <Canvas
+            style={{ width: '100%', height: 180 }}
+            paint={(painter, availableWidth, availableHeight) => {
+              const padding = { left: 45, right: 20, top: 25, bottom: 35 };
+              const chartWidth = availableWidth - padding.left - padding.right;
+              const chartHeight = availableHeight - padding.top - padding.bottom;
+              const pointSpacing = chartWidth / Math.max(data.length - 1, 1);
 
-            // Draw grid lines
-            for (let i = 0; i <= 5; i++) {
-              const y = padding.top + (chartHeight * i) / 5;
-              painter
-                .strokeColor('#e5e7eb')
-                .moveTo(padding.left, y)
-                .lineTo(availableWidth - padding.right, y)
-                .stroke();
-            }
-
-            // Draw axes
-            painter
-                .strokeColor('#374151')
-              .moveTo(padding.left, padding.top)
-              .lineTo(padding.left, availableHeight - padding.bottom)
-              .lineTo(availableWidth - padding.right, availableHeight - padding.bottom)
-              .stroke();
-
-            // Draw line
-            painter.strokeColor('#8b5cf6').lineWidth(2);
-            data.forEach((match, index) => {
-              const x = padding.left + index * pointSpacing;
-              const points = match.cumulativePoints || 0;
-              const y = availableHeight - padding.bottom - (points / maxPoints) * chartHeight;
-
-              if (index === 0) {
-                painter.moveTo(x, y);
-              } else {
-                painter.lineTo(x, y);
+              // Draw grid lines with improved styling
+              for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartHeight * i) / 5;
+                painter
+                  .strokeColor(REPORT_COLORS.neutral.gray200)
+                  .lineWidth(0.5)
+                  .moveTo(padding.left, y)
+                  .lineTo(availableWidth - padding.right, y)
+                  .stroke();
               }
 
-              // Draw point
-              painter.circle(x, y, 2).fill();
-            });
-            painter.stroke();
-
-            // Draw Y-axis labels
-            for (let i = 0; i <= 5; i++) {
-              const value = Math.round((maxPoints * i) / 5);
-              const y = availableHeight - padding.bottom - (chartHeight * i) / 5;
+              // Draw axes with better styling
               painter
-                .fillColor('#6b7280')
-                .fontSize(8)
-                .text(String(value), 5, y - 4, { width: 30, align: 'right' });
-            }
+                .strokeColor(REPORT_COLORS.neutral.gray400)
+                .lineWidth(1.5)
+                .moveTo(padding.left, padding.top)
+                .lineTo(padding.left, availableHeight - padding.bottom)
+                .lineTo(availableWidth - padding.right, availableHeight - padding.bottom)
+                .stroke();
 
-            // X-axis label
-            painter
-              .fillColor('#6b7280')
-              .fontSize(10)
-              .text('Jornadas', availableWidth / 2 - 20, availableHeight - 15);
+              // Draw line with brand red color
+              painter.strokeColor(REPORT_COLORS.primary.main).lineWidth(2.5);
+              data.forEach((match, index) => {
+                const x = padding.left + index * pointSpacing;
+                const points = match.cumulativePoints || 0;
+                const y = availableHeight - padding.bottom - (points / maxPoints) * chartHeight;
 
-            return null;
-          }}
-        />
+                if (index === 0) {
+                  painter.moveTo(x, y);
+                } else {
+                  painter.lineTo(x, y);
+                }
+
+                // Draw point with border (red theme)
+                painter.circle(x, y, 4).fillColor(REPORT_COLORS.primary.main).fill();
+                painter.circle(x, y, 4).strokeColor(REPORT_COLORS.neutral.white).lineWidth(1.5).stroke();
+              });
+              painter.stroke();
+
+              // Draw Y-axis labels
+              for (let i = 0; i <= 5; i++) {
+                const value = Math.round((maxPoints * i) / 5);
+                const y = availableHeight - padding.bottom - (chartHeight * i) / 5;
+                painter
+                  .fillColor(REPORT_COLORS.neutral.gray600)
+                  .fontSize(9)
+                  .text(String(value), 5, y - 4, { width: 35, align: 'right' });
+              }
+
+              // X-axis label
+              painter
+                .fillColor(REPORT_COLORS.neutral.gray700)
+                .fontSize(10)
+                .text('Jornadas', availableWidth / 2 - 20, availableHeight - 18);
+
+              return null;
+            }}
+          />
+        </View>
       </PDFSection>
 
       <PDFSection title="Detalle por Jornada">

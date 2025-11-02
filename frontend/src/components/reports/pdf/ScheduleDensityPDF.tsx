@@ -1,4 +1,5 @@
 import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFLineChart } from "./PDFDocument";
+import { REPORT_COLORS } from "@/constants/reportColors";
 import type { ScheduleDensityResponse } from "@/interface/IReports";
 
 interface ScheduleDensityPDFProps {
@@ -59,9 +60,9 @@ export const ScheduleDensityPDF = ({ data, teamName }: ScheduleDensityPDFProps) 
         <PDFLineChart
           data={chartData}
           lines={[
-            { key: "descanso", name: "Días de Descanso", color: "#10b981" },
-            { key: "ultimos7d", name: "Últimos 7d", color: "#3b82f6" },
-            { key: "proximos7d", name: "Próximos 7d", color: "#8b5cf6" },
+            { key: "descanso", name: "Días de Descanso", color: REPORT_COLORS.chart.green },
+            { key: "ultimos7d", name: "Últimos 7d", color: REPORT_COLORS.primary.main },
+            { key: "proximos7d", name: "Próximos 7d", color: REPORT_COLORS.chart.orange },
           ]}
           height={160}
         />

@@ -1,24 +1,35 @@
 import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFBarChart } from "./PDFDocument";
 import { Text, View, StyleSheet } from "@react-pdf/renderer";
+import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING, PDF_RADIUS } from "@/constants/reportColors";
 import type { TeamRosterProfileResponse } from "@/interface/IReports";
 
 const styles = StyleSheet.create({
   statBox: {
     flexDirection: "row",
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: "#f9fafb",
-    borderRadius: 4,
+    marginBottom: PDF_SPACING.sm,
+    padding: PDF_SPACING.sm,
+    backgroundColor: REPORT_COLORS.pdf.sectionBg,
+    borderRadius: PDF_RADIUS.sm,
+    borderLeft: `2 solid ${REPORT_COLORS.pdf.cardBorder}`,
   },
   statLabel: {
-    fontSize: 11,
-    color: "#6b7280",
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    color: REPORT_COLORS.neutral.gray600,
     flex: 1,
   },
   statValue: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: "#1f2937",
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+    color: REPORT_COLORS.primary.main,
+  },
+  sectionHeader: {
+    fontSize: PDF_TYPOGRAPHY.fontSize.body,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+    marginTop: PDF_SPACING.sm,
+    marginBottom: PDF_SPACING.xs,
+    color: REPORT_COLORS.neutral.gray800,
   },
 });
 
@@ -100,14 +111,7 @@ export const RosterProfilePDF = ({ data }: RosterProfilePDFProps) => {
 
           {team.physicalStates && team.physicalStates.length > 0 && (
             <>
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "bold",
-                  marginTop: 10,
-                  marginBottom: 5,
-                }}
-              >
+              <Text style={styles.sectionHeader}>
                 Estado Físico
               </Text>
               <PDFTable

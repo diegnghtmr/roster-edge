@@ -1,57 +1,91 @@
 import { Document, Page, Text, View, StyleSheet, Canvas } from "@react-pdf/renderer";
+import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING, PDF_RADIUS } from "@/constants/reportColors";
 
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    backgroundColor: "#ffffff",
+    backgroundColor: REPORT_COLORS.pdf.background,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.primary,
   },
   header: {
-    marginBottom: 20,
-    borderBottom: "2 solid #3b82f6",
-    paddingBottom: 10,
+    marginBottom: PDF_SPACING.xl,
+    paddingBottom: PDF_SPACING.md,
+    borderBottom: `3 solid ${REPORT_COLORS.primary.main}`,
+    backgroundColor: REPORT_COLORS.pdf.sectionBg,
+    padding: PDF_SPACING.lg,
+    borderRadius: PDF_RADIUS.md,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1e40af",
-    marginBottom: 5,
+    fontSize: PDF_TYPOGRAPHY.fontSize.h1,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+    color: REPORT_COLORS.primary.main,
+    marginBottom: PDF_SPACING.xs,
+    letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 12,
-    color: "#6b7280",
+    fontSize: PDF_TYPOGRAPHY.fontSize.body,
+    color: REPORT_COLORS.neutral.gray600,
+    marginTop: PDF_SPACING.xs,
+  },
+  metaInfo: {
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    color: REPORT_COLORS.neutral.gray500,
+    marginTop: PDF_SPACING.xs,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.oblique,
   },
   section: {
-    marginTop: 15,
-    marginBottom: 15,
+    marginTop: PDF_SPACING.lg,
+    marginBottom: PDF_SPACING.lg,
+    padding: PDF_SPACING.md,
+    backgroundColor: REPORT_COLORS.neutral.white,
+    borderRadius: PDF_RADIUS.md,
+    borderLeft: `4 solid ${REPORT_COLORS.primary.main}`,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#374151",
-    marginBottom: 10,
+    fontSize: PDF_TYPOGRAPHY.fontSize.h3,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+    color: REPORT_COLORS.neutral.gray800,
+    marginBottom: PDF_SPACING.md,
+    paddingBottom: PDF_SPACING.xs,
+    borderBottom: `1 solid ${REPORT_COLORS.neutral.gray200}`,
   },
   table: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 4,
+    borderColor: REPORT_COLORS.pdf.tableBorder,
+    borderRadius: PDF_RADIUS.sm,
+    overflow: "hidden",
   },
   tableRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    minHeight: 30,
+    borderBottomColor: REPORT_COLORS.pdf.tableBorder,
+    minHeight: 32,
     alignItems: "center",
   },
   tableHeader: {
-    backgroundColor: "#f3f4f6",
-    fontWeight: "bold",
+    backgroundColor: REPORT_COLORS.pdf.tableHeaderBg,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+  },
+  tableHeaderCell: {
+    flex: 1,
+    padding: PDF_SPACING.sm,
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    color: REPORT_COLORS.pdf.tableHeaderText,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
   },
   tableCell: {
     flex: 1,
-    padding: 8,
-    fontSize: 10,
-    color: "#374151",
+    padding: PDF_SPACING.sm,
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    color: REPORT_COLORS.neutral.gray700,
+  },
+  tableCellAlt: {
+    backgroundColor: REPORT_COLORS.neutral.gray50,
   },
   footer: {
     position: "absolute",
@@ -59,38 +93,46 @@ const styles = StyleSheet.create({
     left: 40,
     right: 40,
     textAlign: "center",
-    color: "#9ca3af",
-    fontSize: 10,
-    borderTop: "1 solid #e5e7eb",
-    paddingTop: 10,
+    color: REPORT_COLORS.pdf.footerText,
+    fontSize: PDF_TYPOGRAPHY.fontSize.tiny,
+    borderTop: `1 solid ${REPORT_COLORS.neutral.gray200}`,
+    paddingTop: PDF_SPACING.sm,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.oblique,
   },
   statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 15,
-    gap: 10,
+    marginBottom: PDF_SPACING.md,
+    gap: PDF_SPACING.sm,
   },
   statCard: {
     flexBasis: "30%",
-    padding: 10,
-    backgroundColor: "#f9fafb",
+    padding: PDF_SPACING.md,
+    backgroundColor: REPORT_COLORS.pdf.sectionBg,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 4,
+    borderColor: REPORT_COLORS.pdf.cardBorder,
+    borderRadius: PDF_RADIUS.md,
+    borderLeft: `3 solid ${REPORT_COLORS.primary.main}`,
   },
   statLabel: {
-    fontSize: 10,
-    color: "#6b7280",
-    marginBottom: 4,
+    fontSize: PDF_TYPOGRAPHY.fontSize.small,
+    color: REPORT_COLORS.neutral.gray600,
+    marginBottom: PDF_SPACING.xs,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   statValue: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1e40af",
+    fontSize: PDF_TYPOGRAPHY.fontSize.h2,
+    fontWeight: PDF_TYPOGRAPHY.fontWeight.bold,
+    fontFamily: PDF_TYPOGRAPHY.fontFamily.bold,
+    color: REPORT_COLORS.primary.main,
   },
   chartContainer: {
-    marginTop: 10,
-    marginBottom: 15,
+    marginTop: PDF_SPACING.md,
+    marginBottom: PDF_SPACING.md,
+    padding: PDF_SPACING.md,
+    backgroundColor: REPORT_COLORS.neutral.white,
+    borderRadius: PDF_RADIUS.sm,
   },
 });
 
@@ -107,13 +149,18 @@ export const PDFDocument = ({ title, subtitle, children }: PDFDocumentProps) => 
     day: "numeric",
   });
 
+  const currentTime = new Date().toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
-          <Text style={styles.subtitle}>Generado el {currentDate}</Text>
+          <Text style={styles.metaInfo}>Generado el {currentDate} a las {currentTime}</Text>
         </View>
         {children}
         <Text style={styles.footer}>
@@ -140,13 +187,16 @@ export const PDFTable = ({ headers, data }: PDFTableProps) => (
   <View style={styles.table}>
     <View style={[styles.tableRow, styles.tableHeader]}>
       {headers.map((header, index) => (
-        <Text key={index} style={styles.tableCell}>
+        <Text key={index} style={styles.tableHeaderCell}>
           {header}
         </Text>
       ))}
     </View>
     {data.map((row, rowIndex) => (
-      <View key={rowIndex} style={styles.tableRow}>
+      <View
+        key={rowIndex}
+        style={rowIndex % 2 === 1 ? [styles.tableRow, styles.tableCellAlt] : styles.tableRow}
+      >
         {row.map((cell, cellIndex) => (
           <Text key={cellIndex} style={styles.tableCell}>
             {cell}
@@ -188,8 +238,19 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
         style={{ width: '100%', height }}
         paint={(painter, availableWidth, availableHeight) => {
           const barWidth = availableWidth / data.length;
-          const padding = 40;
+          const padding = 45;
           const chartHeight = availableHeight - padding;
+
+          // Draw background grid lines
+          for (let i = 0; i <= 4; i++) {
+            const y = padding/2 + (chartHeight * i) / 4;
+            painter
+              .strokeColor(REPORT_COLORS.neutral.gray200)
+              .lineWidth(0.5)
+              .moveTo(0, y)
+              .lineTo(availableWidth, y)
+              .stroke();
+          }
 
           // Draw bars
           data.forEach((item, index) => {
@@ -197,25 +258,32 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
             const x = index * barWidth;
             const y = availableHeight - barHeight - padding/2;
 
-            // Draw bar
+            // Draw gradient-like bar with shadow effect (red theme)
             painter
-              .fillColor('#3b82f6')
-              .rect(x + barWidth * 0.1, y, barWidth * 0.8, barHeight)
+              .fillColor(REPORT_COLORS.primary.light)
+              .rect(x + barWidth * 0.15, y, barWidth * 0.7, barHeight)
               .fill();
 
-            // Draw value on top
+            // Draw bar border
             painter
-              .fillColor('#374151')
-              .fontSize(8)
-              .text(String(item.value), x, y - 12, {
+              .strokeColor(REPORT_COLORS.primary.dark)
+              .lineWidth(1)
+              .rect(x + barWidth * 0.15, y, barWidth * 0.7, barHeight)
+              .stroke();
+
+            // Draw value on top with better styling
+            painter
+              .fillColor(REPORT_COLORS.neutral.gray800)
+              .fontSize(9)
+              .text(String(item.value), x, y - 14, {
                 width: barWidth,
                 align: 'center',
               });
 
             // Draw label at bottom
             painter
-              .fillColor('#6b7280')
-              .fontSize(7)
+              .fillColor(REPORT_COLORS.neutral.gray600)
+              .fontSize(8)
               .text(
                 item.name.length > 10 ? item.name.substring(0, 10) + '...' : item.name,
                 x,
@@ -227,9 +295,10 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
               );
           });
 
-          // Draw axis
+          // Draw axis with better styling
           painter
-            .strokeColor('#e5e7eb')
+            .strokeColor(REPORT_COLORS.neutral.gray400)
+            .lineWidth(1.5)
             .moveTo(0, availableHeight - padding/2)
             .lineTo(availableWidth, availableHeight - padding/2)
             .stroke();
@@ -347,7 +416,16 @@ interface PDFPieChartProps {
 
 export const PDFPieChart = ({ data, title, height = 180 }: PDFPieChartProps) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
-  const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
+  const colors = [
+    REPORT_COLORS.chart.blue,
+    REPORT_COLORS.chart.green,
+    REPORT_COLORS.chart.orange,
+    REPORT_COLORS.chart.purple,
+    REPORT_COLORS.chart.cyan,
+    REPORT_COLORS.chart.pink,
+    REPORT_COLORS.chart.indigo,
+    REPORT_COLORS.chart.yellow,
+  ];
 
   return (
     <View style={styles.chartContainer}>
@@ -357,11 +435,11 @@ export const PDFPieChart = ({ data, title, height = 180 }: PDFPieChartProps) => 
         paint={(painter, availableWidth) => {
           const centerX = availableWidth / 2;
           const centerY = height / 2;
-          const radius = Math.min(centerX, centerY) - 40;
+          const radius = Math.min(centerX, centerY) - 45;
 
           let currentAngle = -90; // Start at top
 
-          // Draw pie slices
+          // Draw pie slices with borders
           data.forEach((item, index) => {
             const sliceAngle = (item.value / total) * 360;
             const color = colors[index % colors.length];
@@ -377,30 +455,47 @@ export const PDFPieChart = ({ data, title, height = 180 }: PDFPieChartProps) => 
               A ${radius} ${radius} 0 ${sliceAngle > 180 ? 1 : 0} 1 ${centerX + radius * Math.cos(((currentAngle + sliceAngle) * Math.PI) / 180)} ${centerY + radius * Math.sin(((currentAngle + sliceAngle) * Math.PI) / 180)}
               Z
             `).fill();
+
+            // Draw slice border
+            painter.strokeColor(REPORT_COLORS.neutral.white);
+            painter.lineWidth(2);
+            painter.path(`
+              M ${centerX} ${centerY}
+              L ${centerX + radius * Math.cos((currentAngle * Math.PI) / 180)} ${centerY + radius * Math.sin((currentAngle * Math.PI) / 180)}
+              A ${radius} ${radius} 0 ${sliceAngle > 180 ? 1 : 0} 1 ${centerX + radius * Math.cos(((currentAngle + sliceAngle) * Math.PI) / 180)} ${centerY + radius * Math.sin(((currentAngle + sliceAngle) * Math.PI) / 180)}
+              Z
+            `).stroke();
+
             painter.restore();
 
             currentAngle += sliceAngle;
           });
 
-          // Draw legend
+          // Draw legend with better styling
           let legendY = 10;
           data.forEach((item, index) => {
             const color = colors[index % colors.length];
             const percentage = ((item.value / total) * 100).toFixed(1);
 
-            // Color box
+            // Color box with border
             painter
               .fillColor(color)
-              .rect(10, legendY, 8, 8)
+              .rect(10, legendY, 10, 10)
               .fill();
+
+            painter
+              .strokeColor(REPORT_COLORS.neutral.gray400)
+              .lineWidth(0.5)
+              .rect(10, legendY, 10, 10)
+              .stroke();
 
             // Label
             painter
-              .fillColor('#374151')
-              .fontSize(8)
-              .text(`${item.name}: ${percentage}%`, 22, legendY);
+              .fillColor(REPORT_COLORS.neutral.gray800)
+              .fontSize(9)
+              .text(`${item.name}: ${percentage}%`, 24, legendY);
 
-            legendY += 12;
+            legendY += 14;
           });
 
           return null;
@@ -441,7 +536,8 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
           for (let i = 0; i <= 5; i++) {
             const y = padding.top + (chartHeight * i) / 5;
             painter
-              .strokeColor('#e5e7eb')
+              .strokeColor(REPORT_COLORS.neutral.gray200)
+              .lineWidth(0.5)
               .moveTo(padding.left, y)
               .lineTo(availableWidth - padding.right, y)
               .stroke();
@@ -449,15 +545,15 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
             // Y-axis labels
             const value = Math.round((maxValue * (5 - i)) / 5);
             painter
-              .fillColor('#6b7280')
-              .fontSize(8)
+              .fillColor(REPORT_COLORS.neutral.gray600)
+              .fontSize(9)
               .text(String(value), 5, y - 4, { width: 30, align: 'right' });
           }
 
           // Draw axes
           painter
-            .strokeColor('#374151')
-            .lineWidth(1)
+            .strokeColor(REPORT_COLORS.neutral.gray400)
+            .lineWidth(1.5)
             .moveTo(padding.left, padding.top)
             .lineTo(padding.left, availableHeight - padding.bottom)
             .lineTo(availableWidth - padding.right, availableHeight - padding.bottom)
@@ -465,7 +561,7 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
 
           // Draw lines
           lines.forEach((line) => {
-            painter.strokeColor(line.color).lineWidth(2);
+            painter.strokeColor(line.color).lineWidth(2.5);
 
             data.forEach((item, index) => {
               const x = padding.left + index * pointSpacing;
@@ -478,8 +574,9 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
                 painter.lineTo(x, y);
               }
 
-              // Draw point
-              painter.circle(x, y, 2).fillColor(line.color).fill();
+              // Draw point with border
+              painter.circle(x, y, 4).fillColor(line.color).fill();
+              painter.circle(x, y, 4).strokeColor(REPORT_COLORS.neutral.white).lineWidth(1.5).stroke();
             });
             painter.stroke();
           });
@@ -494,8 +591,8 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
                 : String(item.name);
 
               painter
-                .fillColor('#6b7280')
-                .fontSize(7)
+                .fillColor(REPORT_COLORS.neutral.gray600)
+                .fontSize(8)
                 .text(label, x - 15, availableHeight - padding.bottom + 5, {
                   width: 30,
                   align: 'center',
@@ -503,22 +600,30 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
             }
           });
 
-          // Draw legend
+          // Draw legend with better styling
           let legendY = 10;
           lines.forEach((line) => {
+            // Line indicator
             painter
               .strokeColor(line.color)
-              .lineWidth(2)
-              .moveTo(padding.left, legendY)
-              .lineTo(padding.left + 15, legendY)
+              .lineWidth(3)
+              .moveTo(padding.left, legendY + 4)
+              .lineTo(padding.left + 18, legendY + 4)
               .stroke();
 
+            // Point indicator
             painter
-              .fillColor('#374151')
-              .fontSize(8)
-              .text(line.name, padding.left + 20, legendY - 3);
+              .circle(padding.left + 9, legendY + 4, 3)
+              .fillColor(line.color)
+              .fill();
 
-            legendY += 12;
+            // Label
+            painter
+              .fillColor(REPORT_COLORS.neutral.gray800)
+              .fontSize(9)
+              .text(line.name, padding.left + 22, legendY);
+
+            legendY += 14;
           });
 
           return null;

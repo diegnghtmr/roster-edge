@@ -1,4 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { REPORT_COLORS } from "@/constants/reportColors";
 
 interface BarChartComponentProps {
   data: Record<string, string | number>[];
@@ -56,12 +57,18 @@ export const BarChartComponent = ({
   const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-md">
-          <p className="font-semibold text-gray-800 mb-1">{label}</p>
+        <div className="bg-white p-4 border-2 border-gray-200 rounded-lg shadow-lg">
+          <p className="font-bold text-gray-900 mb-2 text-base">{label}</p>
           {payload.map((entry, index: number) => (
-            <p key={index} style={{ color: entry.color }} className="text-sm">
-              {entry.name}: {entry.value}
-            </p>
+            <div key={index} className="flex items-center gap-2 mb-1">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: entry.color }}
+              />
+              <p className="text-sm font-medium text-gray-700">
+                {entry.name}: <span className="font-bold">{entry.value}</span>
+              </p>
+            </div>
           ))}
         </div>
       );
@@ -75,25 +82,54 @@ export const BarChartComponent = ({
         data={data}
         margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke={REPORT_COLORS.neutral.gray200}
+          vertical={false}
+        />
         <XAxis
           dataKey={xKey}
           tick={<CustomizedAxisTick />}
-          tickLine={{ stroke: "#666" }}
+          tickLine={{ stroke: REPORT_COLORS.neutral.gray400 }}
+          axisLine={{ stroke: REPORT_COLORS.neutral.gray400, strokeWidth: 1.5 }}
           interval={0}
           height={80}
-          label={xAxisLabel ? { value: xAxisLabel, position: 'insideBottom', offset: -60 } : undefined}
+          label={xAxisLabel ? {
+            value: xAxisLabel,
+            position: 'insideBottom',
+            offset: -60,
+            style: { fill: REPORT_COLORS.neutral.gray700, fontWeight: 600 }
+          } : undefined}
         />
         <YAxis
-          tick={{ fill: "#666" }}
-          tickLine={{ stroke: "#666" }}
-          label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: 'insideLeft' } : undefined}
+          tick={{ fill: REPORT_COLORS.neutral.gray600, fontSize: 12 }}
+          tickLine={{ stroke: REPORT_COLORS.neutral.gray400 }}
+          axisLine={{ stroke: REPORT_COLORS.neutral.gray400, strokeWidth: 1.5 }}
+          label={yAxisLabel ? {
+            value: yAxisLabel,
+            angle: -90,
+            position: 'insideLeft',
+            style: { fill: REPORT_COLORS.neutral.gray700, fontWeight: 600 }
+          } : undefined}
           domain={[0, 'auto']}
         />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend wrapperStyle={{ paddingTop: '10px' }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: REPORT_COLORS.neutral.gray100 }} />
+        <Legend
+          wrapperStyle={{
+            paddingTop: '20px',
+            fontSize: '14px'
+          }}
+          iconType="rect"
+          iconSize={12}
+        />
         {bars.map((bar) => (
-          <Bar key={bar.key} dataKey={bar.key} fill={bar.color} name={bar.name} />
+          <Bar
+            key={bar.key}
+            dataKey={bar.key}
+            fill={bar.color}
+            name={bar.name}
+            radius={[4, 4, 0, 0]}
+          />
         ))}
       </BarChart>
     </ResponsiveContainer>
