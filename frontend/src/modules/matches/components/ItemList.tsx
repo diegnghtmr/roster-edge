@@ -2,23 +2,16 @@ import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
-import type { Currency } from "@/interface/ICurrency";
+import type { IMatch } from "@/interface/IMatch";
 
-interface CurrencyItemListProps {
-  currency: Currency;
+interface MatchItemProps {
+  match: IMatch;
   onDelete: (id: number) => void;
 }
 
-export const CurrencyItemList = ({
-  currency,
-  onDelete,
-}: CurrencyItemListProps) => {
-  // Format created date
-  const formatCreatedDate = (
-    dateArray:
-      | [number, number, number, number, number, number, number]
-      | undefined
-  ): string => {
+export const MatchItem = ({ match, onDelete }: MatchItemProps) => {
+  // Format date array to string
+  const formatDateArray = (dateArray: number[]): string => {
     if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 3) {
       return "N/A";
     }
@@ -28,21 +21,30 @@ export const CurrencyItemList = ({
       .padStart(2, "0")}/${year}`;
   };
 
+  // Format time array to string
+  const formatTimeArray = (timeArray: number[]): string => {
+    if (!timeArray || !Array.isArray(timeArray) || timeArray.length < 2) {
+      return "N/A";
+    }
+    const [hour, minute] = timeArray;
+    return `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   return (
-    <TableRow key={currency.id}>
-      <TableCell className="text-start font-medium">{currency.id}</TableCell>
-      <TableCell className="text-start font-semibold">
-        {currency.name}
-      </TableCell>
-      <TableCell className="text-start font-medium">
-        {currency.symbol}
+    <TableRow key={match.id}>
+      <TableCell className="text-start font-medium">{match.id}</TableCell>
+      <TableCell className="text-start">
+        {formatDateArray(match.date)}
       </TableCell>
       <TableCell className="text-start">
-        {formatCreatedDate(currency.createdAt)}
+        {formatTimeArray(match.startTime)} - {formatTimeArray(match.endTime)}
       </TableCell>
+
       <TableCell>
         <div className="flex gap-2">
-          <Link to={`/currencies/${currency.id}/edit`}>
+          <Link to={`/matches/${match.id}/edit`}>
             <Button
               variant="outline"
               size="sm"
@@ -55,7 +57,7 @@ export const CurrencyItemList = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onDelete(currency.id)}
+            onClick={() => onDelete(match.id)}
             className="flex items-center gap-1 text-red-700 hover:text-red-800"
           >
             <Trash2 className="h-4 w-4" />

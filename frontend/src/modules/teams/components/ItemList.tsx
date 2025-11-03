@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { Team } from "@/interface/ITeam";
 
@@ -49,11 +48,6 @@ export const TeamItemList = ({ team, onDelete }: TeamItemListProps) => {
       <TableCell className="text-start">{team.mascot}</TableCell>
       <TableCell className="text-start">
         {formatFoundationDate(team.foundation)}
-      </TableCell>
-      <TableCell className="text-start">
-        <Badge variant={team.active ? "default" : "secondary"}>
-          {team.active ? "Activo" : "Inactivo"}
-        </Badge>
       </TableCell>
       <TableCell className="text-start">
         {formatCreatedDate(team.createdAt)}

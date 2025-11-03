@@ -22,7 +22,6 @@ const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
   { title: "Nombre", key: "name" },
   { title: "País", key: "countryId" },
-  { title: "Estado", key: "active", className: "w-24" },
   { title: "Fecha de creación", key: "createdAt" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
@@ -33,16 +32,6 @@ const filters: FilterConfig[] = [
     label: "Nombre",
     type: "text",
     placeholder: "Buscar por nombre...",
-  },
-  {
-    key: "active",
-    label: "Estado",
-    type: "select",
-    options: [
-      { key: "true", value: "Activo" },
-      { key: "false", value: "Inactivo" },
-    ],
-    placeholder: "Seleccionar estado",
   },
 ];
 

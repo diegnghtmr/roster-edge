@@ -25,7 +25,6 @@ const headers: TableColumn[] = [
   { title: "Teléfono", key: "phone" },
   { title: "Fecha de nacimiento", key: "birthDate" },
   { title: "Fecha de contratación", key: "hireDate" },
-  { title: "Estado", key: "active", className: "w-24" },
   { title: "Fecha de creación", key: "createdAt" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
@@ -48,16 +47,6 @@ const filters: FilterConfig[] = [
     label: "Email",
     type: "text",
     placeholder: "Buscar por email...",
-  },
-  {
-    key: "active",
-    label: "Estado",
-    type: "select",
-    options: [
-      { key: "true", value: "Activo" },
-      { key: "false", value: "Inactivo" },
-    ],
-    placeholder: "Seleccionar estado",
   },
 ];
 

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { City } from "@/interface/ICity";
 
@@ -33,11 +32,7 @@ export const CityItemList = ({ city, onDelete }: CityItemListProps) => {
       <TableCell className="text-start">
         {city.countryName || `País ID: ${city.countryId}`}
       </TableCell>
-      <TableCell className="text-start">
-        <Badge variant={city.active ? "default" : "secondary"}>
-          {city.active ? "Activo" : "Inactivo"}
-        </Badge>
-      </TableCell>
+
       <TableCell className="text-start">
         {formatCreatedDate(city.createdAt)}
       </TableCell>

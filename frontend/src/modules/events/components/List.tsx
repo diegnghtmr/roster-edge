@@ -23,9 +23,6 @@ const headers: TableColumn[] = [
   { title: "Nombre", key: "name" },
   { title: "Descripción", key: "description" },
   { title: "Fecha", key: "date" },
-  { title: "Temporada", key: "seasonId" },
-  { title: "Sede", key: "venueId" },
-  { title: "Estado", key: "active", className: "w-24" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
 
@@ -41,28 +38,6 @@ const filters: FilterConfig[] = [
     label: "Descripción",
     type: "text",
     placeholder: "Buscar por descripción...",
-  },
-  {
-    key: "seasonId",
-    label: "Temporada",
-    type: "text",
-    placeholder: "Buscar por temporada...",
-  },
-  {
-    key: "venueId",
-    label: "Sede",
-    type: "text",
-    placeholder: "Buscar por sede...",
-  },
-  {
-    key: "active",
-    label: "Estado",
-    type: "select",
-    options: [
-      { key: "true", value: "Activo" },
-      { key: "false", value: "Inactivo" },
-    ],
-    placeholder: "Seleccionar estado",
   },
 ];
 

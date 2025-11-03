@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { IStadium } from "@/interface/IStadium";
 
@@ -36,14 +35,6 @@ export const StadiumItem = ({ stadium, onDelete }: StadiumItemProps) => {
       </TableCell>
       <TableCell className="text-start">
         {formatFoundationDate(stadium.foundation)}
-      </TableCell>
-      <TableCell className="text-start font-medium">
-        {stadium.venueId}
-      </TableCell>
-      <TableCell className="text-start">
-        <Badge variant={stadium.active ? "default" : "secondary"}>
-          {stadium.active ? "Activo" : "Inactivo"}
-        </Badge>
       </TableCell>
       <TableCell>
         <div className="flex gap-2">

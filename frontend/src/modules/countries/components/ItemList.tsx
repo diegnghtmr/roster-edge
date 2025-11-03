@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { Country } from "@/interface/ICountry";
 
@@ -33,11 +32,7 @@ export const CountryItemList = ({
     <TableRow key={country.id}>
       <TableCell className="text-start font-medium">{country.id}</TableCell>
       <TableCell className="text-start font-semibold">{country.name}</TableCell>
-      <TableCell className="text-start">
-        <Badge variant={country.active ? "default" : "secondary"}>
-          {country.active ? "Activo" : "Inactivo"}
-        </Badge>
-      </TableCell>
+
       <TableCell className="text-start">
         {formatCreatedDate(country.createdAt)}
       </TableCell>

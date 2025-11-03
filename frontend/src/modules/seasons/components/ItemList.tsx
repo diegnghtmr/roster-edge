@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { ISeason } from "@/interface/ISeason";
 
@@ -26,18 +25,13 @@ export const SeasonItem = ({ season, onDelete }: SeasonItemProps) => {
     <TableRow key={season.id}>
       <TableCell className="text-start font-medium">{season.id}</TableCell>
       <TableCell className="text-start font-semibold">{season.name}</TableCell>
-      <TableCell className="text-start font-medium">{season.clubId}</TableCell>
       <TableCell className="text-start">
         {formatDateArray(season.startDate)}
       </TableCell>
       <TableCell className="text-start">
         {formatDateArray(season.endDate)}
       </TableCell>
-      <TableCell className="text-start">
-        <Badge variant={season.active ? "default" : "secondary"}>
-          {season.active ? "Activo" : "Inactivo"}
-        </Badge>
-      </TableCell>
+
       <TableCell>
         <div className="flex gap-2">
           <Link to={`/seasons/${season.id}/edit`}>

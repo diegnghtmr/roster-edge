@@ -4,7 +4,7 @@ import useGetList from "@/api/services/getServices/useGetList";
 import { useMutateDeleteService } from "@/api/services/useDelete";
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import type { FilterConfig } from "@/components/table/SearchComponent";
-import type { StaffRole } from "@/interface/IStaffRole";
+import type { IMatchday } from "@/interface/IMatchday";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,12 +16,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { StaffRoleItemList } from "./ItemList";
+import { MatchdayItem } from "./ItemList";
 
 const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
   { title: "Nombre", key: "name" },
-  { title: "Fecha de creación", key: "createdAt" },
+  { title: "Descripción", key: "description" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
 
@@ -32,24 +32,28 @@ const filters: FilterConfig[] = [
     type: "text",
     placeholder: "Buscar por nombre...",
   },
+  {
+    key: "description",
+    label: "Descripción",
+    type: "text",
+    placeholder: "Buscar por descripción...",
+  },
 ];
 
-export const StaffRolesList: React.FC = () => {
+export const MatchdaysList: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [shouldRefetch, setShouldRefetch] = useState(false);
-  const [staffRoleToDelete, setStaffRoleToDelete] = useState<number | null>(
-    null
-  );
+  const [matchdayToDelete, setMatchdayToDelete] = useState<number | null>(null);
 
-  const { data, isLoading, refetch, isFetching } = useGetList({
-    key: "staffRolesList",
-    resource: ["staff-roles"],
+  const { data, isLoading, refetch, isFetching } = useGetList<IMatchday[]>({
+    key: "matchdaysList",
+    resource: ["matchdays"],
     keyResults: "data",
     enabled: true,
     params: searchParams,
   });
 
-  const deleteService = useMutateDeleteService(["staff-roles"]);
+  const deleteService = useMutateDeleteService(["matchdays"]);
 
   // Avoid infinity loops handle manually refetch
   useEffect(() => {
@@ -66,32 +70,32 @@ export const StaffRolesList: React.FC = () => {
 
   // Handle the delete button event
   const handleDelete = useCallback((id: number) => {
-    setStaffRoleToDelete(id);
+    setMatchdayToDelete(id);
   }, []);
 
-  // Confirm and delete staff role
+  // Confirm and delete matchday
   const confirmDelete = () => {
-    if (staffRoleToDelete !== null) {
-      deleteItem(staffRoleToDelete.toString());
-      setStaffRoleToDelete(null);
+    if (matchdayToDelete !== null) {
+      deleteItem(matchdayToDelete.toString());
+      setMatchdayToDelete(null);
     }
   };
 
-  // Delete staff role
+  // Delete matchday
   const deleteItem = (id: string) => {
     deleteService.mutate(id, {
       onSuccess: () => {
-        toast.success("Rol de personal eliminado exitosamente");
+        toast.success("Jornada eliminada exitosamente");
         setShouldRefetch(true);
       },
       onError: () => {
-        toast.error("Error al eliminar el rol de personal");
+        toast.error("Error al eliminar la jornada");
       },
     });
   };
 
-  // Ensure data is properly typed as StaffRole array
-  const staffRoles: StaffRole[] = React.useMemo(() => {
+  // Ensure data is properly typed as IMatchday array
+  const matchdays: IMatchday[] = React.useMemo(() => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
     console.warn("Unexpected data structure:", data);
@@ -99,10 +103,10 @@ export const StaffRolesList: React.FC = () => {
   }, [data]);
 
   // Render function for each row
-  const renderRow = (staffRole: StaffRole) => (
-    <StaffRoleItemList
-      key={staffRole.id}
-      staffRole={staffRole}
+  const renderRow = (matchday: IMatchday) => (
+    <MatchdayItem
+      key={matchday.id}
+      matchday={matchday}
       onDelete={handleDelete}
     />
   );
@@ -111,26 +115,26 @@ export const StaffRolesList: React.FC = () => {
     <>
       <div className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4">
         <DataTable
-          data={staffRoles}
+          data={matchdays}
           headers={headers}
           filters={filters}
           renderRow={renderRow}
           loading={isLoading}
-          emptyMessage="No se encontraron roles de personal"
+          emptyMessage="No se encontraron jornadas"
           className="mt-6"
         />
       </div>
 
       <AlertDialog
-        open={staffRoleToDelete !== null}
-        onOpenChange={(open) => !open && setStaffRoleToDelete(null)}
+        open={matchdayToDelete !== null}
+        onOpenChange={(open) => !open && setMatchdayToDelete(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. El rol de personal será
-              eliminado permanentemente del sistema.
+              Esta acción no se puede deshacer. La jornada será eliminada
+              permanentemente del sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

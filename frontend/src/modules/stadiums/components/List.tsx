@@ -24,8 +24,6 @@ const headers: TableColumn[] = [
   { title: "Superficie", key: "surface" },
   { title: "Capacidad", key: "totalCapacity" },
   { title: "Fundación", key: "foundation" },
-  { title: "Sede", key: "venueId" },
-  { title: "Estado", key: "active", className: "w-24" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
 
@@ -41,16 +39,6 @@ const filters: FilterConfig[] = [
     label: "Capacidad",
     type: "text",
     placeholder: "Buscar por capacidad...",
-  },
-  {
-    key: "active",
-    label: "Estado",
-    type: "select",
-    options: [
-      { key: "true", value: "Activo" },
-      { key: "false", value: "Inactivo" },
-    ],
-    placeholder: "Seleccionar estado",
   },
 ];
 

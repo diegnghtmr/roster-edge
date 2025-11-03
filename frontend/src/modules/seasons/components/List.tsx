@@ -21,10 +21,10 @@ import { SeasonItem } from "./ItemList";
 const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
   { title: "Nombre", key: "name" },
-  { title: "Club", key: "clubId" },
+
   { title: "Fecha Inicio", key: "startDate" },
   { title: "Fecha Fin", key: "endDate" },
-  { title: "Estado", key: "active", className: "w-24" },
+
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
 
@@ -34,22 +34,6 @@ const filters: FilterConfig[] = [
     label: "Nombre",
     type: "text",
     placeholder: "Buscar por nombre...",
-  },
-  {
-    key: "clubId",
-    label: "Club",
-    type: "text",
-    placeholder: "Buscar por club...",
-  },
-  {
-    key: "active",
-    label: "Estado",
-    type: "select",
-    options: [
-      { key: "true", value: "Activo" },
-      { key: "false", value: "Inactivo" },
-    ],
-    placeholder: "Seleccionar estado",
   },
 ];
 

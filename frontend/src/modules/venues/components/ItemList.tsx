@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { IVenueResponse } from "@/interface/IVenue";
 import type { City } from "@/interface/ICity";
@@ -40,11 +39,7 @@ export const VenueItemList = ({
       <TableCell className="text-start">{venue.phone}</TableCell>
       <TableCell className="text-start">{getCityName(venue.cityId)}</TableCell>
       <TableCell className="text-start">{getClubName(venue.clubId)}</TableCell>
-      <TableCell className="text-start">
-        <Badge variant={venue.active ? "default" : "secondary"}>
-          {venue.active ? "Activo" : "Inactivo"}
-        </Badge>
-      </TableCell>
+
       <TableCell>
         <div className="flex gap-2">
           <Link to={`/venues/${venue.id}/edit`}>

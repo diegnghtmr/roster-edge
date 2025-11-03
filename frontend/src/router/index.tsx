@@ -34,6 +34,12 @@ import SeasonUpdateModule from "@/modules/seasons/update";
 import EventsModule from "@/modules/events";
 import EventCreateModule from "@/modules/events/create";
 import EventUpdateModule from "@/modules/events/update";
+import MatchdaysModule from "@/modules/matchdays";
+import MatchdayCreateModule from "@/modules/matchdays/create";
+import MatchdayUpdateModule from "@/modules/matchdays/update";
+import MatchesModule from "@/modules/matches";
+import MatchCreateModule from "@/modules/matches/create";
+import MatchUpdateModule from "@/modules/matches/update";
 import { VenuesModule } from "@/modules/venues";
 import { CreateVenue } from "@/modules/venues/create";
 import { UpdateVenue } from "@/modules/venues/update";
@@ -216,6 +222,32 @@ export default function useRouterApp() {
             {
               path: "/events/:id/edit",
               element: <EventUpdateModule />,
+            },
+            {
+              path: "/matchdays",
+              element: <MatchdaysModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/matchdays-create",
+              element: <MatchdayCreateModule />,
+            },
+            {
+              path: "/matchdays/:id/edit",
+              element: <MatchdayUpdateModule />,
+            },
+            {
+              path: "/matches",
+              element: <MatchesModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/matches-create",
+              element: <MatchCreateModule />,
+            },
+            {
+              path: "/matches/:id/edit",
+              element: <MatchUpdateModule />,
             },
             {
               path: "/venues",

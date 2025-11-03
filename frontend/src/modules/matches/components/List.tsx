@@ -3,8 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import useGetList from "@/api/services/getServices/useGetList";
 import { useMutateDeleteService } from "@/api/services/useDelete";
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import type { FilterConfig } from "@/components/table/SearchComponent";
-import type { StaffRole } from "@/interface/IStaffRole";
+import type { IMatch } from "@/interface/IMatch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,40 +15,30 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { StaffRoleItemList } from "./ItemList";
+import { MatchItem } from "./ItemList";
 
 const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
-  { title: "Nombre", key: "name" },
-  { title: "Fecha de creación", key: "createdAt" },
+  { title: "Fecha", key: "date" },
+  { title: "Horario", key: "time" },
+
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
 
-const filters: FilterConfig[] = [
-  {
-    key: "name",
-    label: "Nombre",
-    type: "text",
-    placeholder: "Buscar por nombre...",
-  },
-];
-
-export const StaffRolesList: React.FC = () => {
+export const MatchesList: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [shouldRefetch, setShouldRefetch] = useState(false);
-  const [staffRoleToDelete, setStaffRoleToDelete] = useState<number | null>(
-    null
-  );
+  const [matchToDelete, setMatchToDelete] = useState<number | null>(null);
 
-  const { data, isLoading, refetch, isFetching } = useGetList({
-    key: "staffRolesList",
-    resource: ["staff-roles"],
+  const { data, isLoading, refetch, isFetching } = useGetList<IMatch[]>({
+    key: "matchesList",
+    resource: ["matches"],
     keyResults: "data",
     enabled: true,
     params: searchParams,
   });
 
-  const deleteService = useMutateDeleteService(["staff-roles"]);
+  const deleteService = useMutateDeleteService(["matches"]);
 
   // Avoid infinity loops handle manually refetch
   useEffect(() => {
@@ -66,32 +55,32 @@ export const StaffRolesList: React.FC = () => {
 
   // Handle the delete button event
   const handleDelete = useCallback((id: number) => {
-    setStaffRoleToDelete(id);
+    setMatchToDelete(id);
   }, []);
 
-  // Confirm and delete staff role
+  // Confirm and delete match
   const confirmDelete = () => {
-    if (staffRoleToDelete !== null) {
-      deleteItem(staffRoleToDelete.toString());
-      setStaffRoleToDelete(null);
+    if (matchToDelete !== null) {
+      deleteItem(matchToDelete.toString());
+      setMatchToDelete(null);
     }
   };
 
-  // Delete staff role
+  // Delete match
   const deleteItem = (id: string) => {
     deleteService.mutate(id, {
       onSuccess: () => {
-        toast.success("Rol de personal eliminado exitosamente");
+        toast.success("Partido eliminado exitosamente");
         setShouldRefetch(true);
       },
       onError: () => {
-        toast.error("Error al eliminar el rol de personal");
+        toast.error("Error al eliminar el partido");
       },
     });
   };
 
-  // Ensure data is properly typed as StaffRole array
-  const staffRoles: StaffRole[] = React.useMemo(() => {
+  // Ensure data is properly typed as IMatch array
+  const matches: IMatch[] = React.useMemo(() => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
     console.warn("Unexpected data structure:", data);
@@ -99,38 +88,33 @@ export const StaffRolesList: React.FC = () => {
   }, [data]);
 
   // Render function for each row
-  const renderRow = (staffRole: StaffRole) => (
-    <StaffRoleItemList
-      key={staffRole.id}
-      staffRole={staffRole}
-      onDelete={handleDelete}
-    />
+  const renderRow = (match: IMatch) => (
+    <MatchItem key={match.id} match={match} onDelete={handleDelete} />
   );
 
   return (
     <>
       <div className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4">
         <DataTable
-          data={staffRoles}
+          data={matches}
           headers={headers}
-          filters={filters}
           renderRow={renderRow}
           loading={isLoading}
-          emptyMessage="No se encontraron roles de personal"
+          emptyMessage="No se encontraron partidos"
           className="mt-6"
         />
       </div>
 
       <AlertDialog
-        open={staffRoleToDelete !== null}
-        onOpenChange={(open) => !open && setStaffRoleToDelete(null)}
+        open={matchToDelete !== null}
+        onOpenChange={(open) => !open && setMatchToDelete(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. El rol de personal será
-              eliminado permanentemente del sistema.
+              Esta acción no se puede deshacer. El partido será eliminado
+              permanentemente del sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

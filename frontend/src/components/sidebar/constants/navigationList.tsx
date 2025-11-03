@@ -9,6 +9,8 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import BadgeIcon from "@mui/icons-material/Badge";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import SportsFootballIcon from "@mui/icons-material/SportsFootball";
 import type { INavigationList } from "../Sidebar";
 
 export const navigationList: INavigationList[] = [
@@ -30,6 +32,20 @@ export const navigationList: INavigationList[] = [
     name: "Eventos",
     path: "events",
     icon: <EventIcon />,
+    permissions: [],
+    childrens: [],
+  },
+  {
+    name: "Jornadas",
+    path: "matchdays",
+    icon: <DateRangeIcon />,
+    permissions: [],
+    childrens: [],
+  },
+  {
+    name: "Partidos",
+    path: "matches",
+    icon: <SportsFootballIcon />,
     permissions: [],
     childrens: [],
   },

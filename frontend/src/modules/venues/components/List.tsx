@@ -27,7 +27,6 @@ const headers: TableColumn[] = [
   { title: "Teléfono", key: "phone" },
   { title: "Ciudad", key: "cityId" },
   { title: "Club", key: "clubId" },
-  { title: "Estado", key: "active", className: "w-24" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
 
