@@ -10,7 +10,6 @@ import TeamGenderUpdateModule from "@/modules/team-genders/update";
 import { TeamsModule } from "@/modules/teams";
 import TeamCreateModule from "@/modules/teams/create";
 import TeamUpdateModule from "@/modules/teams/update";
-
 import { StaffModule } from "@/modules/staff";
 import StaffCreateModule from "@/modules/staff/create";
 import StaffUpdateModule from "@/modules/staff/update";
@@ -29,6 +28,12 @@ import CurrencyUpdateModule from "@/modules/currencies/update";
 import StadiumsModule from "@/modules/stadiums";
 import StadiumCreateModule from "@/modules/stadiums/create";
 import StadiumUpdateModule from "@/modules/stadiums/update";
+import SeasonsModule from "@/modules/seasons";
+import SeasonCreateModule from "@/modules/seasons/create";
+import SeasonUpdateModule from "@/modules/seasons/update";
+import EventsModule from "@/modules/events";
+import EventCreateModule from "@/modules/events/create";
+import EventUpdateModule from "@/modules/events/update";
 import { VenuesModule } from "@/modules/venues";
 import { CreateVenue } from "@/modules/venues/create";
 import { UpdateVenue } from "@/modules/venues/update";
@@ -185,6 +190,32 @@ export default function useRouterApp() {
             {
               path: "/stadiums/:id/edit",
               element: <StadiumUpdateModule />,
+            },
+            {
+              path: "/seasons",
+              element: <SeasonsModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/seasons-create",
+              element: <SeasonCreateModule />,
+            },
+            {
+              path: "/seasons/:id/edit",
+              element: <SeasonUpdateModule />,
+            },
+            {
+              path: "/events",
+              element: <EventsModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/events-create",
+              element: <EventCreateModule />,
+            },
+            {
+              path: "/events/:id/edit",
+              element: <EventUpdateModule />,
             },
             {
               path: "/venues",

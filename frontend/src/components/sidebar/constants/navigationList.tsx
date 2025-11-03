@@ -8,6 +8,7 @@ import PlaceIcon from "@mui/icons-material/Place";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BadgeIcon from "@mui/icons-material/Badge";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import type { INavigationList } from "../Sidebar";
 
 export const navigationList: INavigationList[] = [
@@ -19,7 +20,14 @@ export const navigationList: INavigationList[] = [
     childrens: [],
   },
   {
-    name: "Events",
+    name: "Temporadas",
+    path: "seasons",
+    icon: <CalendarTodayIcon />,
+    permissions: [],
+    childrens: [],
+  },
+  {
+    name: "Eventos",
     path: "events",
     icon: <EventIcon />,
     permissions: [],
