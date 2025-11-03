@@ -35,9 +35,10 @@ public class ClubController extends BaseController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get clubs with filters - name: {}, active: {}, foundationFrom: {}, foundationTo: {}",
-                name, active, foundationFrom, foundationTo);
-        List<ClubDTO> clubs = clubService.findAllClubs(name, active, foundationFrom, foundationTo);
+                name, effectiveActive, foundationFrom, foundationTo);
+        List<ClubDTO> clubs = clubService.findAllClubs(name, effectiveActive, foundationFrom, foundationTo);
         return ResponseEntity.ok(ApiResponse.success(clubs));
     }
 

@@ -1,6 +1,7 @@
 package co.edu.uniquindio.rosteredge.backend.controller;
 
 import co.edu.uniquindio.rosteredge.backend.exception.BusinessException;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -137,6 +138,13 @@ public abstract class BaseController {
         // TODO: Implement based on your authentication/authorization mechanism
         // For example, check roles or permissions from SecurityContext
         return true; // Placeholder
+    }
+
+    /**
+     * Normalizes the active flag applying the default behaviour (true when null).
+     */
+    protected Boolean resolveActive(Boolean active) {
+        return FilterUtils.resolveActive(active);
     }
 
     /**

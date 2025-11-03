@@ -6,6 +6,7 @@ import co.edu.uniquindio.rosteredge.backend.model.Subscription;
 import co.edu.uniquindio.rosteredge.backend.repository.SubscriptionRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.view.SubscriptionCoverageQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.SubscriptionService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,8 @@ public class SubscriptionServiceImpl extends SimpleCrudService<Subscription> imp
     public List<Subscription> findByFilters(Long planId, Long statusId, Boolean active,
                                             LocalDate startDateFrom, LocalDate startDateTo,
                                             LocalDate endDateFrom, LocalDate endDateTo) {
-        return subscriptionRepository.findByFilters(planId, statusId, active, startDateFrom, startDateTo,
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return subscriptionRepository.findByFilters(planId, statusId, effectiveActive, startDateFrom, startDateTo,
                 endDateFrom, endDateTo);
     }
 
@@ -43,6 +45,9 @@ public class SubscriptionServiceImpl extends SimpleCrudService<Subscription> imp
     @Transactional(readOnly = true)
     public List<SubscriptionCoverageResponse> findSubscriptionCoverage(SubscriptionCoverageFilter filter) {
         SubscriptionCoverageFilter effectiveFilter = filter != null ? filter : new SubscriptionCoverageFilter();
+        if (effectiveFilter.getActive() == null) {
+            effectiveFilter.setActive(Boolean.TRUE);
+        }
         return subscriptionCoverageQueryRepository.findSubscriptions(effectiveFilter);
     }
 }

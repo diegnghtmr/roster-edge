@@ -34,7 +34,7 @@ public class PaymentController extends SimpleCrudController<Payment> {
         Long currencyId = parseLong(request.getParameter("currencyId"));
         Long planId = parseLong(request.getParameter("planId"));
         Long rosterId = parseLong(request.getParameter("rosterId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         LocalDateTime paymentDateFrom = parseDateTime(request.getParameter("paymentDateFrom"));
         LocalDateTime paymentDateTo = parseDateTime(request.getParameter("paymentDateTo"));
         BigDecimal amountFrom = parseBigDecimal(request.getParameter("amountFrom"));

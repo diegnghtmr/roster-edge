@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Stadium;
 import co.edu.uniquindio.rosteredge.backend.repository.StadiumRepository;
 import co.edu.uniquindio.rosteredge.backend.service.StadiumService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,8 @@ public class StadiumServiceImpl extends SimpleCrudService<Stadium> implements St
                                        Integer capacityFrom, Integer capacityTo,
                                        LocalDate foundationFrom, LocalDate foundationTo,
                                        BigDecimal areaFrom, BigDecimal areaTo) {
-        return stadiumRepository.findByFilters(venueId, surface, active, capacityFrom, capacityTo,
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return stadiumRepository.findByFilters(venueId, surface, effectiveActive, capacityFrom, capacityTo,
                 foundationFrom, foundationTo, areaFrom, areaTo);
     }
 }

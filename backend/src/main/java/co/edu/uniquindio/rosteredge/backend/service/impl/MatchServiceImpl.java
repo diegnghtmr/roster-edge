@@ -6,6 +6,7 @@ import co.edu.uniquindio.rosteredge.backend.model.Match;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.view.MatchScheduleQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -38,15 +39,19 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
     @Transactional(readOnly = true)
     public List<Match> findAllMatches(Long teamId, Long eventId, Long seasonId, Long matchdayId, Long stadiumId,
                                       Boolean active, LocalDate dateFrom, LocalDate dateTo) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
         log.debug("Finding matches with filters - teamId: {}, eventId: {}, seasonId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                teamId, eventId, seasonId, matchdayId, stadiumId, active, dateFrom, dateTo);
-        return matchRepository.findByFilters(eventId, seasonId, matchdayId, stadiumId, teamId, active, dateFrom, dateTo);
+                teamId, eventId, seasonId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
+        return matchRepository.findByFilters(eventId, seasonId, matchdayId, stadiumId, teamId, effectiveActive, dateFrom, dateTo);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<MatchResponse> findMatchSchedule(MatchScheduleFilter filter) {
         MatchScheduleFilter effectiveFilter = filter != null ? filter : new MatchScheduleFilter();
+        if (effectiveFilter.getActive() == null) {
+            effectiveFilter.setActive(Boolean.TRUE);
+        }
         log.debug("Finding match schedule with filter: {}", effectiveFilter);
         return matchScheduleQueryRepository.findMatches(effectiveFilter);
     }

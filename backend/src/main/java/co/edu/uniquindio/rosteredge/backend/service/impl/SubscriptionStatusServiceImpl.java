@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.SubscriptionStatus;
 import co.edu.uniquindio.rosteredge.backend.repository.SubscriptionStatusRepository;
 import co.edu.uniquindio.rosteredge.backend.service.SubscriptionStatusService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class SubscriptionStatusServiceImpl extends SimpleCrudService<Subscriptio
     @Override
     @Transactional(readOnly = true)
     public List<SubscriptionStatus> findByFilters(String name, Boolean active) {
-        return subscriptionStatusRepository.findByFilters(name, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return subscriptionStatusRepository.findByFilters(name, effectiveActive);
     }
 }
 

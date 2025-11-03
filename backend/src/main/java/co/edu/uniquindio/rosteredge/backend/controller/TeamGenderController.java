@@ -30,7 +30,7 @@ public class TeamGenderController extends SimpleCrudController<TeamGender> {
         HttpServletRequest request = currentRequest();
         
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get team genders with filters - name: {}, active: {}", name, active);
 

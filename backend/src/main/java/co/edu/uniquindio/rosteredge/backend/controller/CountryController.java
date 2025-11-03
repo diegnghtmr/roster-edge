@@ -29,7 +29,7 @@ public class CountryController extends SimpleCrudController<Country> {
     public ResponseEntity<ApiResponse<List<Country>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get countries with filters - name: {}, active: {}", name, active);
 

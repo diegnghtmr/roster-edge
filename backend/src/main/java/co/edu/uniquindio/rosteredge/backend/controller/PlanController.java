@@ -30,7 +30,7 @@ public class PlanController extends SimpleCrudController<Plan> {
     public ResponseEntity<ApiResponse<List<Plan>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         BigDecimal priceFrom = parseBigDecimal(request.getParameter("priceFrom"));
         BigDecimal priceTo = parseBigDecimal(request.getParameter("priceTo"));
 

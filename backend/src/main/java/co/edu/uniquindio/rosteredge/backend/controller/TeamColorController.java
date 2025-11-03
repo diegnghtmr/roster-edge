@@ -31,7 +31,7 @@ public class TeamColorController extends SimpleCrudController<TeamColor> {
         
         Long teamId = parseLong(request.getParameter("teamId"));
         Long colorId = parseLong(request.getParameter("colorId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get team colors with filters - teamId: {}, colorId: {}, active: {}",
                 teamId, colorId, active);

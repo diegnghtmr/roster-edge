@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.MatchAwayTeam;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchAwayTeamRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchAwayTeamService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class MatchAwayTeamServiceImpl extends SimpleCrudService<MatchAwayTeam> i
     @Override
     @Transactional(readOnly = true)
     public List<MatchAwayTeam> findByFilters(Long matchId, Long teamId, Boolean active) {
-        return matchAwayTeamRepository.findByFilters(matchId, teamId, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return matchAwayTeamRepository.findByFilters(matchId, teamId, effectiveActive);
     }
 }
 

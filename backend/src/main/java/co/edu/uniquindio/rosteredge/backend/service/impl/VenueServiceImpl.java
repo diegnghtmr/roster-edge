@@ -7,6 +7,7 @@ import co.edu.uniquindio.rosteredge.backend.model.Venue;
 import co.edu.uniquindio.rosteredge.backend.repository.VenueRepository;
 import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.VenueService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,9 +45,10 @@ public class VenueServiceImpl extends AbstractBaseService<Venue, Long> implement
 
     @Override
     public List<VenueDTO> findAllVenues(String name, String email, Long cityId, Long clubId, Boolean active, LocalDate foundationFrom, LocalDate foundationTo) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
         log.info("Finding venues with filters - name: {}, email: {}, cityId: {}, clubId: {}, active: {}, foundationFrom: {}, foundationTo: {}",
-                name, email, cityId, clubId, active, foundationFrom, foundationTo);
-        return venueRepository.findByFilters(name, email, cityId, clubId, active, foundationFrom, foundationTo).stream()
+                name, email, cityId, clubId, effectiveActive, foundationFrom, foundationTo);
+        return venueRepository.findByFilters(name, email, cityId, clubId, effectiveActive, foundationFrom, foundationTo).stream()
                 .map(mapper::toVenueDTO)
                 .collect(Collectors.toList());
     }
@@ -54,9 +56,14 @@ public class VenueServiceImpl extends AbstractBaseService<Venue, Long> implement
     @Override
     public VenueDTO findVenueById(Long id) {
         log.info("Finding venue with id: {}", id);
-        return venueRepository.findById(id)
-                .map(mapper::toVenueDTO)
+        Venue venue = venueRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(venue.getActive())) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
+
+        return mapper.toVenueDTO(venue);
     }
 
     @Override
@@ -64,6 +71,10 @@ public class VenueServiceImpl extends AbstractBaseService<Venue, Long> implement
         log.info("Updating venue with id: {}", id);
         Venue existingVenue = venueRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(existingVenue.getActive())) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
 
         existingVenue.setName(venueDTO.getName());
         existingVenue.setEmail(venueDTO.getEmail());

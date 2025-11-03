@@ -50,9 +50,10 @@ public class MatchController extends BaseController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get matches with filters - teamId: {}, eventId: {}, seasonId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                teamId, eventId, seasonId, matchdayId, stadiumId, active, dateFrom, dateTo);
-        List<Match> matches = matchService.findAllMatches(teamId, eventId, seasonId, matchdayId, stadiumId, active, dateFrom, dateTo);
+                teamId, eventId, seasonId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
+        List<Match> matches = matchService.findAllMatches(teamId, eventId, seasonId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(matches));
     }
 

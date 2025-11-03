@@ -12,6 +12,7 @@ import co.edu.uniquindio.rosteredge.backend.repository.view.PlayerOverviewQueryR
 import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
 import co.edu.uniquindio.rosteredge.backend.service.PlayerService;
 import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -52,8 +53,9 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     @Transactional(readOnly = true)
     public List<PlayerDTO> findAllPlayers(Long teamId, Long primaryPositionId, Boolean active) {
-        log.info("Finding players with filters - teamId: {}, primaryPositionId: {}, active: {}", teamId, primaryPositionId, active);
-        return playerRepository.findByFilters(teamId, primaryPositionId, active)
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        log.info("Finding players with filters - teamId: {}, primaryPositionId: {}, active: {}", teamId, primaryPositionId, effectiveActive);
+        return playerRepository.findByFilters(teamId, primaryPositionId, effectiveActive)
                 .stream()
                 .map(entityMapper::toPlayerDTO)
                 .collect(Collectors.toList());
@@ -63,6 +65,9 @@ public class PlayerServiceImpl implements PlayerService {
     @Transactional(readOnly = true)
     public List<PlayerResponse> findPlayersOverview(PlayerOverviewFilter filter) {
         PlayerOverviewFilter effectiveFilter = filter != null ? filter : new PlayerOverviewFilter();
+        if (effectiveFilter.getActive() == null) {
+            effectiveFilter.setActive(Boolean.TRUE);
+        }
         log.info("Finding player overview with filter: {}", effectiveFilter);
         return playerOverviewQueryRepository.findPlayers(effectiveFilter);
     }
@@ -73,6 +78,10 @@ public class PlayerServiceImpl implements PlayerService {
         log.info("Finding player with id: {}", id);
         Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(player.getActive())) {
+            throw new EntityNotFoundException("Player not found with id: " + id);
+        }
         return entityMapper.toPlayerDTO(player);
     }
 
@@ -81,6 +90,10 @@ public class PlayerServiceImpl implements PlayerService {
         log.info("Updating player with id: {}", id);
         Player existingPlayer = playerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(existingPlayer.getActive())) {
+            throw new EntityNotFoundException("Player not found with id: " + id);
+        }
 
         // Update user fields
         existingPlayer.setEmail(playerDTO.getEmail());
@@ -112,6 +125,22 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void deletePlayer(Long id) {
         log.info("Deleting player with id: {}", id);
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(player.getActive())) {
+            log.debug("Player with id {} is already inactive", id);
+            return;
+        }
+
+        player.softDelete();
+        player.preUpdate();
+        playerRepository.save(player);
+    }
+
+    @Override
+    public void deletePlayerHard(Long id) {
+        log.info("Hard deleting player with id: {}", id);
         if (!playerRepository.existsById(id)) {
             throw new EntityNotFoundException("Player not found with id: " + id);
         }

@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.ClubEvent;
 import co.edu.uniquindio.rosteredge.backend.repository.ClubEventRepository;
 import co.edu.uniquindio.rosteredge.backend.service.ClubEventService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class ClubEventServiceImpl extends SimpleCrudService<ClubEvent> implement
     @Override
     @Transactional(readOnly = true)
     public List<ClubEvent> findByFilters(Long clubId, Long eventId, Boolean active) {
-        return clubEventRepository.findByFilters(clubId, eventId, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return clubEventRepository.findByFilters(clubId, eventId, effectiveActive);
     }
 }
 

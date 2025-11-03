@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Currency;
 import co.edu.uniquindio.rosteredge.backend.repository.CurrencyRepository;
 import co.edu.uniquindio.rosteredge.backend.service.CurrencyService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class CurrencyServiceImpl extends SimpleCrudService<Currency> implements 
     @Override
     @Transactional(readOnly = true)
     public List<Currency> findByFilters(String name, String symbol, Boolean active) {
-        return currencyRepository.findByFilters(name, symbol, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return currencyRepository.findByFilters(name, symbol, effectiveActive);
     }
 }
 

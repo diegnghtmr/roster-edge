@@ -10,6 +10,7 @@ import co.edu.uniquindio.rosteredge.backend.repository.TeamRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.view.TeamInsightsQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.TeamService;
 import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,9 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional(readOnly = true)
     public List<TeamDTO> findAllTeams(Long clubId, Long genderId, Long categoryId, Boolean active) {
-        log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}", clubId, genderId, categoryId, active);
-        return teamRepository.findByFilters(clubId, genderId, categoryId, active)
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}", clubId, genderId, categoryId, effectiveActive);
+        return teamRepository.findByFilters(clubId, genderId, categoryId, effectiveActive)
                 .stream()
                 .map(entityMapper::toTeamDTO)
                 .collect(Collectors.toList());
@@ -51,6 +53,9 @@ public class TeamServiceImpl implements TeamService {
     @Transactional(readOnly = true)
     public List<TeamInsightsResponse> findTeamInsights(TeamInsightsFilter filter) {
         TeamInsightsFilter effectiveFilter = filter != null ? filter : new TeamInsightsFilter();
+        if (effectiveFilter.getActive() == null) {
+            effectiveFilter.setActive(Boolean.TRUE);
+        }
         log.info("Finding team insights with filter: {}", effectiveFilter);
         return teamInsightsQueryRepository.findTeams(effectiveFilter);
     }
@@ -61,6 +66,10 @@ public class TeamServiceImpl implements TeamService {
         log.info("Finding team with id: {}", id);
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(team.getActive())) {
+            throw new EntityNotFoundException("Team not found with id: " + id);
+        }
         return entityMapper.toTeamDTO(team);
     }
 
@@ -69,6 +78,10 @@ public class TeamServiceImpl implements TeamService {
         log.info("Updating team with id: {}", id);
         Team existingTeam = teamRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(existingTeam.getActive())) {
+            throw new EntityNotFoundException("Team not found with id: " + id);
+        }
 
         existingTeam.setName(teamDTO.getName());
         existingTeam.setGenderId(teamDTO.getGenderId());
@@ -85,6 +98,22 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void deleteTeam(Long id) {
         log.info("Deleting team with id: {}", id);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Team not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(team.getActive())) {
+            log.debug("Team with id {} is already inactive", id);
+            return;
+        }
+
+        team.softDelete();
+        team.preUpdate();
+        teamRepository.save(team);
+    }
+
+    @Override
+    public void deleteTeamHard(Long id) {
+        log.info("Hard deleting team with id: {}", id);
         if (!teamRepository.existsById(id)) {
             throw new EntityNotFoundException("Team not found with id: " + id);
         }

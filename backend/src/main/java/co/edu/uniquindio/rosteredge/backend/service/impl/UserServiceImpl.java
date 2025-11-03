@@ -8,6 +8,7 @@ import co.edu.uniquindio.rosteredge.backend.repository.UserRepository;
 import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.UserService;
 import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,9 +74,10 @@ public class UserServiceImpl extends AbstractBaseService<User, Long> implements 
 
     @Override
     public List<UserDTO> findAllUsers(Long cityId, Boolean active, String name, String email) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
         log.info("Finding users with filters - cityId: {}, active: {}, name: {}, email: {}",
-                cityId, active, name, email);
-        return userRepository.findByFilters(cityId, active, name, email).stream()
+                cityId, effectiveActive, name, email);
+        return userRepository.findByFilters(cityId, effectiveActive, name, email).stream()
                 .map(mapper::toUserDTO)
                 .toList();
     }
@@ -83,10 +85,16 @@ public class UserServiceImpl extends AbstractBaseService<User, Long> implements 
     @Override
     public UserDTO findUserById(Long id) {
         log.info("Finding user with id: {}", id);
-        return userRepository.findById(id)
-                .map(mapper::toUserDTO)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException(
                         getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(user.getActive())) {
+            throw new co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException(
+                    getEntityName(), id);
+        }
+
+        return mapper.toUserDTO(user);
     }
 
 

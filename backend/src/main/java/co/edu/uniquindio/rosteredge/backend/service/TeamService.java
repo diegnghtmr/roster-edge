@@ -11,6 +11,7 @@ public interface TeamService {
     TeamDTO findTeamById(Long id);
     TeamDTO updateTeam(Long id, TeamDTO teamDTO);
     void deleteTeam(Long id);
+    void deleteTeamHard(Long id);
 
     List<TeamInsightsResponse> findTeamInsights(TeamInsightsFilter filter);
 }

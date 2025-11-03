@@ -17,10 +17,10 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
     @Query("SELECT m.* FROM \"Match\" m " +
            "LEFT JOIN \"MatchHomeTeam\" mht ON m.id = mht.match_id " +
            "LEFT JOIN \"MatchAwayTeam\" mat ON m.id = mat.match_id " +
-           "WHERE mht.team_id = :teamId OR mat.team_id = :teamId")
+           "WHERE (mht.team_id = :teamId OR mat.team_id = :teamId) AND m.active = true")
     List<Match> findByTeamId(@Param("teamId") Long teamId);
 
-    @Query("SELECT * FROM \"Match\" WHERE date BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM \"Match\" WHERE date BETWEEN :startDate AND :endDate AND active = true")
     List<Match> findByDateBetween(@Param("startDate") LocalDate startDate,
                                   @Param("endDate") LocalDate endDate);
 

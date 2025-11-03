@@ -34,7 +34,7 @@ public class SubscriptionController extends SimpleCrudController<Subscription> {
 
         Long planId = parseLong(request.getParameter("planId"));
         Long statusId = parseLong(request.getParameter("statusId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         LocalDate startDateFrom = parseDate(request.getParameter("startDateFrom"));
         LocalDate startDateTo = parseDate(request.getParameter("startDateTo"));
         LocalDate endDateFrom = parseDate(request.getParameter("endDateFrom"));

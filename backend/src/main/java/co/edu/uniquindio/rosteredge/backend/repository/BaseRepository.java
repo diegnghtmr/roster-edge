@@ -1,5 +1,6 @@
 package co.edu.uniquindio.rosteredge.backend.repository;
 
+import co.edu.uniquindio.rosteredge.backend.model.BaseEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @param <ID> Entity ID type
  */
 @NoRepositoryBean
-public interface BaseRepository<T, ID> extends CrudRepository<T, ID> {
+public interface BaseRepository<T extends BaseEntity, ID> extends CrudRepository<T, ID> {
     
     /**
      * Find all records as a list

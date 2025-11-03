@@ -36,9 +36,10 @@ public class EventController extends BaseController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                seasonId, venueId, active, dateFrom, dateTo);
-        List<EventDTO> events = eventService.findAllEvents(seasonId, venueId, active, dateFrom, dateTo);
+                seasonId, venueId, effectiveActive, dateFrom, dateTo);
+        List<EventDTO> events = eventService.findAllEvents(seasonId, venueId, effectiveActive, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(events));
     }
 

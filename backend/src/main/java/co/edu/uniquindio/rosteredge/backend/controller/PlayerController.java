@@ -42,9 +42,10 @@ public class PlayerController extends BaseController {
             @RequestParam(required = false) Long teamId,
             @RequestParam(required = false) Long primaryPositionId,
             @RequestParam(required = false) Boolean active) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get players with filters - teamId: {}, primaryPositionId: {}, active: {}",
-                teamId, primaryPositionId, active);
-        List<PlayerDTO> players = playerService.findAllPlayers(teamId, primaryPositionId, active);
+                teamId, primaryPositionId, effectiveActive);
+        List<PlayerDTO> players = playerService.findAllPlayers(teamId, primaryPositionId, effectiveActive);
         return ResponseEntity.ok(ApiResponse.success(players));
     }
 

@@ -30,7 +30,7 @@ public class CurrencyController extends SimpleCrudController<Currency> {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));
         String symbol = trimToNull(request.getParameter("symbol"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get currencies with filters - name: {}, symbol: {}, active: {}",
                 name, symbol, active);

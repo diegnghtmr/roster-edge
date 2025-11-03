@@ -31,7 +31,7 @@ public class PlanBenefitController extends SimpleCrudController<PlanBenefit> {
         
         Long planId = parseLong(request.getParameter("planId"));
         String description = trimToNull(request.getParameter("description"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get plan benefits with filters - planId: {}, description: {}, active: {}",
                 planId, description, active);

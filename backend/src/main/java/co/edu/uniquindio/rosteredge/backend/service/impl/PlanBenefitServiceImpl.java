@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.PlanBenefit;
 import co.edu.uniquindio.rosteredge.backend.repository.PlanBenefitRepository;
 import co.edu.uniquindio.rosteredge.backend.service.PlanBenefitService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class PlanBenefitServiceImpl extends SimpleCrudService<PlanBenefit> imple
     @Override
     @Transactional(readOnly = true)
     public List<PlanBenefit> findByFilters(Long planId, String description, Boolean active) {
-        return planBenefitRepository.findByFilters(planId, description, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return planBenefitRepository.findByFilters(planId, description, effectiveActive);
     }
 }
 

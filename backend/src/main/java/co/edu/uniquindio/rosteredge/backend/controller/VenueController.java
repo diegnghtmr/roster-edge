@@ -38,9 +38,10 @@ public class VenueController extends BaseController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get venues with filters - name: {}, email: {}, cityId: {}, clubId: {}, active: {}, foundationFrom: {}, foundationTo: {}",
-                name, email, cityId, clubId, active, foundationFrom, foundationTo);
-        List<VenueDTO> venues = venueService.findAllVenues(name, email, cityId, clubId, active, foundationFrom, foundationTo);
+                name, email, cityId, clubId, effectiveActive, foundationFrom, foundationTo);
+        List<VenueDTO> venues = venueService.findAllVenues(name, email, cityId, clubId, effectiveActive, foundationFrom, foundationTo);
         return ResponseEntity.ok(ApiResponse.success(venues));
     }
 

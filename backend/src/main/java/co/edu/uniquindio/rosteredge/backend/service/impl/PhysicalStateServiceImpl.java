@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.PhysicalState;
 import co.edu.uniquindio.rosteredge.backend.repository.PhysicalStateRepository;
 import co.edu.uniquindio.rosteredge.backend.service.PhysicalStateService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class PhysicalStateServiceImpl extends SimpleCrudService<PhysicalState> i
     @Override
     @Transactional(readOnly = true)
     public List<PhysicalState> findByFilters(String name, Boolean active) {
-        return physicalStateRepository.findByFilters(name, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return physicalStateRepository.findByFilters(name, effectiveActive);
     }
 }
 

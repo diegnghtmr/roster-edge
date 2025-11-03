@@ -1,6 +1,7 @@
 package co.edu.uniquindio.rosteredge.backend.service;
 
 import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
+import co.edu.uniquindio.rosteredge.backend.model.BaseEntity;
 import co.edu.uniquindio.rosteredge.backend.repository.BaseRepository;
 import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.util.Optional;
  */
 @Transactional
 @Slf4j
-public abstract class AbstractBaseService<T, ID> implements BaseService<T, ID> {
+public abstract class AbstractBaseService<T extends BaseEntity, ID> implements BaseService<T, ID> {
 
     protected final BaseRepository<T, ID> repository;
     private CascadeDeleteManager cascadeDeleteManager;
@@ -49,13 +50,36 @@ public abstract class AbstractBaseService<T, ID> implements BaseService<T, ID> {
     @Override
     public Optional<T> findById(ID id) {
         log.debug("Finding entity by id: {}", id);
-        return repository.findById(id);
+        return repository.findById(id)
+                .filter(entity -> {
+                    boolean isActive = Boolean.TRUE.equals(entity.getActive());
+                    if (!isActive) {
+                        log.debug("Entity with id {} found but is inactive", id);
+                    }
+                    return isActive;
+                });
     }
 
     @Override
     public List<T> findAll() {
-        log.debug("Finding all entities");
-        return repository.findAll();
+        return findAll(Boolean.TRUE);
+    }
+
+    @Override
+    public List<T> findAll(Boolean active) {
+        log.debug("Finding entities with active filter: {}", active);
+        List<T> entities = repository.findAll();
+
+        if (active == null) {
+            return entities;
+        }
+
+        return entities.stream()
+                .filter(entity -> {
+                    boolean isActive = Boolean.TRUE.equals(entity.getActive());
+                    return active ? isActive : !isActive;
+                })
+                .toList();
     }
 
     @Override
@@ -71,13 +95,30 @@ public abstract class AbstractBaseService<T, ID> implements BaseService<T, ID> {
 
     @Override
     public void deleteById(ID id) {
-        log.debug("Deleting entity with id: {}", id);
+        log.debug("Soft deleting entity with id: {}", id);
+        T entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id.toString()));
+
+        if (!Boolean.TRUE.equals(entity.getActive())) {
+            log.debug("Entity with id {} is already inactive", id);
+            return;
+        }
+
+        entity.softDelete();
+        entity.preUpdate();
+        repository.save(entity);
+        log.debug("Entity soft deleted successfully");
+    }
+
+    @Override
+    public void deleteHardById(ID id) {
+        log.debug("Hard deleting entity with id: {}", id);
         if (!existsById(id)) {
             throw new EntityNotFoundException(getEntityName(), id.toString());
         }
         beforeDelete(id);
         repository.deleteById(id);
-        log.debug("Entity deleted successfully");
+        log.debug("Entity hard deleted successfully");
     }
 
     @Override

@@ -11,6 +11,7 @@ public interface PlayerService {
     PlayerDTO findPlayerById(Long id);
     PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO);
     void deletePlayer(Long id);
+    void deletePlayerHard(Long id);
 
     List<PlayerResponse> findPlayersOverview(PlayerOverviewFilter filter);
 }

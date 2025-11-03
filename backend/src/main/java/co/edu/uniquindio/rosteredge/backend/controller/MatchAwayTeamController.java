@@ -30,7 +30,7 @@ public class MatchAwayTeamController extends SimpleCrudController<MatchAwayTeam>
         HttpServletRequest request = currentRequest();
         Long matchId = parseLong(request.getParameter("matchId"));
         Long teamId = parseLong(request.getParameter("teamId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get match away teams with filters - matchId: {}, teamId: {}, active: {}",
                 matchId, teamId, active);

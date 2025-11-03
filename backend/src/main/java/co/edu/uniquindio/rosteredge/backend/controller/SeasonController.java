@@ -38,9 +38,10 @@ public class SeasonController extends BaseController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDateTo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get seasons with filters - clubId: {}, name: {}, active: {}, startDateFrom: {}, startDateTo: {}, endDateFrom: {}, endDateTo: {}",
-                clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
-        List<SeasonDTO> seasons = seasonService.findAllSeasons(clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
+                clubId, name, effectiveActive, startDateFrom, startDateTo, endDateFrom, endDateTo);
+        List<SeasonDTO> seasons = seasonService.findAllSeasons(clubId, name, effectiveActive, startDateFrom, startDateTo, endDateFrom, endDateTo);
         return ResponseEntity.ok(ApiResponse.success(seasons));
     }
 

@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.controller;
 import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
 import co.edu.uniquindio.rosteredge.backend.model.BaseEntity;
 import co.edu.uniquindio.rosteredge.backend.service.CrudService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,11 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse<List<T>>> findAll() {
-        List<T> items = service.findAll();
+        HttpServletRequest request = currentRequest();
+        Boolean activeParam = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(activeParam);
+
+        List<T> items = service.findAll(active);
         return ResponseEntity.ok(ApiResponse.success(items));
     }
 
@@ -156,5 +161,12 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /**
+     * Normalizes the active flag applying the default behaviour.
+     */
+    protected Boolean resolveActive(Boolean active) {
+        return FilterUtils.resolveActive(active);
     }
 }

@@ -29,7 +29,7 @@ public class StaffRoleController extends SimpleCrudController<StaffRole> {
     public ResponseEntity<ApiResponse<List<StaffRole>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = request.getParameter("name");
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get staff roles with filters - name: {}, active: {}", name, active);
 

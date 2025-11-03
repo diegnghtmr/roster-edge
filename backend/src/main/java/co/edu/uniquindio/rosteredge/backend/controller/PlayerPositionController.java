@@ -30,7 +30,7 @@ public class PlayerPositionController extends SimpleCrudController<PlayerPositio
         HttpServletRequest request = currentRequest();
         
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get player positions with filters - name: {}, active: {}", name, active);
 

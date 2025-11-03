@@ -30,7 +30,7 @@ public class StaffController extends SimpleCrudController<Staff> {
         HttpServletRequest request = currentRequest();
         Long teamId = parseLong(request.getParameter("teamId"));
         Long staffRoleId = parseLong(request.getParameter("staffRoleId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get staff with filters - teamId: {}, staffRoleId: {}, active: {}",
                 teamId, staffRoleId, active);

@@ -27,9 +27,10 @@ public class UserController extends BaseController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String email) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get users with filters - cityId: {}, active: {}, name: {}, email: {}",
-                cityId, active, name, email);
-        List<UserDTO> users = userService.findAllUsers(cityId, active, name, email);
+                cityId, effectiveActive, name, email);
+        List<UserDTO> users = userService.findAllUsers(cityId, effectiveActive, name, email);
         return ResponseEntity.ok(ApiResponse.success(users));
     }
 

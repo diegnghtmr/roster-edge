@@ -7,6 +7,7 @@ import co.edu.uniquindio.rosteredge.backend.model.Club;
 import co.edu.uniquindio.rosteredge.backend.repository.ClubRepository;
 import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.ClubService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,9 +45,10 @@ public class ClubServiceImpl extends AbstractBaseService<Club, Long> implements 
 
     @Override
     public List<ClubDTO> findAllClubs(String name, Boolean active, LocalDate foundationFrom, LocalDate foundationTo) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
         log.info("Finding clubs with filters - name: {}, active: {}, foundationFrom: {}, foundationTo: {}",
-                name, active, foundationFrom, foundationTo);
-        return clubRepository.findByFilters(name, active, foundationFrom, foundationTo).stream()
+                name, effectiveActive, foundationFrom, foundationTo);
+        return clubRepository.findByFilters(name, effectiveActive, foundationFrom, foundationTo).stream()
                 .map(mapper::toClubDTO)
                 .collect(Collectors.toList());
     }
@@ -54,9 +56,14 @@ public class ClubServiceImpl extends AbstractBaseService<Club, Long> implements 
     @Override
     public ClubDTO findClubById(Long id) {
         log.info("Finding club with id: {}", id);
-        return clubRepository.findById(id)
-                .map(mapper::toClubDTO)
+        Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(club.getActive())) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
+
+        return mapper.toClubDTO(club);
     }
 
     @Override
@@ -64,6 +71,10 @@ public class ClubServiceImpl extends AbstractBaseService<Club, Long> implements 
         log.info("Updating club with id: {}", id);
         Club existingClub = clubRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(existingClub.getActive())) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
 
         existingClub.setName(clubDTO.getName());
         existingClub.setMotto(clubDTO.getMotto());

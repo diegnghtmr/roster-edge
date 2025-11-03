@@ -31,7 +31,7 @@ public class NotificationController extends SimpleCrudController<Notification> {
         HttpServletRequest request = currentRequest();
         String message = trimToNull(request.getParameter("message"));
         String status = trimToNull(request.getParameter("status"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         LocalDateTime sendFrom = parseDateTime(request.getParameter("sendFrom"));
         LocalDateTime sendTo = parseDateTime(request.getParameter("sendTo"));
 
