@@ -70,4 +70,10 @@ public class Payment extends BaseEntity {
      */
     @NotNull(message = "Plan ID is required")
     private Long planId;
+
+    /**
+     * Roster ID
+     */
+    @NotNull(message = "Roster ID is required")
+    private Long rosterId;
 }

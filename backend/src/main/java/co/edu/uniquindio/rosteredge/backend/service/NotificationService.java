@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface NotificationService extends CrudService<Notification> {
 
-    List<Notification> findByFilters(String message, Boolean active,
+    List<Notification> findByFilters(String message, String status, Boolean active,
                                      LocalDateTime sendFrom, LocalDateTime sendTo);
 }

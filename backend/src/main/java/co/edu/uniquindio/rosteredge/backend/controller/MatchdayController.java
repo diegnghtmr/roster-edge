@@ -25,11 +25,11 @@ public class MatchdayController extends SimpleCrudController<Matchday> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Matchday>>> findAll() {
         HttpServletRequest request = currentRequest();
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get matchdays with filters - name: {}, active: {}", name, active);
 

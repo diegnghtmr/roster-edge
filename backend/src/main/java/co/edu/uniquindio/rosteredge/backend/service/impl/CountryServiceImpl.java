@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Country;
 import co.edu.uniquindio.rosteredge.backend.repository.CountryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.CountryService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +27,9 @@ public class CountryServiceImpl extends SimpleCrudService<Country> implements Co
 
     @Override
     @Transactional(readOnly = true)
-    public List<Country> findByFilters(String name, Boolean active) {
-        return countryRepository.findByFilters(name, active);
+   public List<Country> findByFilters(String name, Boolean active) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return countryRepository.findByFilters(name, effectiveActive);
     }
 }
 

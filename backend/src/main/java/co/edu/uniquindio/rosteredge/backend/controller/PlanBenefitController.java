@@ -25,13 +25,13 @@ public class PlanBenefitController extends SimpleCrudController<PlanBenefit> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PlanBenefit>>> findAll() {
         HttpServletRequest request = currentRequest();
         
         Long planId = parseLong(request.getParameter("planId"));
         String description = trimToNull(request.getParameter("description"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get plan benefits with filters - planId: {}, description: {}, active: {}",
                 planId, description, active);

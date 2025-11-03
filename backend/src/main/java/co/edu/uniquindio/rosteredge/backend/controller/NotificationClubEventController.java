@@ -25,13 +25,13 @@ public class NotificationClubEventController extends SimpleCrudController<Notifi
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<NotificationClubEvent>>> findAll() {
         HttpServletRequest request = currentRequest();
         
         Long notificationId = parseLong(request.getParameter("notificationId"));
         Long clubEventId = parseLong(request.getParameter("clubEventId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get notification club events with filters - notificationId: {}, clubEventId: {}, active: {}",
                 notificationId, clubEventId, active);

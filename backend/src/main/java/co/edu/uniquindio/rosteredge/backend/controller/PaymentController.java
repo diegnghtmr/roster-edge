@@ -27,22 +27,23 @@ public class PaymentController extends SimpleCrudController<Payment> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Payment>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long paymentMethodId = parseLong(request.getParameter("paymentMethodId"));
         Long currencyId = parseLong(request.getParameter("currencyId"));
         Long planId = parseLong(request.getParameter("planId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Long rosterId = parseLong(request.getParameter("rosterId"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         LocalDateTime paymentDateFrom = parseDateTime(request.getParameter("paymentDateFrom"));
         LocalDateTime paymentDateTo = parseDateTime(request.getParameter("paymentDateTo"));
         BigDecimal amountFrom = parseBigDecimal(request.getParameter("amountFrom"));
         BigDecimal amountTo = parseBigDecimal(request.getParameter("amountTo"));
 
-        log.info("Request to get payments with filters - paymentMethodId: {}, currencyId: {}, planId: {}, active: {}, paymentDateFrom: {}, paymentDateTo: {}, amountFrom: {}, amountTo: {}",
-                paymentMethodId, currencyId, planId, active, paymentDateFrom, paymentDateTo, amountFrom, amountTo);
+        log.info("Request to get payments with filters - paymentMethodId: {}, currencyId: {}, planId: {}, rosterId: {}, active: {}, paymentDateFrom: {}, paymentDateTo: {}, amountFrom: {}, amountTo: {}",
+                paymentMethodId, currencyId, planId, rosterId, active, paymentDateFrom, paymentDateTo, amountFrom, amountTo);
 
-        List<Payment> payments = paymentService.findByFilters(paymentMethodId, currencyId, planId, active,
+        List<Payment> payments = paymentService.findByFilters(paymentMethodId, currencyId, planId, rosterId, active,
                 paymentDateFrom, paymentDateTo, amountFrom, amountTo);
         return ResponseEntity.ok(ApiResponse.success(payments));
     }

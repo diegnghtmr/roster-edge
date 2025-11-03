@@ -26,11 +26,11 @@ public class StreakController extends SimpleCrudController<Streak> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Streak>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long teamId = parseLong(request.getParameter("teamId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         LocalDate startDateFrom = parseDate(request.getParameter("startDateFrom"));
         LocalDate startDateTo = parseDate(request.getParameter("startDateTo"));
         LocalDate endDateFrom = parseDate(request.getParameter("endDateFrom"));

@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Plan;
 import co.edu.uniquindio.rosteredge.backend.repository.PlanRepository;
 import co.edu.uniquindio.rosteredge.backend.service.PlanService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,8 @@ public class PlanServiceImpl extends SimpleCrudService<Plan> implements PlanServ
     @Override
     @Transactional(readOnly = true)
     public List<Plan> findByFilters(String name, Boolean active, BigDecimal priceFrom, BigDecimal priceTo) {
-        return planRepository.findByFilters(name, active, priceFrom, priceTo);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return planRepository.findByFilters(name, effectiveActive, priceFrom, priceTo);
     }
 }
 

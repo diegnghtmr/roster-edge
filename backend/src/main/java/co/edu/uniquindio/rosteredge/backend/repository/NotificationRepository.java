@@ -12,10 +12,12 @@ import java.util.List;
 public interface NotificationRepository extends BaseRepository<Notification, Long> {
 
     @Query("SELECT * FROM \"Notification\" WHERE (:message IS NULL OR LOWER(message) LIKE LOWER(CONCAT('%', :message, '%'))) " +
+           "AND (:status IS NULL OR status = :status) " +
            "AND (:active IS NULL OR active = :active) " +
            "AND (CAST(:sendFrom AS TIMESTAMP) IS NULL OR send_date >= CAST(:sendFrom AS TIMESTAMP)) " +
            "AND (CAST(:sendTo AS TIMESTAMP) IS NULL OR send_date <= CAST(:sendTo AS TIMESTAMP))")
     List<Notification> findByFilters(@Param("message") String message,
+                                     @Param("status") String status,
                                      @Param("active") Boolean active,
                                      @Param("sendFrom") LocalDateTime sendFrom,
                                      @Param("sendTo") LocalDateTime sendTo);

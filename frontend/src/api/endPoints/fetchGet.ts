@@ -1,41 +1,71 @@
+import { toast } from "sonner";
+
 interface IParamsType {
   resource: string[] | undefined;
-  params?: string | undefined;
+  params?: Record<string, string> | URLSearchParams | string;
 }
 
 export const fetchGet = async ({ resource, params }: IParamsType) => {
   const searchParams = new URLSearchParams(params);
-  const cookies = localStorage.getItem('token');
+  const cookies = localStorage.getItem("token");
 
   try {
     // Join resource array with slashes
     const resourcePath = Array.isArray(resource)
-      ? resource.join('/')
+      ? resource.join("/")
       : resource;
     const response = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/${resourcePath}/?${searchParams}`,
       {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${cookies}`,
-          'Content-type': 'application/json',
+          "Content-type": "application/json",
         },
       },
     );
 
     // Check if the response is not ok (e.g., 404, 500)
     if (!response.ok) {
-      if (response.status !== 401) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      // Handle server errors
+      if (response.status === 0 || response.status >= 500) {
+        toast.error(
+          "El servidor no está disponible. Por favor, inténtalo más tarde.",
+        );
+        throw new Error(
+          "El servidor no está disponible. Por favor, inténtalo más tarde.",
+        );
+      } else if (response.status === 401) {
+        toast.error("No autorizado. Por favor, inicia sesión nuevamente.");
+        throw new Error("No autorizado. Por favor, inicia sesión nuevamente.");
+      } else if (response.status === 403) {
+        toast.error("No tienes permisos para realizar esta acción.");
+        throw new Error("No tienes permisos para realizar esta acción.");
+      } else if (response.status === 404) {
+        toast.error("Recurso no encontrado.");
+        throw new Error("Recurso no encontrado.");
+      } else if (response.status === 400) {
+        toast.error("Datos de entrada inválidos.");
+        throw new Error("Datos de entrada inválidos.");
+      } else if (response.status === 409) {
+        toast.error("Conflicto: El recurso ya existe.");
+        throw new Error("Conflicto: El recurso ya existe.");
       }
+      throw new Error(`Error del servidor: ${response.status}`);
     }
 
     // Parse the JSON response
     return await response.json();
   } catch (error) {
-    return {
-      success: false,
-      message: 'Failed to fetch data. Please try again later.',
-    };
+    // Handle network errors
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      toast.error(
+        "El servidor no está disponible. Por favor, inténtalo más tarde.",
+      );
+      throw new Error(
+        "El servidor no está disponible. Por favor, inténtalo más tarde.",
+      );
+    }
+    throw error;
   }
 };

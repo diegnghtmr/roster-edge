@@ -1,5 +1,7 @@
 package co.edu.uniquindio.rosteredge.backend.service;
 
+import co.edu.uniquindio.rosteredge.backend.model.BaseEntity;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +12,7 @@ import java.util.Optional;
  * @param <T> Entity type
  * @param <ID> Entity ID type
  */
-public interface BaseService<T, ID> {
+public interface BaseService<T extends BaseEntity, ID> {
     
     /**
      * Save an entity (create or update)
@@ -34,6 +36,23 @@ public interface BaseService<T, ID> {
      * @return List of all entities
      */
     List<T> findAll();
+
+    /**
+     * Get entities filtered by active flag. Pass null to retrieve all records regardless of active status.
+     *
+     * @param active Desired active state (true for active, false for inactive, null for all)
+     * @return List of entities that match the filter
+     */
+    List<T> findAll(Boolean active);
+
+    /**
+     * Get every entity without applying the active filter.
+     *
+     * @return List of all entities, including inactive ones
+     */
+    default List<T> findAllIncludingInactive() {
+        return findAll(null);
+    }
     
     /**
      * Update an existing entity
@@ -50,6 +69,13 @@ public interface BaseService<T, ID> {
      * @param id The ID of the entity to delete
      */
     void deleteById(ID id);
+
+    /**
+     * Permanently delete an entity by its ID, bypassing soft delete.
+     *
+     * @param id The ID of the entity to delete
+     */
+    void deleteHardById(ID id);
     
     /**
      * Check if an entity exists with the given ID

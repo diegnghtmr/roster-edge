@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.TeamGender;
 import co.edu.uniquindio.rosteredge.backend.repository.TeamGenderRepository;
 import co.edu.uniquindio.rosteredge.backend.service.TeamGenderService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class TeamGenderServiceImpl extends SimpleCrudService<TeamGender> impleme
     @Override
     @Transactional(readOnly = true)
     public List<TeamGender> findByFilters(String name, Boolean active) {
-        return teamGenderRepository.findByFilters(name, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return teamGenderRepository.findByFilters(name, effectiveActive);
     }
 }
 

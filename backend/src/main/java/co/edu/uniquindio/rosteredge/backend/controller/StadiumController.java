@@ -27,13 +27,13 @@ public class StadiumController extends SimpleCrudController<Stadium> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Stadium>>> findAll() {
         HttpServletRequest request = currentRequest();
 
         Long venueId = parseLong(request.getParameter("venueId"));
         String surface = trimToNull(request.getParameter("surface"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         Integer capacityFrom = parseInteger(request.getParameter("capacityFrom"));
         Integer capacityTo = parseInteger(request.getParameter("capacityTo"));
         LocalDate foundationFrom = parseDate(request.getParameter("foundationFrom"));

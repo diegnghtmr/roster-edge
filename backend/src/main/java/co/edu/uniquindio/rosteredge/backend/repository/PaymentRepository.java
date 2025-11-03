@@ -15,6 +15,7 @@ public interface PaymentRepository extends BaseRepository<Payment, Long> {
     @Query("SELECT * FROM \"Payment\" WHERE (:paymentMethodId IS NULL OR payment_method_id = :paymentMethodId) " +
            "AND (:currencyId IS NULL OR currency_id = :currencyId) " +
            "AND (:planId IS NULL OR plan_id = :planId) " +
+           "AND (:rosterId IS NULL OR roster_id = :rosterId) " +
            "AND (:active IS NULL OR active = :active) " +
            "AND (CAST(:paymentDateFrom AS TIMESTAMP) IS NULL OR payment_date >= CAST(:paymentDateFrom AS TIMESTAMP)) " +
            "AND (CAST(:paymentDateTo AS TIMESTAMP) IS NULL OR payment_date <= CAST(:paymentDateTo AS TIMESTAMP)) " +
@@ -23,6 +24,7 @@ public interface PaymentRepository extends BaseRepository<Payment, Long> {
     List<Payment> findByFilters(@Param("paymentMethodId") Long paymentMethodId,
                                 @Param("currencyId") Long currencyId,
                                 @Param("planId") Long planId,
+                                @Param("rosterId") Long rosterId,
                                 @Param("active") Boolean active,
                                 @Param("paymentDateFrom") LocalDateTime paymentDateFrom,
                                 @Param("paymentDateTo") LocalDateTime paymentDateTo,

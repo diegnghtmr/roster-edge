@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Notification;
 import co.edu.uniquindio.rosteredge.backend.repository.NotificationRepository;
 import co.edu.uniquindio.rosteredge.backend.service.NotificationService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +28,10 @@ public class NotificationServiceImpl extends SimpleCrudService<Notification> imp
 
     @Override
     @Transactional(readOnly = true)
-    public List<Notification> findByFilters(String message, Boolean active,
+    public List<Notification> findByFilters(String message, String status, Boolean active,
                                             LocalDateTime sendFrom, LocalDateTime sendTo) {
-        return notificationRepository.findByFilters(message, active, sendFrom, sendTo);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return notificationRepository.findByFilters(message, status, effectiveActive, sendFrom, sendTo);
     }
 }
 

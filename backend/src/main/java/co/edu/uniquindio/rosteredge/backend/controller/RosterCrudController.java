@@ -26,12 +26,12 @@ public class RosterCrudController extends SimpleCrudController<Roster> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<Roster>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long clubId = parseLong(request.getParameter("clubId"));
         Long subscriptionId = parseLong(request.getParameter("subscriptionId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
         String name = trimToNull(request.getParameter("name"));
         String email = trimToNull(request.getParameter("email"));
         LocalDate creationFrom = parseDate(request.getParameter("creationFrom"));

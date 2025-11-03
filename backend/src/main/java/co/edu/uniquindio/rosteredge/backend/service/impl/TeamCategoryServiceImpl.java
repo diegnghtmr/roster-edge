@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.TeamCategory;
 import co.edu.uniquindio.rosteredge.backend.repository.TeamCategoryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.TeamCategoryService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class TeamCategoryServiceImpl extends SimpleCrudService<TeamCategory> imp
     @Override
     @Transactional(readOnly = true)
     public List<TeamCategory> findByFilters(String name, Boolean active) {
-        return teamCategoryRepository.findByFilters(name, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return teamCategoryRepository.findByFilters(name, effectiveActive);
     }
 }
 

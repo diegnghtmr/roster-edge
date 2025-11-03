@@ -168,7 +168,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
                 </div>
               );
 
-            case "button":
+            case "button": {
               const isActive = searchParams.get(filter.key) === filter.key;
               return (
                 <div key={filter.key} className="flex flex-col">
@@ -188,6 +188,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
                   </Button>
                 </div>
               );
+            }
 
             default:
               return null;

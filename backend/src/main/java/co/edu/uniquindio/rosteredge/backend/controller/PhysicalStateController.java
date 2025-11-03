@@ -25,12 +25,12 @@ public class PhysicalStateController extends SimpleCrudController<PhysicalState>
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<PhysicalState>>> findAll() {
         HttpServletRequest request = currentRequest();
         
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get physical states with filters - name: {}, active: {}", name, active);
 

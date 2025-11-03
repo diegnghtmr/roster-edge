@@ -25,12 +25,12 @@ public class ClubEventController extends SimpleCrudController<ClubEvent> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<ClubEvent>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long clubId = parseLong(request.getParameter("clubId"));
         Long eventId = parseLong(request.getParameter("eventId"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get club events with filters - clubId: {}, eventId: {}, active: {}",
                 clubId, eventId, active);

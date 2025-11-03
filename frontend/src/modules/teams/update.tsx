@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { TeamForm, type INewTeam } from "./components/Form";
-import { useMutateService } from "@/api/services/useMutation";
+import {
+  useMutateService,
+  extractErrorMessage,
+  type MutationResponse,
+} from "@/api/services/useMutation";
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { Team } from "@/interface/ITeam";
@@ -9,15 +13,6 @@ import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
 import type { TeamCategory } from "@/interface/ITeamCategory";
 import type { Club } from "@/interface/IClub";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface IField {
   name: string;
@@ -28,7 +23,7 @@ export const TeamUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [team, setTeam] = useState<INewTeam>({
     name: "",
     mascot: "",
@@ -113,23 +108,21 @@ export const TeamUpdateModule = () => {
       };
 
       mutate(teamData, {
-        onSuccess: (response: any) => {
-          if (response?.error) {
-            // Show error dialog instead of toast
-            setErrorMessage(
-              response.error.message || "Error al actualizar el equipo"
+        onSuccess: (response: MutationResponse) => {
+          const errorMessage = extractErrorMessage(response.error);
+          if (errorMessage) {
+            toast.error(
+              errorMessage || "Error al actualizar el teams",
             );
           } else {
-            // Only redirect on success
-            toast.success("Equipo actualizado exitosamente");
-            navigate("/teams");
+            toast.success("Teams actualizado exitosamente");
+            navigate("/teamss");
           }
         },
-        onError: (error: any) => {
-          // Show error dialog for network/server errors
-          setErrorMessage(
+        onError: (error: Error) => {
+          toast.error(
             error?.message ||
-              "Error al actualizar el equipo. Por favor, intenta nuevamente."
+              "Error al actualizar el teams. Por favor, intenta nuevamente.",
           );
         },
         onSettled: () => {
@@ -181,22 +174,7 @@ export const TeamUpdateModule = () => {
         />
       </div>
 
-      <AlertDialog
-        open={!!errorMessage}
-        onOpenChange={() => setErrorMessage(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error al actualizar el equipo</AlertDialogTitle>
-            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMessage(null)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </div>
   );
 };

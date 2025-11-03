@@ -25,12 +25,12 @@ public class CityController extends SimpleCrudController<City> {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<City>>> findAll() {
         HttpServletRequest request = currentRequest();
         Long countryId = parseLong(request.getParameter("countryId"));
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get cities with filters - countryId: {}, name: {}, active: {}",
                 countryId, name, active);

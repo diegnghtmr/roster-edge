@@ -35,11 +35,13 @@ public class MatchDTO extends BaseDTO {
     @NotNull(message = "Stadium ID is required")
     private Long stadiumId;
 
-    @NotNull(message = "Season ID is required")
-    private Long seasonId;
+    @NotNull(message = "Event ID is required")
+    private Long eventId;
 
     // Additional fields for display purposes
     private String matchdayName;
     private String stadiumName;
+    private String eventName;
+    private Long seasonId;
     private String seasonName;
 }

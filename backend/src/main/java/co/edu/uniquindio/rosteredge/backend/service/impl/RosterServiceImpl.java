@@ -7,6 +7,7 @@ import co.edu.uniquindio.rosteredge.backend.security.PasswordHasher;
 import co.edu.uniquindio.rosteredge.backend.security.RosterSessionService;
 import co.edu.uniquindio.rosteredge.backend.security.TokenService;
 import co.edu.uniquindio.rosteredge.backend.service.RosterService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,8 @@ public class RosterServiceImpl extends SimpleCrudService<Roster> implements Rost
     @Override
     @Transactional(readOnly = true)
     public Optional<Roster> findByEmail(String email) {
-        return repository.findByEmail(email);
+        return repository.findByEmail(email)
+                .filter(roster -> Boolean.TRUE.equals(roster.getActive()));
     }
 
     @Override
@@ -87,7 +89,8 @@ public class RosterServiceImpl extends SimpleCrudService<Roster> implements Rost
                                       String name, String email,
                                       LocalDate creationFrom, LocalDate creationTo,
                                       LocalDate lastAccessFrom, LocalDate lastAccessTo) {
-        return repository.findByFilters(clubId, subscriptionId, active, name, email,
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return repository.findByFilters(clubId, subscriptionId, effectiveActive, name, email,
                 creationFrom, creationTo, lastAccessFrom, lastAccessTo);
     }
 }

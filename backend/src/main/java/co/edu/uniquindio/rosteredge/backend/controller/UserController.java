@@ -21,26 +21,27 @@ public class UserController extends BaseController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers(
             @RequestParam(required = false) Long cityId,
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String email) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get users with filters - cityId: {}, active: {}, name: {}, email: {}",
-                cityId, active, name, email);
-        List<UserDTO> users = userService.findAllUsers(cityId, active, name, email);
+                cityId, effectiveActive, name, email);
+        List<UserDTO> users = userService.findAllUsers(cityId, effectiveActive, name, email);
         return ResponseEntity.ok(ApiResponse.success(users));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
         log.info("Request to get user by id: {}", id);
         UserDTO user = userService.findUserById(id);
         return ResponseEntity.ok(ApiResponse.success(user));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register/")
     public ResponseEntity<ApiResponse<UserDTO>> register(@Valid @RequestBody UserDTO userDTO) {
         log.info("Registering new user: {}", userDTO.getName());
         UserDTO responseDTO = userService.register(userDTO);

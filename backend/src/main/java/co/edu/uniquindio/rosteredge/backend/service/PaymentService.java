@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PaymentService extends CrudService<Payment> {
 
-    List<Payment> findByFilters(Long paymentMethodId, Long currencyId, Long planId, Boolean active,
+    List<Payment> findByFilters(Long paymentMethodId, Long currencyId, Long planId, Long rosterId, Boolean active,
                                 LocalDateTime paymentDateFrom, LocalDateTime paymentDateTo,
                                 BigDecimal amountFrom, BigDecimal amountTo);
 }

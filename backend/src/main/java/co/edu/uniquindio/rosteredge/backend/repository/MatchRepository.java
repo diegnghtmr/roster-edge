@@ -17,10 +17,10 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
     @Query("SELECT m.* FROM \"Match\" m " +
            "LEFT JOIN \"MatchHomeTeam\" mht ON m.id = mht.match_id " +
            "LEFT JOIN \"MatchAwayTeam\" mat ON m.id = mat.match_id " +
-           "WHERE mht.team_id = :teamId OR mat.team_id = :teamId")
+           "WHERE (mht.team_id = :teamId OR mat.team_id = :teamId) AND m.active = true")
     List<Match> findByTeamId(@Param("teamId") Long teamId);
 
-    @Query("SELECT * FROM \"Match\" WHERE date BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM \"Match\" WHERE date BETWEEN :startDate AND :endDate AND active = true")
     List<Match> findByDateBetween(@Param("startDate") LocalDate startDate,
                                   @Param("endDate") LocalDate endDate);
 
@@ -28,16 +28,19 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
     List<Match> findByActiveTrue();
 
     @Query("SELECT DISTINCT m.* FROM \"Match\" m " +
+           "JOIN \"Event\" e ON m.event_id = e.id " +
            "LEFT JOIN \"MatchHomeTeam\" mht ON m.id = mht.match_id " +
            "LEFT JOIN \"MatchAwayTeam\" mat ON m.id = mat.match_id " +
-           "WHERE (:seasonId IS NULL OR m.season_id = :seasonId) " +
+           "WHERE (:eventId IS NULL OR m.event_id = :eventId) " +
+           "AND (:seasonId IS NULL OR e.season_id = :seasonId) " +
            "AND (:matchdayId IS NULL OR m.matchday_id = :matchdayId) " +
            "AND (:stadiumId IS NULL OR m.stadium_id = :stadiumId) " +
            "AND (:teamId IS NULL OR mht.team_id = :teamId OR mat.team_id = :teamId) " +
            "AND (:active IS NULL OR m.active = :active) " +
            "AND (CAST(:dateFrom AS DATE) IS NULL OR m.date >= CAST(:dateFrom AS DATE)) " +
            "AND (CAST(:dateTo AS DATE) IS NULL OR m.date <= CAST(:dateTo AS DATE))")
-    List<Match> findByFilters(@Param("seasonId") Long seasonId,
+    List<Match> findByFilters(@Param("eventId") Long eventId,
+                              @Param("seasonId") Long seasonId,
                               @Param("matchdayId") Long matchdayId,
                               @Param("stadiumId") Long stadiumId,
                               @Param("teamId") Long teamId,

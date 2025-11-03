@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.MatchHomeTeam;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchHomeTeamRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchHomeTeamService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class MatchHomeTeamServiceImpl extends SimpleCrudService<MatchHomeTeam> i
     @Override
     @Transactional(readOnly = true)
     public List<MatchHomeTeam> findByFilters(Long matchId, Long teamId, Boolean active) {
-        return matchHomeTeamRepository.findByFilters(matchId, teamId, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return matchHomeTeamRepository.findByFilters(matchId, teamId, effectiveActive);
     }
 }
 

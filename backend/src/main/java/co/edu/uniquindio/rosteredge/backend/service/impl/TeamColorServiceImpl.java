@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.TeamColor;
 import co.edu.uniquindio.rosteredge.backend.repository.TeamColorRepository;
 import co.edu.uniquindio.rosteredge.backend.service.TeamColorService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class TeamColorServiceImpl extends SimpleCrudService<TeamColor> implement
     @Override
     @Transactional(readOnly = true)
     public List<TeamColor> findByFilters(Long teamId, Long colorId, Boolean active) {
-        return teamColorRepository.findByFilters(teamId, colorId, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return teamColorRepository.findByFilters(teamId, colorId, effectiveActive);
     }
 }
 

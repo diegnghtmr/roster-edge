@@ -6,12 +6,14 @@ import co.edu.uniquindio.rosteredge.backend.dto.PlayerDTO;
 import co.edu.uniquindio.rosteredge.backend.dto.SeasonDTO;
 import co.edu.uniquindio.rosteredge.backend.dto.TeamDTO;
 import co.edu.uniquindio.rosteredge.backend.dto.UserDTO;
+import co.edu.uniquindio.rosteredge.backend.dto.VenueDTO;
 import co.edu.uniquindio.rosteredge.backend.model.Club;
 import co.edu.uniquindio.rosteredge.backend.model.Event;
 import co.edu.uniquindio.rosteredge.backend.model.Player;
 import co.edu.uniquindio.rosteredge.backend.model.Season;
 import co.edu.uniquindio.rosteredge.backend.model.Team;
 import co.edu.uniquindio.rosteredge.backend.model.User;
+import co.edu.uniquindio.rosteredge.backend.model.Venue;
 import org.springframework.stereotype.Component;
 
 /**
@@ -251,6 +253,43 @@ public class EntityMapper {
     entity.setName(dto.getName());
     entity.setDescription(dto.getDescription());
     entity.setDate(dto.getDate());
+    return entity;
+  }
+
+  // Venue mappings
+  public VenueDTO toVenueDTO(Venue entity) {
+    if (entity == null)
+      return null;
+
+    VenueDTO dto = new VenueDTO();
+    dto.setId(entity.getId());
+    dto.setCreatedAt(entity.getCreatedAt());
+    dto.setUpdatedAt(entity.getUpdatedAt());
+    dto.setActive(entity.getActive());
+    dto.setEmail(entity.getEmail());
+    dto.setCityId(entity.getCityId());
+    dto.setFoundation(entity.getFoundation());
+    dto.setName(entity.getName());
+    dto.setPhone(entity.getPhone());
+    dto.setClubId(entity.getClubId());
+    return dto;
+  }
+
+  public Venue toVenueEntity(VenueDTO dto) {
+    if (dto == null)
+      return null;
+
+    Venue entity = new Venue();
+    entity.setId(dto.getId());
+    entity.setCreatedAt(dto.getCreatedAt());
+    entity.setUpdatedAt(dto.getUpdatedAt());
+    entity.setActive(dto.getActive());
+    entity.setEmail(dto.getEmail());
+    entity.setCityId(dto.getCityId());
+    entity.setFoundation(dto.getFoundation());
+    entity.setName(dto.getName());
+    entity.setPhone(dto.getPhone());
+    entity.setClubId(dto.getClubId());
     return entity;
   }
 }

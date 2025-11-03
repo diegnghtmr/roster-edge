@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.NotificationClubEvent;
 import co.edu.uniquindio.rosteredge.backend.repository.NotificationClubEventRepository;
 import co.edu.uniquindio.rosteredge.backend.service.NotificationClubEventService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class NotificationClubEventServiceImpl extends SimpleCrudService<Notifica
     @Override
     @Transactional(readOnly = true)
     public List<NotificationClubEvent> findByFilters(Long notificationId, Long clubEventId, Boolean active) {
-        return notificationClubEventRepository.findByFilters(notificationId, clubEventId, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return notificationClubEventRepository.findByFilters(notificationId, clubEventId, effectiveActive);
     }
 }
 

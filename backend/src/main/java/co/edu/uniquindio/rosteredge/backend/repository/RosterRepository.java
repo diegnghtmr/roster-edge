@@ -18,10 +18,10 @@ public interface RosterRepository extends BaseRepository<Roster, Long> {
            "AND (:active IS NULL OR active = :active) " +
            "AND (:name IS NULL OR LOWER(name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
            "AND (:email IS NULL OR LOWER(email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
-           "AND (:creationFrom IS NULL OR creation_date >= :creationFrom) " +
-           "AND (:creationTo IS NULL OR creation_date <= :creationTo) " +
-           "AND (:lastAccessFrom IS NULL OR last_access >= :lastAccessFrom) " +
-           "AND (:lastAccessTo IS NULL OR last_access <= :lastAccessTo)")
+           "AND (CAST(:creationFrom AS DATE) IS NULL OR creation_date >= CAST(:creationFrom AS DATE)) " +
+           "AND (CAST(:creationTo AS DATE) IS NULL OR creation_date <= CAST(:creationTo AS DATE)) " +
+           "AND (CAST(:lastAccessFrom AS DATE) IS NULL OR last_access >= CAST(:lastAccessFrom AS DATE)) " +
+           "AND (CAST(:lastAccessTo AS DATE) IS NULL OR last_access <= CAST(:lastAccessTo AS DATE))")
     List<Roster> findByFilters(@Param("clubId") Long clubId,
                                @Param("subscriptionId") Long subscriptionId,
                                @Param("active") Boolean active,

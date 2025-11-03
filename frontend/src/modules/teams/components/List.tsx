@@ -23,7 +23,6 @@ const headers: TableColumn[] = [
   { title: "Nombre", key: "name" },
   { title: "Mascota", key: "mascot" },
   { title: "Fundación", key: "foundation" },
-  { title: "Estado", key: "active", className: "w-24" },
   { title: "Fecha de creación", key: "createdAt" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
@@ -40,16 +39,6 @@ const filters: FilterConfig[] = [
     label: "Mascota",
     type: "text",
     placeholder: "Buscar por mascota...",
-  },
-  {
-    key: "active",
-    label: "Estado",
-    type: "select",
-    options: [
-      { key: "true", value: "Activo" },
-      { key: "false", value: "Inactivo" },
-    ],
-    placeholder: "Seleccionar estado",
   },
 ];
 

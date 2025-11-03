@@ -22,14 +22,14 @@ public class SeasonController extends BaseController {
 
     private final SeasonService seasonService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<SeasonDTO>> createSeason(@Valid @RequestBody SeasonDTO seasonDTO) {
         log.info("Request to create season: {}", seasonDTO.getName());
         SeasonDTO createdSeason = seasonService.createSeason(seasonDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createdSeason, "Season created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<SeasonDTO>>> getAllSeasons(
             @RequestParam(required = false) Long clubId,
             @RequestParam(required = false) String name,
@@ -38,20 +38,21 @@ public class SeasonController extends BaseController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDateTo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDateTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get seasons with filters - clubId: {}, name: {}, active: {}, startDateFrom: {}, startDateTo: {}, endDateFrom: {}, endDateTo: {}",
-                clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
-        List<SeasonDTO> seasons = seasonService.findAllSeasons(clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
+                clubId, name, effectiveActive, startDateFrom, startDateTo, endDateFrom, endDateTo);
+        List<SeasonDTO> seasons = seasonService.findAllSeasons(clubId, name, effectiveActive, startDateFrom, startDateTo, endDateFrom, endDateTo);
         return ResponseEntity.ok(ApiResponse.success(seasons));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<SeasonDTO>> getSeasonById(@PathVariable Long id) {
         log.info("Request to get season by id: {}", id);
         SeasonDTO season = seasonService.findSeasonById(id);
         return ResponseEntity.ok(ApiResponse.success(season));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<SeasonDTO>> updateSeason(@PathVariable Long id, @Valid @RequestBody SeasonDTO seasonDTO) {
         log.info("Request to update season with id: {}", id);
         SeasonDTO updatedSeason = seasonService.updateSeason(id, seasonDTO);

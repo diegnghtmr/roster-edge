@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.controller;
 import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
 import co.edu.uniquindio.rosteredge.backend.model.BaseEntity;
 import co.edu.uniquindio.rosteredge.backend.service.CrudService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<T>> create(@Valid @RequestBody T entity) {
         log.info("Creating {}", entity.getClass().getSimpleName());
         T created = service.save(entity);
@@ -43,19 +44,23 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
                 .body(ApiResponse.success(created, "Resource created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<T>>> findAll() {
-        List<T> items = service.findAll();
+        HttpServletRequest request = currentRequest();
+        Boolean activeParam = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(activeParam);
+
+        List<T> items = service.findAll(active);
         return ResponseEntity.ok(ApiResponse.success(items));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<T>> findById(@PathVariable Long id) {
         T item = service.findByIdOrThrow(id);
         return ResponseEntity.ok(ApiResponse.success(item));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<T>> update(@PathVariable Long id, @Valid @RequestBody T entity) {
         T updated = service.update(id, entity);
         return ResponseEntity.ok(ApiResponse.success(updated, "Resource updated successfully"));
@@ -156,5 +161,12 @@ public abstract class SimpleCrudController<T extends BaseEntity> {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /**
+     * Normalizes the active flag applying the default behaviour.
+     */
+    protected Boolean resolveActive(Boolean active) {
+        return FilterUtils.resolveActive(active);
     }
 }

@@ -1,27 +1,18 @@
 import { memo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
-import useUserStore from "../../storage/storeUser";
 import { Button } from "../ui/button";
 
-const ContentLogout = memo(() => {
-  const [, , removeCookie] = useCookies(["token"]);
-  const { clearUser } = useUserStore();
-  const navigate = useNavigate();
+interface ContentLogoutProps {
+  onOpenProfile: () => void;
+  onLogout: () => void;
+}
 
-  const handleLogout = () => {
-    clearUser();
-    removeCookie("token");
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
+const ContentLogout = memo(({ onOpenProfile, onLogout }: ContentLogoutProps) => {
   return (
     <div className="flex flex-col space-y-2">
-      <Button className="text-white cursor-pointer" onClick={handleLogout}>
+      <Button className="text-white cursor-pointer" onClick={onOpenProfile}>
         Ver perfil
       </Button>
-      <Button className="text-white cursor-pointer" onClick={handleLogout}>
+      <Button className="text-white cursor-pointer" onClick={onLogout}>
         Cerrar Sesión
       </Button>
     </div>

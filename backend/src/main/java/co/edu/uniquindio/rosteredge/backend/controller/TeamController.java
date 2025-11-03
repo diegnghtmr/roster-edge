@@ -2,15 +2,25 @@ package co.edu.uniquindio.rosteredge.backend.controller;
 
 import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.TeamDTO;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.TeamInsightsFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.response.TeamInsightsResponse;
 import co.edu.uniquindio.rosteredge.backend.service.TeamService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/teams")
@@ -33,10 +43,18 @@ public class TeamController extends BaseController {
             @RequestParam(required = false) Long genderId,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Boolean active) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}",
-                clubId, genderId, categoryId, active);
-        List<TeamDTO> teams = teamService.findAllTeams(clubId, genderId, categoryId, active);
+                clubId, genderId, categoryId, effectiveActive);
+        List<TeamDTO> teams = teamService.findAllTeams(clubId, genderId, categoryId, effectiveActive);
         return ResponseEntity.ok(ApiResponse.success(teams));
+    }
+
+    @GetMapping("/insights/")
+    public ResponseEntity<ApiResponse<List<TeamInsightsResponse>>> getTeamInsights(@ModelAttribute TeamInsightsFilter filter) {
+        log.info("Request to get team insights with filter: {}", filter);
+        List<TeamInsightsResponse> insights = teamService.findTeamInsights(filter);
+        return ResponseEntity.ok(ApiResponse.success(insights));
     }
 
     @GetMapping("/{id}/")

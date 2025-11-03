@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Payment;
 import co.edu.uniquindio.rosteredge.backend.repository.PaymentRepository;
 import co.edu.uniquindio.rosteredge.backend.service.PaymentService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,11 @@ public class PaymentServiceImpl extends SimpleCrudService<Payment> implements Pa
 
     @Override
     @Transactional(readOnly = true)
-    public List<Payment> findByFilters(Long paymentMethodId, Long currencyId, Long planId, Boolean active,
+    public List<Payment> findByFilters(Long paymentMethodId, Long currencyId, Long planId, Long rosterId, Boolean active,
                                        LocalDateTime paymentDateFrom, LocalDateTime paymentDateTo,
                                        BigDecimal amountFrom, BigDecimal amountTo) {
-        return paymentRepository.findByFilters(paymentMethodId, currencyId, planId, active,
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return paymentRepository.findByFilters(paymentMethodId, currencyId, planId, rosterId, effectiveActive,
                 paymentDateFrom, paymentDateTo, amountFrom, amountTo);
     }
 }

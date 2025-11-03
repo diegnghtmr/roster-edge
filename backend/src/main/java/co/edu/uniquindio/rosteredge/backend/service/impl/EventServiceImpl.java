@@ -6,6 +6,8 @@ import co.edu.uniquindio.rosteredge.backend.mapper.EntityMapper;
 import co.edu.uniquindio.rosteredge.backend.model.Event;
 import co.edu.uniquindio.rosteredge.backend.repository.EventRepository;
 import co.edu.uniquindio.rosteredge.backend.service.EventService;
+import co.edu.uniquindio.rosteredge.backend.service.cascade.CascadeDeleteManager;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final EntityMapper entityMapper;
+    private final CascadeDeleteManager cascadeDeleteManager;
 
     @Override
     public EventDTO createEvent(EventDTO eventDTO) {
@@ -36,9 +39,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventDTO> findAllEvents(Long seasonId, Long venueId, Boolean active, LocalDate dateFrom, LocalDate dateTo) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
         log.info("Finding events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                seasonId, venueId, active, dateFrom, dateTo);
-        return eventRepository.findByFilters(seasonId, venueId, active, dateFrom, dateTo)
+                seasonId, venueId, effectiveActive, dateFrom, dateTo);
+        return eventRepository.findByFilters(seasonId, venueId, effectiveActive, dateFrom, dateTo)
                 .stream()
                 .map(entityMapper::toEventDTO)
                 .collect(Collectors.toList());
@@ -50,6 +54,11 @@ public class EventServiceImpl implements EventService {
         log.info("Finding event with id: {}", id);
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(event.getActive())) {
+            throw new EntityNotFoundException("Event not found with id: " + id);
+        }
+
         return entityMapper.toEventDTO(event);
     }
 
@@ -58,6 +67,10 @@ public class EventServiceImpl implements EventService {
         log.info("Updating event with id: {}", id);
         Event existingEvent = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(existingEvent.getActive())) {
+            throw new EntityNotFoundException("Event not found with id: " + id);
+        }
 
         existingEvent.setSeasonId(eventDTO.getSeasonId());
         existingEvent.setVenueId(eventDTO.getVenueId());
@@ -73,9 +86,27 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteEvent(Long id) {
         log.info("Deleting event with id: {}", id);
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + id));
+
+        if (!Boolean.TRUE.equals(event.getActive())) {
+            log.debug("Event with id {} is already inactive", id);
+            return;
+        }
+
+        event.softDelete();
+        event.preUpdate();
+        eventRepository.save(event);
+    }
+
+    @Override
+    public void deleteEventHard(Long id) {
+        log.info("Hard deleting event with id: {}", id);
         if (!eventRepository.existsById(id)) {
             throw new EntityNotFoundException("Event not found with id: " + id);
         }
+        cascadeDeleteManager.clearAssociations("Event", id);
         eventRepository.deleteById(id);
     }
 }
+

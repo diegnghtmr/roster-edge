@@ -7,6 +7,7 @@ import co.edu.uniquindio.rosteredge.backend.model.Season;
 import co.edu.uniquindio.rosteredge.backend.repository.SeasonRepository;
 import co.edu.uniquindio.rosteredge.backend.service.AbstractBaseService;
 import co.edu.uniquindio.rosteredge.backend.service.SeasonService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +47,10 @@ public class SeasonServiceImpl extends AbstractBaseService<Season, Long> impleme
     public List<SeasonDTO> findAllSeasons(Long clubId, String name, Boolean active,
                                           LocalDate startDateFrom, LocalDate startDateTo,
                                           LocalDate endDateFrom, LocalDate endDateTo) {
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
         log.info("Finding seasons with filters - clubId: {}, name: {}, active: {}, startDateFrom: {}, startDateTo: {}, endDateFrom: {}, endDateTo: {}",
-                clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo);
-        return seasonRepository.findByFilters(clubId, name, active, startDateFrom, startDateTo, endDateFrom, endDateTo).stream()
+                clubId, name, effectiveActive, startDateFrom, startDateTo, endDateFrom, endDateTo);
+        return seasonRepository.findByFilters(clubId, name, effectiveActive, startDateFrom, startDateTo, endDateFrom, endDateTo).stream()
                 .map(mapper::toSeasonDTO)
                 .collect(Collectors.toList());
     }
@@ -56,9 +58,14 @@ public class SeasonServiceImpl extends AbstractBaseService<Season, Long> impleme
     @Override
     public SeasonDTO findSeasonById(Long id) {
         log.info("Finding season with id: {}", id);
-        return seasonRepository.findById(id)
-                .map(mapper::toSeasonDTO)
+        Season season = seasonRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(season.getActive())) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
+
+        return mapper.toSeasonDTO(season);
     }
 
     @Override
@@ -66,6 +73,10 @@ public class SeasonServiceImpl extends AbstractBaseService<Season, Long> impleme
         log.info("Updating season with id: {}", id);
         Season existingSeason = seasonRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(getEntityName(), id));
+
+        if (!Boolean.TRUE.equals(existingSeason.getActive())) {
+            throw new EntityNotFoundException(getEntityName(), id);
+        }
 
         existingSeason.setClubId(seasonDTO.getClubId());
         existingSeason.setName(seasonDTO.getName());
@@ -79,9 +90,7 @@ public class SeasonServiceImpl extends AbstractBaseService<Season, Long> impleme
     @Override
     public void deleteSeason(Long id) {
         log.info("Deleting season with id: {}", id);
-        if (!seasonRepository.existsById(id)) {
-            throw new EntityNotFoundException(getEntityName(), id);
-        }
-        seasonRepository.deleteById(id);
+        super.deleteById(id);
     }
 }
+

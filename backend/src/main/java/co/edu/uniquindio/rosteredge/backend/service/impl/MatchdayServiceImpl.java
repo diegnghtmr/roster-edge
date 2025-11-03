@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl;
 import co.edu.uniquindio.rosteredge.backend.model.Matchday;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchdayRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchdayService;
+import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ public class MatchdayServiceImpl extends SimpleCrudService<Matchday> implements 
     @Override
     @Transactional(readOnly = true)
     public List<Matchday> findByFilters(String name, Boolean active) {
-        return matchdayRepository.findByFilters(name, active);
+        Boolean effectiveActive = FilterUtils.resolveActive(active);
+        return matchdayRepository.findByFilters(name, effectiveActive);
     }
 }
 

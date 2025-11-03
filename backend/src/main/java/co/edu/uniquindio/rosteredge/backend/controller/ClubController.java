@@ -22,7 +22,7 @@ public class ClubController extends BaseController {
 
     private final ClubService clubService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<ClubDTO>> createClub(@Valid @RequestBody ClubDTO clubDTO) {
         log.info("Request to create club: {}", clubDTO.getName());
         ClubDTO createdClub = clubService.createClub(clubDTO);
@@ -35,20 +35,21 @@ public class ClubController extends BaseController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate foundationTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get clubs with filters - name: {}, active: {}, foundationFrom: {}, foundationTo: {}",
-                name, active, foundationFrom, foundationTo);
-        List<ClubDTO> clubs = clubService.findAllClubs(name, active, foundationFrom, foundationTo);
+                name, effectiveActive, foundationFrom, foundationTo);
+        List<ClubDTO> clubs = clubService.findAllClubs(name, effectiveActive, foundationFrom, foundationTo);
         return ResponseEntity.ok(ApiResponse.success(clubs));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<ClubDTO>> getClubById(@PathVariable Long id) {
         log.info("Request to get club by id: {}", id);
         ClubDTO club = clubService.findClubById(id);
         return ResponseEntity.ok(ApiResponse.success(club));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<ClubDTO>> updateClub(@PathVariable Long id, @Valid @RequestBody ClubDTO clubDTO) {
         log.info("Request to update club with id: {}", id);
         ClubDTO updatedClub = clubService.updateClub(id, clubDTO);

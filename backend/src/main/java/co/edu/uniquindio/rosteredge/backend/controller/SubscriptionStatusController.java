@@ -25,12 +25,12 @@ public class SubscriptionStatusController extends SimpleCrudController<Subscript
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<SubscriptionStatus>>> findAll() {
         HttpServletRequest request = currentRequest();
         
         String name = trimToNull(request.getParameter("name"));
-        Boolean active = parseBoolean(request.getParameter("active"));
+        Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
 
         log.info("Request to get subscription statuses with filters - name: {}, active: {}", name, active);
 

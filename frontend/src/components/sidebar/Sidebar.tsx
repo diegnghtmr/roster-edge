@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Link, useLocation } from "react-router-dom";
-import { type Key, memo } from "react";
+import { type Key, memo, useState } from "react";
 import clsx from "clsx";
 
 interface IChildren {
@@ -33,6 +33,7 @@ interface IProps {
 
 const Sidebar = memo(({ navigationList }: IProps) => {
   const location = useLocation();
+  const [isHovered, setIsHovered] = useState(false);
 
   // Check if a menu item should be active
   const isCurrentPage = (currentPage: string) => {
@@ -42,7 +43,12 @@ const Sidebar = memo(({ navigationList }: IProps) => {
   return (
     <Box
       role="presentation"
-      className="md:fixed bg-white h-full xl:[height:calc(100%-60px)] z-[9] mt-0 overflow-y-auto no-scrollbar w-60"
+      className="z-[1] pt-4 md:fixed bg-white h-full xl:[height:calc(100%-65px)] mt-0 overflow-y-auto no-scrollbar transition-all duration-300 ease-in-out shadow-lg"
+      style={{
+        width: isHovered ? "240px" : "64px",
+      }}
+      onMouseEnter={() => window.innerWidth >= 1024 && setIsHovered(true)}
+      onMouseLeave={() => window.innerWidth >= 1024 && setIsHovered(false)}
     >
       <List>
         {navigationList.map((item: INavigationList, index: Key) => {
@@ -50,7 +56,7 @@ const Sidebar = memo(({ navigationList }: IProps) => {
             return (
               <div className="w-full mb-1" key={"menu-" + index}>
                 <Accordion
-                  className={clsx("bg-white p-0")}
+                  className={clsx("bg-white p-0 transition-all duration-300")}
                   style={{
                     backgroundColor: "inherit",
                     border: 0,
@@ -58,22 +64,46 @@ const Sidebar = memo(({ navigationList }: IProps) => {
                   }}
                 >
                   <AccordionSummary
-                    expandIcon={<ExpandMoreIcon className="text-gray-900 " />}
+                    expandIcon={
+                      isHovered || window.innerWidth < 1024 ? (
+                        <ExpandMoreIcon className="text-gray-900 transition-opacity duration-300" />
+                      ) : (
+                        <div className="w-6 h-6" />
+                      )
+                    }
                     aria-controls="panel1-content"
                     id="panel1-header"
+                    className="transition-all duration-300"
                   >
-                    <div className="text-primary-900 ">{item.icon}</div>
-                    <Typography className="ml-7 text-gray-900 " ml={2}>
+                    <div className="text-primary-900 transition-all duration-300">
+                      {item.icon}
+                    </div>
+                    <Typography
+                      className={clsx(
+                        "ml-7 text-gray-900 transition-all duration-300 whitespace-nowrap",
+                        isHovered || window.innerWidth < 1024
+                          ? "opacity-100"
+                          : "opacity-0 w-0",
+                      )}
+                      ml={2}
+                    >
                       {item.name}
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails className="border-t border-slate-400 bg-white px-4 !py-0">
+                  <AccordionDetails
+                    className={clsx(
+                      "border-t border-slate-400 bg-white px-4 !py-0 transition-all duration-300",
+                      isHovered || window.innerWidth < 1024
+                        ? "opacity-100 max-h-screen"
+                        : "opacity-0 max-h-0 overflow-hidden",
+                    )}
+                  >
                     {item.childrens.map((children, index) => {
                       return (
                         <div
                           key={"submenu-" + index}
                           className={
-                            "hover:bg-red-100 -mx-4 pl-2 bg-gray-200 " +
+                            "hover:bg-red-100 -mx-4 pl-2 bg-gray-200 transition-all duration-300 " +
                             (isCurrentPage(children.path)
                               ? "bg-red-100 border-l-4 border-red-400 "
                               : "")
@@ -83,7 +113,7 @@ const Sidebar = memo(({ navigationList }: IProps) => {
                             <ListItem>
                               <div
                                 className={
-                                  " hover:font-semibold " +
+                                  " hover:font-semibold transition-all duration-300 " +
                                   (isCurrentPage(children.path)
                                     ? "text-red-400 font-semibold"
                                     : "text-gray-900 ")
@@ -93,12 +123,15 @@ const Sidebar = memo(({ navigationList }: IProps) => {
                               </div>
                               <ListItemText
                                 primary={children.name}
-                                className={
-                                  "ml-4 " +
-                                  (isCurrentPage(children.path)
+                                className={clsx(
+                                  "ml-4 transition-all duration-300 whitespace-nowrap",
+                                  isCurrentPage(children.path)
                                     ? "text-red-400 font-semibold"
-                                    : "text-gray-900 ")
-                                }
+                                    : "text-gray-900",
+                                  isHovered || window.innerWidth < 1024
+                                    ? "opacity-100"
+                                    : "opacity-0 w-0",
+                                )}
                               />
                             </ListItem>
                           </Link>
@@ -113,12 +146,12 @@ const Sidebar = memo(({ navigationList }: IProps) => {
             return (
               <Link to={item.path} key={index}>
                 <div
-                  className={
-                    "flex gap-4 new-center w-full py-[12px] px-4 hover:bg-red-100 hover: " +
-                    (isCurrentPage(item.path)
+                  className={clsx(
+                    "flex gap-4 new-center w-full py-[12px] px-4 hover:bg-red-100 transition-all duration-300",
+                    isCurrentPage(item.path)
                       ? "bg-red-100 border-l-4 border-red-400 "
-                      : "")
-                  }
+                      : "",
+                  )}
                 >
                   <div
                     className={
@@ -130,11 +163,15 @@ const Sidebar = memo(({ navigationList }: IProps) => {
                     {item.icon}
                   </div>
                   <span
-                    className={
+                    className={clsx(
+                      "transition-all duration-300 whitespace-nowrap",
                       isCurrentPage(item.path)
                         ? "text-red-400 font-semibold"
-                        : "text-gray-900 "
-                    }
+                        : "text-gray-900",
+                      isHovered || window.innerWidth < 1024
+                        ? "opacity-100"
+                        : "opacity-0 w-0",
+                    )}
                   >
                     {item.name}
                   </span>

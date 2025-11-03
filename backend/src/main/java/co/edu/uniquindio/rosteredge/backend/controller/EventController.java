@@ -22,34 +22,35 @@ public class EventController extends BaseController {
 
     private final EventService eventService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<EventDTO>> createEvent(@Valid @RequestBody EventDTO eventDTO) {
         log.info("Request to create event: {}", eventDTO.getName());
         EventDTO createdEvent = eventService.createEvent(eventDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createdEvent, "Event created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ApiResponse<List<EventDTO>>> getAllEvents(
             @RequestParam(required = false) Long seasonId,
             @RequestParam(required = false) Long venueId,
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
+        Boolean effectiveActive = resolveActive(active);
         log.info("Request to get events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                seasonId, venueId, active, dateFrom, dateTo);
-        List<EventDTO> events = eventService.findAllEvents(seasonId, venueId, active, dateFrom, dateTo);
+                seasonId, venueId, effectiveActive, dateFrom, dateTo);
+        List<EventDTO> events = eventService.findAllEvents(seasonId, venueId, effectiveActive, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(events));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/")
     public ResponseEntity<ApiResponse<EventDTO>> getEventById(@PathVariable Long id) {
         log.info("Request to get event by id: {}", id);
         EventDTO event = eventService.findEventById(id);
         return ResponseEntity.ok(ApiResponse.success(event));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/")
     public ResponseEntity<ApiResponse<EventDTO>> updateEvent(@PathVariable Long id, @Valid @RequestBody EventDTO eventDTO) {
         log.info("Request to update event with id: {}", id);
         EventDTO updatedEvent = eventService.updateEvent(id, eventDTO);
