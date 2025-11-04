@@ -30,7 +30,7 @@ export const CityItemList = ({ city, onDelete }: CityItemListProps) => {
       <TableCell className="text-start font-medium">{city.id}</TableCell>
       <TableCell className="text-start font-semibold">{city.name}</TableCell>
       <TableCell className="text-start">
-        {city.countryName || `País ID: ${city.countryId}`}
+        {city.countryName ?? "N/A"}
       </TableCell>
 
       <TableCell className="text-start">

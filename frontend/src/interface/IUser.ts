@@ -11,7 +11,7 @@ export interface User {
   lastName?: string | null;
   email: string;
   phone?: string | null;
-  birthDate?: string | null;
+  birthDate?: string | [number, number, number] | null;
   cityId: number | null;
   cityName?: string | null;
 }

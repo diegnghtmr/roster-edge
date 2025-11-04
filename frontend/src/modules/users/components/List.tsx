@@ -11,9 +11,10 @@ const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
   { title: "Nombre", key: "name" },
   { title: "Email", key: "email" },
+  { title: "Teléfono", key: "phone" },
+  { title: "Fecha de nacimiento", key: "birthDate" },
   { title: "Ciudad", key: "cityName" },
   { title: "Activo", key: "active" },
-  { title: "Fecha de creación", key: "createdAt" },
 ];
 
 const filters: FilterConfig[] = [

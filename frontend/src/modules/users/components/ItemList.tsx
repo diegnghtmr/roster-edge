@@ -6,29 +6,36 @@ interface UserItemListProps {
   user: User;
 }
 
-export const UserItemList: React.FC<UserItemListProps> = ({
-  user,
-}) => {
-  // Format ISO string or legacy array date to string
-  const formatCreatedDate = (
-    createdAt: User["createdAt"],
+export const UserItemList: React.FC<UserItemListProps> = ({ user }) => {
+  // Format ISO string or legacy array date to DD/MM/YYYY
+  const formatDateOnly = (
+    value: User["birthDate"] | User["createdAt"],
   ): string => {
-    if (!createdAt) {
+    if (!value) {
       return "N/A";
     }
-    if (Array.isArray(createdAt)) {
-      if (createdAt.length < 3) {
+    if (Array.isArray(value)) {
+      if (value.length < 3) {
         return "N/A";
       }
-      const [year, month, day] = createdAt;
+      const [year, month, day] = value;
       return `${day.toString().padStart(2, "0")}/${month
         .toString()
         .padStart(2, "0")}/${year}`;
     }
-    if (typeof createdAt !== "string") {
+    if (typeof value !== "string") {
       return "N/A";
     }
-    const [datePart] = createdAt.split("T");
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) {
+      return `${date
+        .getDate()
+        .toString()
+        .padStart(2, "0")}/${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}/${date.getFullYear()}`;
+    }
+    const [datePart] = value.split("T");
     if (!datePart) {
       return "N/A";
     }
@@ -64,13 +71,16 @@ export const UserItemList: React.FC<UserItemListProps> = ({
         {user.email}
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
+        {user.phone || "N/A"}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-900">
+        {formatDateOnly(user.birthDate)}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-900">
         {user.cityName || "N/A"}
       </td>
       <td className="px-6 py-4 text-sm">
         {getActiveBadge(user.active)}
-      </td>
-      <td className="px-6 py-4 text-sm text-gray-900">
-        {formatCreatedDate(user.createdAt)}
       </td>
     </tr>
   );
