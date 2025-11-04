@@ -2,6 +2,7 @@ package co.edu.uniquindio.rosteredge.backend.repository.report;
 
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.CategoryParticipationReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.MatchLoadReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PaymentMethodReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PointsProgressReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.RosterProfileReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.ScheduleDensityReportFilter;
@@ -10,13 +11,16 @@ import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonAgendaReport
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonStandingsReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffImpactReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffRatioReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SubscriptionPlanReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.CategoryParticipationResponse;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.PaymentMethodPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScheduleDensityResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScoringRankingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonAgendaResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonStandingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.StaffImpactResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.StaffImpactResponse.TeamStaffImpactDetail;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.SubscriptionPlanPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamMatchLoadResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamPointsProgressResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamRosterProfileResponse;
@@ -28,8 +32,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -843,6 +849,201 @@ public class AnalyticsReportQueryRepository {
             .pointsPerMatch(getAsDouble(rs, "points_per_match"))
             .winRate(getAsDouble(rs, "win_rate"))
             .staffToPlayerRatio(calculateRatio(getAsInt(rs, "staff"), getAsInt(rs, "players")))
+            .build());
+    }
+
+    public List<PaymentMethodPerformanceResponse> findPaymentMethodPerformance(PaymentMethodReportFilter filter) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("fromDate", filter.getFromDate(), Types.DATE)
+            .addValue("toDate", filter.getToDate(), Types.DATE)
+            .addValue("planId", filter.getPlanId(), Types.BIGINT)
+            .addValue("currencyId", filter.getCurrencyId(), Types.BIGINT);
+
+        String sql = """
+            WITH filtered_payments AS (
+                SELECT p.payment_method_id,
+                       p.payment_date,
+                       p.amount,
+                       COALESCE(p.discount, 0) AS discount,
+                       p.plan_id,
+                       p.roster_id,
+                       pm.name AS payment_method_name,
+                       (p.amount - COALESCE(p.discount, 0)) AS net_amount
+                FROM "Payment" p
+                JOIN "PaymentMethod" pm ON pm.id = p.payment_method_id
+                WHERE p.active = true
+                  AND (:fromDate IS NULL OR p.payment_date::date >= :fromDate)
+                  AND (:toDate IS NULL OR p.payment_date::date <= :toDate)
+                  AND (:planId IS NULL OR p.plan_id = :planId)
+                  AND (:currencyId IS NULL OR p.currency_id = :currencyId)
+            ),
+            totals AS (
+                SELECT COALESCE(SUM(net_amount), 0) AS total_net
+                FROM filtered_payments
+            )
+            SELECT fp.payment_method_id,
+                   fp.payment_method_name,
+                   COUNT(*) AS total_payments,
+                   COUNT(DISTINCT fp.roster_id) AS unique_customers,
+                   COUNT(DISTINCT fp.plan_id) AS plans_covered,
+                   COALESCE(SUM(fp.amount), 0) AS gross_amount,
+                   COALESCE(SUM(fp.discount), 0) AS total_discount,
+                   COALESCE(SUM(fp.net_amount), 0) AS net_revenue,
+                   COALESCE(SUM(fp.net_amount) / NULLIF(COUNT(*)::numeric, 0::numeric), 0::numeric) AS average_ticket,
+                   CASE
+                       WHEN t.total_net = 0 THEN 0
+                       ELSE SUM(fp.net_amount) / t.total_net * 100
+                   END AS revenue_share_percentage,
+                   CASE
+                       WHEN COALESCE(SUM(fp.amount), 0) = 0 THEN 0
+                       ELSE COALESCE(SUM(fp.discount), 0) / SUM(fp.amount) * 100
+                   END AS discount_rate_percentage,
+                   MIN(fp.payment_date) AS first_payment_date,
+                   MAX(fp.payment_date) AS last_payment_date
+            FROM filtered_payments fp
+            CROSS JOIN totals t
+            GROUP BY fp.payment_method_id, fp.payment_method_name, t.total_net
+            ORDER BY net_revenue DESC, fp.payment_method_name
+            """;
+
+        return jdbcTemplate.query(sql, params, (rs, rowNum) -> {
+            Timestamp firstPayment = rs.getTimestamp("first_payment_date");
+            Timestamp lastPayment = rs.getTimestamp("last_payment_date");
+            return PaymentMethodPerformanceResponse.builder()
+                .paymentMethodId(rs.getLong("payment_method_id"))
+                .paymentMethodName(rs.getString("payment_method_name"))
+                .totalPayments(getAsLong(rs, "total_payments"))
+                .uniqueCustomers(getAsLong(rs, "unique_customers"))
+                .plansCovered(getAsInt(rs, "plans_covered"))
+                .grossAmount(rs.getBigDecimal("gross_amount"))
+                .totalDiscount(rs.getBigDecimal("total_discount"))
+                .netRevenue(rs.getBigDecimal("net_revenue"))
+                .averageTicket(rs.getBigDecimal("average_ticket"))
+                .revenueSharePercentage(getAsDouble(rs, "revenue_share_percentage"))
+                .discountRatePercentage(getAsDouble(rs, "discount_rate_percentage"))
+                .firstPaymentDate(firstPayment != null ? firstPayment.toLocalDateTime() : null)
+                .lastPaymentDate(lastPayment != null ? lastPayment.toLocalDateTime() : null)
+                .build();
+        });
+    }
+
+    public List<SubscriptionPlanPerformanceResponse> findSubscriptionPlanPerformance(SubscriptionPlanReportFilter filter) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("planId", filter.getPlanId(), Types.BIGINT)
+            .addValue("statusId", filter.getStatusId(), Types.BIGINT)
+            .addValue("fromDate", filter.getFromDate(), Types.DATE)
+            .addValue("toDate", filter.getToDate(), Types.DATE)
+            .addValue("referenceDate", filter.getReferenceDate(), Types.DATE)
+            .addValue("renewalHorizonDays", filter.getRenewalHorizonDays(), Types.INTEGER)
+            .addValue("churnWindowDays", filter.getChurnWindowDays(), Types.INTEGER);
+
+        String sql = """
+            WITH plan_base AS (
+                SELECT p.id AS plan_id,
+                       p.name AS plan_name,
+                       p.price AS plan_price
+                FROM "Plan" p
+            ),
+            subscription_data AS (
+                SELECT s.plan_id,
+                       s.active,
+                       s.status_id,
+                       s.end_date,
+                       ss.name AS status_name,
+                       CASE
+                           WHEN s.end_date BETWEEN :referenceDate AND (:referenceDate + make_interval(days => COALESCE(:renewalHorizonDays, 0)))
+                                AND COALESCE(ss.name, 'ACTIVE') IN ('ACTIVE', 'TRIAL')
+                               THEN 1 ELSE 0
+                       END AS renewal_flag,
+                       CASE
+                           WHEN s.end_date BETWEEN (:referenceDate - make_interval(days => COALESCE(:churnWindowDays, 0))) AND :referenceDate
+                                AND COALESCE(ss.name, 'INACTIVE') IN ('INACTIVE', 'SUSPENDED')
+                               THEN 1 ELSE 0
+                       END AS churn_flag
+                FROM "Subscription" s
+                LEFT JOIN "SubscriptionStatus" ss ON ss.id = s.status_id
+                WHERE (:planId IS NULL OR s.plan_id = :planId)
+                  AND (:statusId IS NULL OR s.status_id = :statusId)
+            ),
+            aggregated_subs AS (
+                SELECT sd.plan_id,
+                       COUNT(*) AS total_subscriptions,
+                       COUNT(*) FILTER (
+                           WHERE COALESCE(sd.status_name, 'ACTIVE') = 'ACTIVE' OR sd.active = true
+                       ) AS active_subscriptions,
+                       COUNT(*) FILTER (WHERE sd.status_name = 'TRIAL') AS trial_subscriptions,
+                       COUNT(*) FILTER (WHERE sd.status_name = 'SUSPENDED') AS suspended_subscriptions,
+                       COUNT(*) FILTER (WHERE sd.status_name = 'INACTIVE') AS inactive_subscriptions,
+                       SUM(sd.renewal_flag) AS upcoming_renewals,
+                       SUM(sd.churn_flag) AS churned_recently
+                FROM subscription_data sd
+                GROUP BY sd.plan_id
+            ),
+            payment_data AS (
+                SELECT p.plan_id,
+                       COUNT(*) AS payments_count,
+                       COALESCE(SUM(p.amount), 0) AS gross_revenue,
+                       COALESCE(SUM(p.discount), 0) AS total_discount,
+                       COALESCE(SUM(p.amount - COALESCE(p.discount, 0)), 0) AS net_revenue
+                FROM "Payment" p
+                WHERE p.active = true
+                  AND (:planId IS NULL OR p.plan_id = :planId)
+                  AND (:fromDate IS NULL OR p.payment_date::date >= :fromDate)
+                  AND (:toDate IS NULL OR p.payment_date::date <= :toDate)
+                GROUP BY p.plan_id
+            )
+            SELECT pb.plan_id,
+                   pb.plan_name,
+                   pb.plan_price,
+                   COALESCE(asubs.total_subscriptions, 0) AS total_subscriptions,
+                   COALESCE(asubs.active_subscriptions, 0) AS active_subscriptions,
+                   COALESCE(asubs.trial_subscriptions, 0) AS trial_subscriptions,
+                   COALESCE(asubs.suspended_subscriptions, 0) AS suspended_subscriptions,
+                   COALESCE(asubs.inactive_subscriptions, 0) AS inactive_subscriptions,
+                   COALESCE(asubs.upcoming_renewals, 0) AS upcoming_renewals,
+                   COALESCE(asubs.churned_recently, 0) AS churned_recently,
+                   COALESCE(pdata.payments_count, 0) AS payments_count,
+                   COALESCE(pdata.gross_revenue, 0) AS gross_revenue,
+                   COALESCE(pdata.total_discount, 0) AS total_discount,
+                   COALESCE(pdata.net_revenue, 0) AS net_revenue,
+                   CASE
+                       WHEN COALESCE(asubs.total_subscriptions, 0) = 0 THEN 0
+                       ELSE COALESCE(asubs.active_subscriptions, 0) * 100.0 / asubs.total_subscriptions
+                   END AS retention_rate_percentage,
+                   COALESCE(
+                       pdata.net_revenue / NULLIF(asubs.total_subscriptions::numeric, 0::numeric),
+                       0::numeric
+                   ) AS average_revenue_per_subscription,
+                   COALESCE(
+                       pdata.net_revenue / NULLIF(asubs.active_subscriptions::numeric, 0::numeric),
+                       0::numeric
+                   ) AS arpu
+            FROM plan_base pb
+            LEFT JOIN aggregated_subs asubs ON asubs.plan_id = pb.plan_id
+            LEFT JOIN payment_data pdata ON pdata.plan_id = pb.plan_id
+            WHERE (:planId IS NULL OR pb.plan_id = :planId)
+              AND (COALESCE(asubs.total_subscriptions, 0) > 0 OR COALESCE(pdata.payments_count, 0) > 0)
+            ORDER BY COALESCE(pdata.net_revenue, 0) DESC, pb.plan_name
+            """;
+
+        return jdbcTemplate.query(sql, params, (rs, rowNum) -> SubscriptionPlanPerformanceResponse.builder()
+            .planId(rs.getLong("plan_id"))
+            .planName(rs.getString("plan_name"))
+            .planPrice(rs.getBigDecimal("plan_price"))
+            .totalSubscriptions(getAsInt(rs, "total_subscriptions"))
+            .activeSubscriptions(getAsInt(rs, "active_subscriptions"))
+            .trialSubscriptions(getAsInt(rs, "trial_subscriptions"))
+            .suspendedSubscriptions(getAsInt(rs, "suspended_subscriptions"))
+            .inactiveSubscriptions(getAsInt(rs, "inactive_subscriptions"))
+            .upcomingRenewals(getAsInt(rs, "upcoming_renewals"))
+            .churnedRecently(getAsInt(rs, "churned_recently"))
+            .paymentsCount(getAsInt(rs, "payments_count"))
+            .grossRevenue(rs.getBigDecimal("gross_revenue"))
+            .totalDiscount(rs.getBigDecimal("total_discount"))
+            .netRevenue(rs.getBigDecimal("net_revenue"))
+            .averageRevenuePerSubscription(rs.getBigDecimal("average_revenue_per_subscription"))
+            .arpu(rs.getBigDecimal("arpu"))
+            .retentionRatePercentage(getAsDouble(rs, "retention_rate_percentage"))
             .build());
     }
 

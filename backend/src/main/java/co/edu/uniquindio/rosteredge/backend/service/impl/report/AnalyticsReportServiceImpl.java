@@ -2,6 +2,7 @@ package co.edu.uniquindio.rosteredge.backend.service.impl.report;
 
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.CategoryParticipationReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.MatchLoadReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PaymentMethodReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PointsProgressReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.RosterProfileReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.ScheduleDensityReportFilter;
@@ -10,19 +11,23 @@ import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonAgendaReport
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonStandingsReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffImpactReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffRatioReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SubscriptionPlanReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.CategoryParticipationResponse;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.PaymentMethodPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScheduleDensityResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScoringRankingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonAgendaResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonStandingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.StaffImpactResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.StaffImpactResponse.TeamStaffImpactDetail;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.SubscriptionPlanPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamMatchLoadResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamPointsProgressResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamRosterProfileResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamStaffRatioResponse;
 import co.edu.uniquindio.rosteredge.backend.repository.report.AnalyticsReportQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.report.AnalyticsReportService;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
@@ -43,6 +48,9 @@ public class AnalyticsReportServiceImpl implements AnalyticsReportService {
 
     private static final int DEFAULT_AGENDA_HORIZON_DAYS = 30;
     private static final int DEFAULT_REST_THRESHOLD = 3;
+    private static final int DEFAULT_REVENUE_LOOKBACK_MONTHS = 6;
+    private static final int DEFAULT_RENEWAL_HORIZON_DAYS = 45;
+    private static final int DEFAULT_CHURN_WINDOW_DAYS = 60;
 
     private final AnalyticsReportQueryRepository reportQueryRepository;
 
@@ -184,6 +192,46 @@ public class AnalyticsReportServiceImpl implements AnalyticsReportService {
             .averagePlayerAge(averageAge)
             .teamDetails(orderedDetails)
             .build();
+    }
+
+    @Override
+    public List<PaymentMethodPerformanceResponse> getPaymentMethodPerformance(PaymentMethodReportFilter filter) {
+        PaymentMethodReportFilter effective = filter != null ? filter : new PaymentMethodReportFilter();
+        LocalDate now = LocalDate.now();
+        if (effective.getFromDate() == null && effective.getToDate() == null) {
+            effective.setToDate(now);
+            effective.setFromDate(now.minusMonths(DEFAULT_REVENUE_LOOKBACK_MONTHS));
+        } else if (effective.getFromDate() != null && effective.getToDate() == null) {
+            effective.setToDate(now);
+        } else if (effective.getFromDate() == null && effective.getToDate() != null) {
+            effective.setFromDate(effective.getToDate().minusMonths(DEFAULT_REVENUE_LOOKBACK_MONTHS));
+        }
+        return reportQueryRepository.findPaymentMethodPerformance(effective);
+    }
+
+    @Override
+    public List<SubscriptionPlanPerformanceResponse> getSubscriptionPlanPerformance(SubscriptionPlanReportFilter filter) {
+        SubscriptionPlanReportFilter effective = filter != null ? filter : new SubscriptionPlanReportFilter();
+        LocalDate referenceDate = effective.getReferenceDate();
+        if (referenceDate == null) {
+            referenceDate = LocalDate.now();
+            effective.setReferenceDate(referenceDate);
+        }
+        if (effective.getRenewalHorizonDays() == null) {
+            effective.setRenewalHorizonDays(DEFAULT_RENEWAL_HORIZON_DAYS);
+        }
+        if (effective.getChurnWindowDays() == null) {
+            effective.setChurnWindowDays(DEFAULT_CHURN_WINDOW_DAYS);
+        }
+        if (effective.getFromDate() == null && effective.getToDate() == null) {
+            effective.setToDate(referenceDate);
+            effective.setFromDate(referenceDate.minusMonths(DEFAULT_REVENUE_LOOKBACK_MONTHS));
+        } else if (effective.getFromDate() != null && effective.getToDate() == null) {
+            effective.setToDate(referenceDate);
+        } else if (effective.getFromDate() == null && effective.getToDate() != null) {
+            effective.setFromDate(effective.getToDate().minusMonths(DEFAULT_REVENUE_LOOKBACK_MONTHS));
+        }
+        return reportQueryRepository.findSubscriptionPlanPerformance(effective);
     }
 
     private Double computeAverage(List<TeamStaffImpactDetail> details, Function<TeamStaffImpactDetail, Double> extractor) {

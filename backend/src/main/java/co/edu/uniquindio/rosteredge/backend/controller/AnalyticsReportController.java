@@ -3,6 +3,7 @@ package co.edu.uniquindio.rosteredge.backend.controller;
 import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.CategoryParticipationReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.MatchLoadReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PaymentMethodReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PointsProgressReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.RosterProfileReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.ScheduleDensityReportFilter;
@@ -11,12 +12,15 @@ import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonAgendaReport
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonStandingsReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffImpactReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffRatioReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SubscriptionPlanReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.CategoryParticipationResponse;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.PaymentMethodPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScheduleDensityResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScoringRankingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonAgendaResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonStandingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.StaffImpactResponse;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.SubscriptionPlanPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamMatchLoadResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamPointsProgressResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamRosterProfileResponse;
@@ -109,6 +113,20 @@ public class AnalyticsReportController extends BaseController {
     public ResponseEntity<ApiResponse<StaffImpactResponse>> getStaffImpact(@ModelAttribute StaffImpactReportFilter filter) {
         log.info("Request analytics staff impact with filter: {}", filter);
         StaffImpactResponse data = analyticsReportService.getStaffImpact(filter);
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/payment-method-performance/")
+    public ResponseEntity<ApiResponse<List<PaymentMethodPerformanceResponse>>> getPaymentMethodPerformance(@ModelAttribute PaymentMethodReportFilter filter) {
+        log.info("Request analytics payment method performance with filter: {}", filter);
+        List<PaymentMethodPerformanceResponse> data = analyticsReportService.getPaymentMethodPerformance(filter);
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/subscription-plan-performance/")
+    public ResponseEntity<ApiResponse<List<SubscriptionPlanPerformanceResponse>>> getSubscriptionPlanPerformance(@ModelAttribute SubscriptionPlanReportFilter filter) {
+        log.info("Request analytics subscription plan performance with filter: {}", filter);
+        List<SubscriptionPlanPerformanceResponse> data = analyticsReportService.getSubscriptionPlanPerformance(filter);
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 }

@@ -56,6 +56,8 @@ import { StaffImpactReport } from "@/modules/reports/staff-impact";
 import { SeasonAgendaReport } from "@/modules/reports/season-agenda";
 import { CategoryParticipationReport } from "@/modules/reports/category-participation";
 import { ScheduleDensityReport } from "@/modules/reports/schedule-density";
+import { PaymentMethodPerformanceReport } from "@/modules/reports/payment-method-performance";
+import { SubscriptionPlanPerformanceReport } from "@/modules/reports/subscription-plan-performance";
 import ErrorPage from "@/page/ErrorPage";
 import Login from "@/page/login/Login";
 import { createBrowserRouter, Navigate } from "react-router-dom";
@@ -323,6 +325,16 @@ export default function useRouterApp() {
             {
               path: "/reports/schedule-density",
               element: <ScheduleDensityReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/payment-method-performance",
+              element: <PaymentMethodPerformanceReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/subscription-plan-performance",
+              element: <SubscriptionPlanPerformanceReport />,
               errorElement: <ErrorPage />,
             },
           ]

@@ -21,6 +21,10 @@ import type {
   ScheduleDensityReportFilter,
   StaffImpactResponse,
   StaffImpactReportFilter,
+  PaymentMethodPerformanceResponse,
+  PaymentMethodReportFilter,
+  SubscriptionPlanPerformanceResponse,
+  SubscriptionPlanReportFilter,
 } from "@/interface/IReports";
 
 // Helper function to build query params
@@ -258,6 +262,52 @@ export const useStaffImpactReport = (
         params,
       });
       return response.data || {};
+    },
+    enabled,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// ============================================
+// Payment Method Performance Report Hook
+// ============================================
+export const usePaymentMethodPerformanceReport = (
+  filters: PaymentMethodReportFilter = {},
+  enabled: boolean = true
+) => {
+  return useQuery<PaymentMethodPerformanceResponse[]>({
+    queryKey: ["reports", "payment-method-performance", filters],
+    queryFn: async () => {
+      const params = buildQueryParams(filters);
+      const response = await fetchGet({
+        resource: ["analytics", "reports", "payment-method-performance"],
+        params,
+      });
+      return response.data || [];
+    },
+    enabled,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+// ============================================
+// Subscription Plan Performance Report Hook
+// ============================================
+export const useSubscriptionPlanPerformanceReport = (
+  filters: SubscriptionPlanReportFilter = {},
+  enabled: boolean = true
+) => {
+  return useQuery<SubscriptionPlanPerformanceResponse[]>({
+    queryKey: ["reports", "subscription-plan-performance", filters],
+    queryFn: async () => {
+      const params = buildQueryParams(filters);
+      const response = await fetchGet({
+        resource: ["analytics", "reports", "subscription-plan-performance"],
+        params,
+      });
+      return response.data || [];
     },
     enabled,
     refetchOnWindowFocus: false,
