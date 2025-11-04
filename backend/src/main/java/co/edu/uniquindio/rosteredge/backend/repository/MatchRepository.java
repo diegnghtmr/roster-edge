@@ -32,12 +32,12 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
     List<Match> findByActiveTrue();
 
     @Query(
-        "SELECT DISTINCT m.* FROM \"Match\" m " +
-            "JOIN \"Event\" e ON m.season_id = e.season_id " +
+        "SELECT DISTINCT m.*, e.season_id AS season_id FROM \"Match\" m " +
+            "JOIN \"Event\" e ON m.event_id = e.id " +
             "LEFT JOIN \"MatchHomeTeam\" mht ON m.id = mht.match_id " +
             "LEFT JOIN \"MatchAwayTeam\" mat ON m.id = mat.match_id " +
             "WHERE (:eventId IS NULL OR e.id = :eventId) " +
-            "AND (:seasonId IS NULL OR m.season_id = :seasonId) " +
+            "AND (:seasonId IS NULL OR e.season_id = :seasonId) " +
             "AND (:matchdayId IS NULL OR m.matchday_id = :matchdayId) " +
             "AND (:stadiumId IS NULL OR m.stadium_id = :stadiumId) " +
             "AND (:teamId IS NULL OR mht.team_id = :teamId OR mat.team_id = :teamId) " +

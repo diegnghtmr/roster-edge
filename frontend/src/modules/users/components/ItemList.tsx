@@ -9,17 +9,34 @@ interface UserItemListProps {
 export const UserItemList: React.FC<UserItemListProps> = ({
   user,
 }) => {
-  // Format date array to string
+  // Format ISO string or legacy array date to string
   const formatCreatedDate = (
-    dateArray: [number, number, number, number, number, number, number],
+    createdAt: User["createdAt"],
   ): string => {
-    if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 3) {
+    if (!createdAt) {
       return "N/A";
     }
-    const [year, month, day] = dateArray;
-    return `${day.toString().padStart(2, "0")}/${month
-      .toString()
-      .padStart(2, "0")}/${year}`;
+    if (Array.isArray(createdAt)) {
+      if (createdAt.length < 3) {
+        return "N/A";
+      }
+      const [year, month, day] = createdAt;
+      return `${day.toString().padStart(2, "0")}/${month
+        .toString()
+        .padStart(2, "0")}/${year}`;
+    }
+    if (typeof createdAt !== "string") {
+      return "N/A";
+    }
+    const [datePart] = createdAt.split("T");
+    if (!datePart) {
+      return "N/A";
+    }
+    const [year, month, day] = datePart.split("-");
+    if (!year || !month || !day) {
+      return "N/A";
+    }
+    return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
   };
 
   const getActiveBadge = (active: boolean) => {
@@ -40,7 +57,8 @@ export const UserItemList: React.FC<UserItemListProps> = ({
         {user.id}
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
-        {user.name}
+        {[user.name, user.lastName].filter(Boolean).join(" ").trim() ||
+          user.name}
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
         {user.email}

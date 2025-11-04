@@ -33,7 +33,7 @@ public class MatchScheduleQueryRepository {
             .append(
                 "       country.id AS country_id, country.name AS country_name, \n"
             )
-            .append("       m.season_id, season.name AS season_name, \n")
+            .append("       event.season_id AS season_id, season.name AS season_name, \n")
             .append("       event.id AS event_id, event.name AS event_name, \n")
             .append(
                 "       home.team_id AS home_team_id, homeTeam.name AS home_team_name, home.score AS home_score, \n"
@@ -62,10 +62,8 @@ public class MatchScheduleQueryRepository {
             .append("       m.active, m.created_at, m.updated_at \n")
             .append("FROM \"Match\" m \n")
             .append("LEFT JOIN \"Matchday\" md ON m.matchday_id = md.id \n")
-            .append("LEFT JOIN \"Season\" season ON m.season_id = season.id \n")
-            .append(
-                "LEFT JOIN \"Event\" event ON event.season_id = m.season_id \n"
-            )
+            .append("LEFT JOIN \"Event\" event ON m.event_id = event.id \n")
+            .append("LEFT JOIN \"Season\" season ON event.season_id = season.id \n")
             .append(
                 "LEFT JOIN \"Stadium\" stadium ON m.stadium_id = stadium.id \n"
             )
@@ -101,7 +99,7 @@ public class MatchScheduleQueryRepository {
             parameters.addValue("eventId", filter.getEventId());
         }
         if (filter.getSeasonId() != null) {
-            sql.append(" AND m.season_id = :seasonId");
+            sql.append(" AND event.season_id = :seasonId");
             parameters.addValue("seasonId", filter.getSeasonId());
         }
         if (filter.getMatchdayId() != null) {
