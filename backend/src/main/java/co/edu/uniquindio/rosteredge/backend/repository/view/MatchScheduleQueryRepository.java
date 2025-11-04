@@ -30,40 +30,78 @@ public class MatchScheduleQueryRepository {
             .append("       m.stadium_id, NULL::text AS stadium_name, \n")
             .append("       stadium.venue_id, venue.name AS venue_name, \n")
             .append("       venue.city_id, city.name AS city_name, \n")
-            .append("       country.id AS country_id, country.name AS country_name, \n")
-            .append("       m.event_id, event.name AS event_name, \n")
-            .append("       event.season_id AS season_id, season.name AS season_name, \n")
-            .append("       home.team_id AS home_team_id, homeTeam.name AS home_team_name, home.score AS home_score, \n")
-            .append("       homeClub.id AS home_club_id, homeClub.name AS home_club_name, \n")
-            .append("       away.team_id AS away_team_id, awayTeam.name AS away_team_name, away.score AS away_score, \n")
-            .append("       awayClub.id AS away_club_id, awayClub.name AS away_club_name, \n")
-            .append("       (CAST(COALESCE(home.score, 0) AS TEXT) || '-' || CAST(COALESCE(away.score, 0) AS TEXT)) AS result_label, \n")
-            .append("       (CAST(m.date AS TIMESTAMP) + m.start_time) AS kickoff, \n")
-            .append("       (CASE WHEN (m.date > CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time > CURRENT_TIME) THEN true ELSE false END) AS upcoming, \n")
-            .append("       (CASE WHEN (m.date < CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time <= CURRENT_TIME) THEN true ELSE false END) AS played, \n")
+            .append(
+                "       country.id AS country_id, country.name AS country_name, \n"
+            )
+            .append("       m.season_id, season.name AS season_name, \n")
+            .append("       event.id AS event_id, event.name AS event_name, \n")
+            .append(
+                "       home.team_id AS home_team_id, homeTeam.name AS home_team_name, home.score AS home_score, \n"
+            )
+            .append(
+                "       homeClub.id AS home_club_id, homeClub.name AS home_club_name, \n"
+            )
+            .append(
+                "       away.team_id AS away_team_id, awayTeam.name AS away_team_name, away.score AS away_score, \n"
+            )
+            .append(
+                "       awayClub.id AS away_club_id, awayClub.name AS away_club_name, \n"
+            )
+            .append(
+                "       (CAST(COALESCE(home.score, 0) AS TEXT) || '-' || CAST(COALESCE(away.score, 0) AS TEXT)) AS result_label, \n"
+            )
+            .append(
+                "       (CAST(m.date AS TIMESTAMP) + m.start_time) AS kickoff, \n"
+            )
+            .append(
+                "       (CASE WHEN (m.date > CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time > CURRENT_TIME) THEN true ELSE false END) AS upcoming, \n"
+            )
+            .append(
+                "       (CASE WHEN (m.date < CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time <= CURRENT_TIME) THEN true ELSE false END) AS played, \n"
+            )
             .append("       m.active, m.created_at, m.updated_at \n")
             .append("FROM \"Match\" m \n")
             .append("LEFT JOIN \"Matchday\" md ON m.matchday_id = md.id \n")
-            .append("LEFT JOIN \"Event\" event ON m.event_id = event.id \n")
-            .append("LEFT JOIN \"Season\" season ON event.season_id = season.id \n")
-            .append("LEFT JOIN \"Stadium\" stadium ON m.stadium_id = stadium.id \n")
-            .append("LEFT JOIN \"Venue\" venue ON stadium.venue_id = venue.id \n")
+            .append("LEFT JOIN \"Season\" season ON m.season_id = season.id \n")
+            .append(
+                "LEFT JOIN \"Event\" event ON event.season_id = m.season_id \n"
+            )
+            .append(
+                "LEFT JOIN \"Stadium\" stadium ON m.stadium_id = stadium.id \n"
+            )
+            .append(
+                "LEFT JOIN \"Venue\" venue ON stadium.venue_id = venue.id \n"
+            )
             .append("LEFT JOIN \"City\" city ON venue.city_id = city.id \n")
-            .append("LEFT JOIN \"Country\" country ON city.country_id = country.id \n")
-            .append("LEFT JOIN \"MatchHomeTeam\" home ON m.id = home.match_id \n")
-            .append("LEFT JOIN \"Team\" homeTeam ON home.team_id = homeTeam.id \n")
-            .append("LEFT JOIN \"Club\" homeClub ON homeTeam.club_id = homeClub.id \n")
-            .append("LEFT JOIN \"MatchAwayTeam\" away ON m.id = away.match_id \n")
-            .append("LEFT JOIN \"Team\" awayTeam ON away.team_id = awayTeam.id \n")
-            .append("LEFT JOIN \"Club\" awayClub ON awayTeam.club_id = awayClub.id \n")
+            .append(
+                "LEFT JOIN \"Country\" country ON city.country_id = country.id \n"
+            )
+            .append(
+                "LEFT JOIN \"MatchHomeTeam\" home ON m.id = home.match_id \n"
+            )
+            .append(
+                "LEFT JOIN \"Team\" homeTeam ON home.team_id = homeTeam.id \n"
+            )
+            .append(
+                "LEFT JOIN \"Club\" homeClub ON homeTeam.club_id = homeClub.id \n"
+            )
+            .append(
+                "LEFT JOIN \"MatchAwayTeam\" away ON m.id = away.match_id \n"
+            )
+            .append(
+                "LEFT JOIN \"Team\" awayTeam ON away.team_id = awayTeam.id \n"
+            )
+            .append(
+                "LEFT JOIN \"Club\" awayClub ON awayTeam.club_id = awayClub.id \n"
+            )
             .append("WHERE 1 = 1");
 
         if (filter.getEventId() != null) {
-            sql.append(" AND m.event_id = :eventId");
+            sql.append(" AND event.id = :eventId");
             parameters.addValue("eventId", filter.getEventId());
         }
         if (filter.getSeasonId() != null) {
-            sql.append(" AND event.season_id = :seasonId");
+            sql.append(" AND m.season_id = :seasonId");
             parameters.addValue("seasonId", filter.getSeasonId());
         }
         if (filter.getMatchdayId() != null) {
@@ -71,7 +109,9 @@ public class MatchScheduleQueryRepository {
             parameters.addValue("matchdayId", filter.getMatchdayId());
         }
         if (filter.getTeamId() != null) {
-            sql.append(" AND (home.team_id = :teamId OR away.team_id = :teamId)");
+            sql.append(
+                " AND (home.team_id = :teamId OR away.team_id = :teamId)"
+            );
             parameters.addValue("teamId", filter.getTeamId());
         }
         if (filter.getClubId() != null) {
@@ -99,18 +139,27 @@ public class MatchScheduleQueryRepository {
             parameters.addValue("dateTo", filter.getDateTo());
         }
         if (Boolean.TRUE.equals(filter.getUpcomingOnly())) {
-            sql.append(" AND ((m.date > CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time > CURRENT_TIME))");
+            sql.append(
+                " AND ((m.date > CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time > CURRENT_TIME))"
+            );
         }
         if (Boolean.TRUE.equals(filter.getPlayedOnly())) {
-            sql.append(" AND ((m.date < CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time <= CURRENT_TIME))");
+            sql.append(
+                " AND ((m.date < CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time <= CURRENT_TIME))"
+            );
         }
 
         sql.append(" ORDER BY m.date DESC, m.start_time DESC, m.id DESC");
 
-        return jdbcTemplate.query(sql.toString(), parameters, this::mapMatchResponse);
+        return jdbcTemplate.query(
+            sql.toString(),
+            parameters,
+            this::mapMatchResponse
+        );
     }
 
-    private MatchResponse mapMatchResponse(ResultSet rs, int rowNum) throws SQLException {
+    private MatchResponse mapMatchResponse(ResultSet rs, int rowNum)
+        throws SQLException {
         return MatchResponse.builder()
             .id(rs.getLong("id"))
             .matchdayId(rs.getObject("matchday_id", Long.class))
@@ -126,10 +175,10 @@ public class MatchScheduleQueryRepository {
             .cityName(rs.getString("city_name"))
             .countryId(rs.getObject("country_id", Long.class))
             .countryName(rs.getString("country_name"))
-            .eventId(rs.getObject("event_id", Long.class))
-            .eventName(rs.getString("event_name"))
             .seasonId(rs.getObject("season_id", Long.class))
             .seasonName(rs.getString("season_name"))
+            .eventId(rs.getObject("event_id", Long.class))
+            .eventName(rs.getString("event_name"))
             .homeTeamId(rs.getObject("home_team_id", Long.class))
             .homeTeamName(rs.getString("home_team_name"))
             .homeScore(rs.getObject("home_score", Integer.class))

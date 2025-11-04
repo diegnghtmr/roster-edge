@@ -1,13 +1,12 @@
 package co.edu.uniquindio.rosteredge.backend.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 /**
  * Request DTO for creating and updating Match entities
@@ -33,8 +32,8 @@ public class MatchRequest {
     @NotNull(message = "Stadium ID is required")
     private Long stadiumId;
 
-    @NotNull(message = "Event ID is required")
-    private Long eventId;
+    @NotNull(message = "Season ID is required")
+    private Long seasonId;
 
     @NotNull(message = "Active status is required")
     private Boolean active;

@@ -1,15 +1,14 @@
 package co.edu.uniquindio.rosteredge.backend.model;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 /**
  * Match entity
@@ -54,8 +53,8 @@ public class Match extends BaseEntity {
     private Long stadiumId;
 
     /**
-     * Event ID
+     * Season ID
      */
-    @NotNull(message = "Event ID is required")
-    private Long eventId;
+    @NotNull(message = "Season ID is required")
+    private Long seasonId;
 }
