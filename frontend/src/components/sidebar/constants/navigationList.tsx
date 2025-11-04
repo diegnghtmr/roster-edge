@@ -11,6 +11,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import SportsFootballIcon from "@mui/icons-material/SportsFootball";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import type { INavigationList } from "../Sidebar";
 
 export const navigationList: INavigationList[] = [
@@ -102,6 +103,13 @@ export const navigationList: INavigationList[] = [
     name: "Reportes",
     path: "reports",
     icon: <AssessmentIcon />,
+    permissions: [],
+    childrens: [],
+  },
+  {
+    name: "Notificaciones",
+    path: "notifications",
+    icon: <NotificationsIcon />,
     permissions: [],
     childrens: [],
   },

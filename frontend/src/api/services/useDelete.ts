@@ -3,6 +3,7 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { fetchDelete } from "../endPoints/fetchDelete.ts";
 import useUserStore from "@/storage/storeUser.ts";
+import { toast } from "sonner";
 
 type DeleteVariables = string | number;
 type DeleteResponse = { data: unknown; status: number };
@@ -16,20 +17,31 @@ export const useMutateDeleteService = (
 
   // In case there's a problem with the token it will take the user to login page
   const handleError = (error: string) => {
-    if (
-      error.toLowerCase().includes("token") ||
-      error.toLowerCase().includes("signature") ||
-      error.toLowerCase().includes("unauthorized") ||
-      error.toLowerCase().includes("expired")
-    ) {
+    const lowerError = error.toLowerCase();
+    const isTokenError =
+      lowerError.includes("token") ||
+      lowerError.includes("signature") ||
+      lowerError.includes("expired") ||
+      lowerError.includes("unauthorized") ||
+      lowerError.includes("no autorizado") ||
+      lowerError.includes("authentication") ||
+      lowerError.includes("auth") ||
+      lowerError.includes("jwt") ||
+      lowerError.includes("session");
+
+    if (isTokenError) {
       clearUser();
       queryClient.removeQueries();
+      toast.error("Sesión expirada. Por favor, inicia sesión nuevamente.");
       navigate("/login?error=session");
     }
   };
 
   const response = useMutation<DeleteResponse, Error, DeleteVariables>({
     mutationFn: (id) => fetchDelete({ id, resource }),
+    onError: (error: Error) => {
+      handleError(error.message);
+    },
   });
 
   if (response?.data) {

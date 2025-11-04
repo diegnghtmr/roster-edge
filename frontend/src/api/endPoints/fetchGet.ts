@@ -36,7 +36,10 @@ export const fetchGet = async ({ resource, params }: IParamsType) => {
           "El servidor no está disponible. Por favor, inténtalo más tarde.",
         );
       } else if (response.status === 401) {
-        toast.error("No autorizado. Por favor, inicia sesión nuevamente.");
+        // Clear user data and redirect to login
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        window.location.href = "/login?error=session";
         throw new Error("No autorizado. Por favor, inicia sesión nuevamente.");
       } else if (response.status === 403) {
         toast.error("No tienes permisos para realizar esta acción.");

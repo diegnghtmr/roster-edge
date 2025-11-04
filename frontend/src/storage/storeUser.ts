@@ -23,7 +23,7 @@ const getSecureLocalStorage = (key: string) => {
   if (value)
     return sc.decryptString(
       value,
-      import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD
+      import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD,
     );
   return "";
 };
@@ -31,7 +31,7 @@ const getSecureLocalStorage = (key: string) => {
 const setObjectSecureLocalStorage = (key: string, value: object) => {
   const encryptedValue = sc.encryptString(
     JSON.stringify(value),
-    import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD
+    import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD,
   );
   localStorage.setItem(key, encryptedValue);
 };
@@ -64,6 +64,20 @@ const useUserStore = create<UserStore>((set) => {
   const clearUser = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    // Also clear any secure storage
+    try {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      // Clear any encrypted data
+      const keys = Object.keys(localStorage);
+      keys.forEach((key) => {
+        if (key.includes("user") || key.includes("token")) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (error) {
+      console.warn("Error clearing secure storage:", error);
+    }
     set({ user: null });
   };
 

@@ -1,4 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
+import NotificationsModule from "@/modules/notifications";
+import UsersModule from "@/modules/users";
 
 import Dashboard from "@/modules/dashboard/Dashboard";
 import TeamCategoriesModule from "@/modules/team-categories";
@@ -261,6 +263,16 @@ export default function useRouterApp() {
             {
               path: "/venues/:id/edit",
               element: <UpdateVenue />,
+            },
+            {
+              path: "/notifications",
+              element: <NotificationsModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/users",
+              element: <UsersModule />,
+              errorElement: <ErrorPage />,
             },
             {
               path: "/contact",

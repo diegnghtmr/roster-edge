@@ -6,7 +6,11 @@ import { useNavigate } from "react-router-dom";
 import useUserStore from "@/storage/storeUser";
 
 type QueryKeyInput = QueryKey | string;
-type RequestParams = Record<string, string> | URLSearchParams | string | undefined;
+type RequestParams =
+  | Record<string, string>
+  | URLSearchParams
+  | string
+  | undefined;
 
 interface IParamsService<TParams = RequestParams> {
   key: QueryKeyInput;
@@ -35,11 +39,17 @@ const useGetList = <TData = unknown>({
   const queryClient = useQueryClient();
   const { clearUser } = useUserStore();
 
-  const hasResource = Array.isArray(resource) ? resource.length > 0 : Boolean(resource);
+  const hasResource = Array.isArray(resource)
+    ? resource.length > 0
+    : Boolean(resource);
   const queryKeyValue = (Array.isArray(key) ? key : [key]) as QueryKey;
-  const paramsFetch = hasResource ? { resource: resource as string[], params } : null;
+  const paramsFetch = hasResource
+    ? { resource: resource as string[], params }
+    : null;
 
-  const { error, data, isLoading, refetch, isFetching } = useQuery<ApiResponse<TData>>({
+  const { error, data, isLoading, refetch, isFetching } = useQuery<
+    ApiResponse<TData>
+  >({
     queryKey: queryKeyValue,
     queryFn: () => {
       if (!paramsFetch) {
@@ -76,7 +86,14 @@ const useGetList = <TData = unknown>({
 
   if (data) {
     const { metaData, results } = dataTransform(data, keyResults || "");
-    return { error, data: results as TData, metaData, isLoading, refetch, isFetching };
+    return {
+      error,
+      data: results as TData,
+      metaData,
+      isLoading,
+      refetch,
+      isFetching,
+    };
   }
 
   if (!hasResource) {
