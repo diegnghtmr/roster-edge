@@ -112,3 +112,79 @@ export const useGendersForFilter = (enabled = true) => {
 
   return { options, isLoading };
 };
+
+/**
+ * Fetch all subscription plans for filter dropdowns
+ */
+export const usePlansForFilter = (enabled = true) => {
+  const { data, isLoading } = useGetList({
+    key: ["plans-filter"],
+    resource: ["plans"],
+    keyResults: "data",
+    enabled,
+  });
+
+  const options: SelectOption[] = (data || []).map((plan: { id: number; name: string }) => ({
+    value: plan.id,
+    label: `${plan.name} (ID: ${plan.id})`,
+  }));
+
+  return { options, isLoading };
+};
+
+/**
+ * Fetch payment methods for filter dropdowns
+ */
+export const usePaymentMethodsForFilter = (enabled = true) => {
+  const { data, isLoading } = useGetList({
+    key: ["payment-methods-filter"],
+    resource: ["payment-methods"],
+    keyResults: "data",
+    enabled,
+  });
+
+  const options: SelectOption[] = (data || []).map((method: { id: number; name: string }) => ({
+    value: method.id,
+    label: `${method.name} (ID: ${method.id})`,
+  }));
+
+  return { options, isLoading };
+};
+
+/**
+ * Fetch currencies for filter dropdowns
+ */
+export const useCurrenciesForFilter = (enabled = true) => {
+  const { data, isLoading } = useGetList({
+    key: ["currencies-filter"],
+    resource: ["currencies"],
+    keyResults: "data",
+    enabled,
+  });
+
+  const options: SelectOption[] = (data || []).map((currency: { id: number; name: string; symbol?: string }) => ({
+    value: currency.id,
+    label: currency.symbol ? `${currency.name} (${currency.symbol})` : `${currency.name} (ID: ${currency.id})`,
+  }));
+
+  return { options, isLoading };
+};
+
+/**
+ * Fetch subscription status catalog for filter dropdowns
+ */
+export const useSubscriptionStatusesForFilter = (enabled = true) => {
+  const { data, isLoading } = useGetList({
+    key: ["subscription-statuses-filter"],
+    resource: ["subscription-statuses"],
+    keyResults: "data",
+    enabled,
+  });
+
+  const options: SelectOption[] = (data || []).map((status: { id: number; name: string }) => ({
+    value: status.id,
+    label: `${status.name} (ID: ${status.id})`,
+  }));
+
+  return { options, isLoading };
+};
