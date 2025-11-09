@@ -30,10 +30,14 @@ public interface TeamRepository extends BaseRepository<Team, Long> {
     @Query("SELECT * FROM \"Team\" WHERE (:clubId IS NULL OR club_id = :clubId) " +
            "AND (:genderId IS NULL OR gender_id = :genderId) " +
            "AND (:categoryId IS NULL OR category_id = :categoryId) " +
-           "AND (:active IS NULL OR active = :active)")
+           "AND (:active IS NULL OR active = :active) " +
+           "AND (:name IS NULL OR LOWER(name) LIKE LOWER('%' || :name || '%')) " +
+           "AND (:mascot IS NULL OR LOWER(mascot) LIKE LOWER('%' || :mascot || '%'))")
     List<Team> findByFilters(@Param("clubId") Long clubId,
                              @Param("genderId") Long genderId,
                              @Param("categoryId") Long categoryId,
-                             @Param("active") Boolean active);
+                             @Param("active") Boolean active,
+                             @Param("name") String name,
+                             @Param("mascot") String mascot);
 
 }

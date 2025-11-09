@@ -34,12 +34,6 @@ const filters: FilterConfig[] = [
     type: "text",
     placeholder: "Buscar por superficie...",
   },
-  {
-    key: "totalCapacity",
-    label: "Capacidad",
-    type: "text",
-    placeholder: "Buscar por capacidad...",
-  },
 ];
 
 export const StadiumsList: React.FC = () => {
