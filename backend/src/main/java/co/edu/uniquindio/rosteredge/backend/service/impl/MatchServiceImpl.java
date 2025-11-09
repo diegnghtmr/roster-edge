@@ -37,12 +37,12 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
 
     @Override
     @Transactional(readOnly = true)
-    public List<Match> findAllMatches(Long teamId, Long eventId, Long seasonId, Long matchdayId, Long stadiumId,
+    public List<Match> findAllMatches(Long teamId, Long eventId, Long matchdayId, Long stadiumId,
                                       Boolean active, LocalDate dateFrom, LocalDate dateTo) {
         Boolean effectiveActive = FilterUtils.resolveActive(active);
-        log.debug("Finding matches with filters - teamId: {}, eventId: {}, seasonId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                teamId, eventId, seasonId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
-        return matchRepository.findByFilters(eventId, seasonId, matchdayId, stadiumId, teamId, effectiveActive, dateFrom, dateTo);
+        log.debug("Finding matches with filters - teamId: {}, eventId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                teamId, eventId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
+        return matchRepository.findByFilters(eventId, matchdayId, stadiumId, teamId, effectiveActive, dateFrom, dateTo);
     }
 
     @Override

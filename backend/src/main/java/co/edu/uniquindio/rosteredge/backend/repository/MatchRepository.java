@@ -37,7 +37,6 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
             "LEFT JOIN \"MatchHomeTeam\" mht ON m.id = mht.match_id " +
             "LEFT JOIN \"MatchAwayTeam\" mat ON m.id = mat.match_id " +
             "WHERE (:eventId IS NULL OR e.id = :eventId) " +
-            "AND (:seasonId IS NULL OR e.season_id = :seasonId) " +
             "AND (:matchdayId IS NULL OR m.matchday_id = :matchdayId) " +
             "AND (:stadiumId IS NULL OR m.stadium_id = :stadiumId) " +
             "AND (:teamId IS NULL OR mht.team_id = :teamId OR mat.team_id = :teamId) " +
@@ -47,7 +46,6 @@ public interface MatchRepository extends BaseRepository<Match, Long> {
     )
     List<Match> findByFilters(
         @Param("eventId") Long eventId,
-        @Param("seasonId") Long seasonId,
         @Param("matchdayId") Long matchdayId,
         @Param("stadiumId") Long stadiumId,
         @Param("teamId") Long teamId,

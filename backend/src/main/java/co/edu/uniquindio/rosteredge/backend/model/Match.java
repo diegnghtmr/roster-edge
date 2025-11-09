@@ -52,9 +52,5 @@ public class Match extends BaseEntity {
     @NotNull(message = "Stadium ID is required")
     private Long stadiumId;
 
-    /**
-     * Season ID
-     */
-    @NotNull(message = "Season ID is required")
-    private Long seasonId;
+
 }

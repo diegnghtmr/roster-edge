@@ -44,16 +44,15 @@ public class MatchController extends BaseController {
     public ResponseEntity<ApiResponse<List<Match>>> getMatches(
             @RequestParam(required = false) Long teamId,
             @RequestParam(required = false) Long eventId,
-            @RequestParam(required = false) Long seasonId,
             @RequestParam(required = false) Long matchdayId,
             @RequestParam(required = false) Long stadiumId,
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
         Boolean effectiveActive = resolveActive(active);
-        log.info("Request to get matches with filters - teamId: {}, eventId: {}, seasonId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                teamId, eventId, seasonId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
-        List<Match> matches = matchService.findAllMatches(teamId, eventId, seasonId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
+        log.info("Request to get matches with filters - teamId: {}, eventId: {}, matchdayId: {}, stadiumId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                teamId, eventId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
+        List<Match> matches = matchService.findAllMatches(teamId, eventId, matchdayId, stadiumId, effectiveActive, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(matches));
     }
 
