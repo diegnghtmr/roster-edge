@@ -10,4 +10,5 @@ public class ScoringRankingReportFilter {
 
     private Long clubId;
     private Long seasonId;
+    private Integer minMatches;
 }

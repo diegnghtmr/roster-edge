@@ -51,8 +51,9 @@ export interface SeasonAgendaResponse {
 export interface SeasonAgendaReportFilter {
   seasonId?: number;
   clubId?: number;
-  startDate?: string;
-  endDate?: string;
+  fromDate?: string;
+  toDate?: string;
+  horizonDays?: number;
 }
 
 // ============================================
@@ -225,7 +226,9 @@ export interface ScheduleDensityResponse {
 export interface ScheduleDensityReportFilter {
   seasonId?: number;
   teamId?: number;
-  restThreshold?: number;
+  fromDate?: string;
+  toDate?: string;
+  alertThresholdDays?: number;
 }
 
 // ============================================

@@ -6,6 +6,7 @@ import co.edu.uniquindio.rosteredge.backend.model.Match;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.view.MatchScheduleQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchService;
+import co.edu.uniquindio.rosteredge.backend.service.notification.MatchNotificationPublisher;
 import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,12 +23,15 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
 
     private final MatchRepository matchRepository;
     private final MatchScheduleQueryRepository matchScheduleQueryRepository;
+    private final MatchNotificationPublisher matchNotificationPublisher;
 
     public MatchServiceImpl(MatchRepository matchRepository,
-                            MatchScheduleQueryRepository matchScheduleQueryRepository) {
+                            MatchScheduleQueryRepository matchScheduleQueryRepository,
+                            MatchNotificationPublisher matchNotificationPublisher) {
         super(matchRepository);
         this.matchRepository = matchRepository;
         this.matchScheduleQueryRepository = matchScheduleQueryRepository;
+        this.matchNotificationPublisher = matchNotificationPublisher;
     }
 
     @Override
@@ -79,7 +83,9 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
     @CacheEvict(value = "matches", allEntries = true)
     public Match save(Match entity) {
         log.debug("Saving match");
-        return super.save(entity);
+        Match saved = super.save(entity);
+        matchNotificationPublisher.publishMatchScheduled(saved);
+        return saved;
     }
 
     @Override

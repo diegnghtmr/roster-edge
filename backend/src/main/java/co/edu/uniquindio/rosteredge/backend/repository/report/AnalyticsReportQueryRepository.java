@@ -260,7 +260,8 @@ public class AnalyticsReportQueryRepository {
     public List<ScoringRankingResponse> findScoringRanking(ScoringRankingReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue("clubId", filter.getClubId(), Types.BIGINT)
-            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
+            .addValue("minMatches", filter.getMinMatches(), Types.INTEGER);
 
         String sql = """
             WITH team_matches AS (
@@ -311,6 +312,7 @@ public class AnalyticsReportQueryRepository {
             WHERE (:clubId IS NULL OR c.id = :clubId)
               AND (:seasonId IS NULL OR s.id = :seasonId)
             GROUP BY s.id, s.name, t.id, t.name, c.id, c.name
+            HAVING (:minMatches IS NULL OR COUNT(tm.match_id) >= :minMatches)
             ORDER BY s.start_date DESC, goal_difference DESC, goals_for DESC
             """;
 
@@ -501,7 +503,9 @@ public class AnalyticsReportQueryRepository {
     public List<CategoryParticipationResponse> findCategoryParticipation(CategoryParticipationReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue("clubId", filter.getClubId(), Types.BIGINT)
-            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
+            .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
+            .addValue("categoryId", filter.getCategoryId(), Types.BIGINT)
+            .addValue("genderId", filter.getGenderId(), Types.BIGINT);
 
         String sql = """
             WITH club_matches AS (
@@ -554,6 +558,8 @@ public class AnalyticsReportQueryRepository {
             JOIN total ON total.season_id = cm.season_id AND total.club_id = cm.club_id
             WHERE (:clubId IS NULL OR cm.club_id = :clubId)
               AND (:seasonId IS NULL OR cm.season_id = :seasonId)
+              AND (:categoryId IS NULL OR cm.category_id = :categoryId)
+              AND (:genderId IS NULL OR cm.gender_id = :genderId)
             GROUP BY cm.season_id, s.name, cm.club_id, c.name, cm.category_id, tc.name, cm.gender_id, tg.name, total.total_matches
             ORDER BY cm.club_id, cm.season_id, matches_count DESC
             """;

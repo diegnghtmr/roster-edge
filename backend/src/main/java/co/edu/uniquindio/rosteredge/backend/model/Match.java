@@ -29,6 +29,12 @@ public class Match extends BaseEntity {
     private Long matchdayId;
 
     /**
+     * Event ID
+     */
+    @NotNull(message = "Event ID is required")
+    private Long eventId;
+
+    /**
      * Start time
      */
     @NotNull(message = "Start time is required")

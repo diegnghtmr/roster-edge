@@ -102,7 +102,19 @@ export const ScheduleDensityReport = () => {
       placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
     },
     {
-      key: "restThreshold",
+      key: "fromDate",
+      label: "Desde",
+      type: "date",
+      placeholder: "YYYY-MM-DD",
+    },
+    {
+      key: "toDate",
+      label: "Hasta",
+      type: "date",
+      placeholder: "YYYY-MM-DD",
+    },
+    {
+      key: "alertThresholdDays",
       label: "Umbral de descanso (dias)",
       type: "number",
       placeholder: "Ej: 3 (opcional, default: 3)",
@@ -140,7 +152,7 @@ export const ScheduleDensityReport = () => {
       }
       if (key.endsWith("Id") && typeof value === "string") {
         processedFilters[key] = Number(value);
-      } else if (key === "restThreshold" && typeof value === "string") {
+      } else if (key === "alertThresholdDays" && typeof value === "string") {
         processedFilters[key] = Number(value);
       } else {
         processedFilters[key] = value;

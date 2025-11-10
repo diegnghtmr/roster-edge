@@ -32,8 +32,8 @@ public class MatchRequest {
     @NotNull(message = "Stadium ID is required")
     private Long stadiumId;
 
-    @NotNull(message = "Season ID is required")
-    private Long seasonId;
+    @NotNull(message = "Event ID is required")
+    private Long eventId;
 
     @NotNull(message = "Active status is required")
     private Boolean active;

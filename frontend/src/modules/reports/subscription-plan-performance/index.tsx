@@ -104,7 +104,6 @@ export const SubscriptionPlanPerformanceReport = () => {
   const totalSuspended = plans.reduce((sum, plan) => sum + (plan.suspendedSubscriptions ?? 0), 0);
   const totalInactive = plans.reduce((sum, plan) => sum + (plan.inactiveSubscriptions ?? 0), 0);
   const totalUpcoming = plans.reduce((sum, plan) => sum + (plan.upcomingRenewals ?? 0), 0);
-  const totalChurn = plans.reduce((sum, plan) => sum + (plan.churnedRecently ?? 0), 0);
   const totalNetRevenue = plans.reduce((sum, plan) => sum + (plan.netRevenue ?? 0), 0);
   const overallRetention = totalSubscriptions > 0 ? (totalActive / totalSubscriptions) * 100 : 0;
 
