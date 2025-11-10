@@ -8,7 +8,6 @@ import co.edu.uniquindio.rosteredge.backend.model.MatchAwayTeam;
 import co.edu.uniquindio.rosteredge.backend.model.MatchHomeTeam;
 import co.edu.uniquindio.rosteredge.backend.model.Matchday;
 import co.edu.uniquindio.rosteredge.backend.model.Notification;
-import co.edu.uniquindio.rosteredge.backend.model.NotificationClubEvent;
 import co.edu.uniquindio.rosteredge.backend.model.Season;
 import co.edu.uniquindio.rosteredge.backend.model.Stadium;
 import co.edu.uniquindio.rosteredge.backend.model.Team;
@@ -18,7 +17,6 @@ import co.edu.uniquindio.rosteredge.backend.repository.EventRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchAwayTeamRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchHomeTeamRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchdayRepository;
-import co.edu.uniquindio.rosteredge.backend.repository.NotificationClubEventRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.SeasonRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.StadiumRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.VenueRepository;
@@ -58,7 +56,7 @@ public class MatchNotificationPublisher {
     private final ClubRepository clubRepository;
     private final ClubEventRepository clubEventRepository;
     private final NotificationService notificationService;
-    private final NotificationClubEventRepository notificationClubEventRepository;
+    private final NotificationClubEventLinkService notificationClubEventLinkService;
 
     /**
      * Publishes a notification describing the match that has just been created.
@@ -124,11 +122,7 @@ public class MatchNotificationPublisher {
                 if (clubEvent.getId() == null || linkedClubEvents.contains(clubEvent.getId())) {
                     continue;
                 }
-                notificationClubEventRepository.save(NotificationClubEvent.builder()
-                        .notificationId(notificationId)
-                        .clubEventId(clubEvent.getId())
-                        .active(Boolean.TRUE)
-                        .build());
+                notificationClubEventLinkService.link(notificationId, clubEvent.getId());
                 linkedClubEvents.add(clubEvent.getId());
             }
         }
@@ -149,12 +143,8 @@ public class MatchNotificationPublisher {
                         .active(Boolean.TRUE)
                         .build()));
 
-        NotificationClubEvent savedLink = notificationClubEventRepository.save(NotificationClubEvent.builder()
-                .notificationId(notificationId)
-                .clubEventId(clubEvent.getId())
-                .active(Boolean.TRUE)
-                .build());
-        return Optional.ofNullable(savedLink.getClubEventId());
+        notificationClubEventLinkService.link(notificationId, clubEvent.getId());
+        return Optional.of(clubEvent.getId());
     }
 
     private String buildMessage(Event event,

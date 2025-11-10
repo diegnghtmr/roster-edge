@@ -20,6 +20,9 @@ public class MatchRequest {
     @NotNull(message = "Matchday ID is required")
     private Long matchdayId;
 
+    @NotNull(message = "Event ID is required")
+    private Long eventId;
+
     @NotNull(message = "Start time is required")
     private LocalTime startTime;
 
@@ -32,8 +35,11 @@ public class MatchRequest {
     @NotNull(message = "Stadium ID is required")
     private Long stadiumId;
 
-    @NotNull(message = "Event ID is required")
-    private Long eventId;
+    @NotNull(message = "Home team is required")
+    private Long homeTeamId;
+
+    @NotNull(message = "Away team is required")
+    private Long awayTeamId;
 
     @NotNull(message = "Active status is required")
     private Boolean active;

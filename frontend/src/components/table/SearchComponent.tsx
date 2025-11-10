@@ -13,7 +13,7 @@ export interface FilterOption {
 export interface FilterConfig {
   key: string;
   label: string;
-  type: "text" | "select" | "button";
+  type: "text" | "select" | "button" | "number" | "date";
   options?: FilterOption[];
   placeholder?: string;
 }
@@ -119,15 +119,26 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
 
           switch (filter.type) {
             case "text":
+            case "number":
+            case "date": {
+              const inputType =
+                filter.type === "number"
+                  ? "number"
+                  : filter.type === "date"
+                    ? "date"
+                    : "text";
+              const showIcon = filter.type === "text";
               return (
                 <div key={filter.key} className="flex-1 min-w-0">
                   <label className="text-sm font-medium text-gray-700 mb-1 block">
                     {filter.label}
                   </label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <div className={cn("relative", showIcon && "pl-0")}>
+                    {showIcon && (
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    )}
                     <Input
-                      type="text"
+                      type={inputType}
                       placeholder={
                         filter.placeholder ||
                         `Buscar ${filter.label.toLowerCase()}...`
@@ -136,12 +147,12 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
                       onChange={(e) =>
                         handleInputChange(filter.key, e.target.value)
                       }
-                      className="pl-10"
+                      className={cn(showIcon && "pl-10")}
                     />
                   </div>
                 </div>
               );
-
+            }
             case "select":
               return (
                 <div key={filter.key} className="flex-1 min-w-0">

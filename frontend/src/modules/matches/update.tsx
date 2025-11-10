@@ -9,6 +9,7 @@ import {
 import useGetList from "@/api/services/getServices/useGetList";
 import { toast } from "sonner";
 import type { IMatch } from "@/interface/IMatch";
+import type { IMatchTeam } from "@/interface/IMatchTeam";
 import { InternalHeader } from "@/components/layout/InternalHeader";
 import { BookmarkCheck } from "lucide-react";
 import { MatchForm, type INewMatch } from "./components/Form";
@@ -34,6 +35,8 @@ export const MatchUpdateModule = () => {
     ],
     stadiumId: 0,
     eventId: 0,
+    homeTeamId: null,
+    awayTeamId: null,
     active: true,
   });
 
@@ -49,7 +52,8 @@ export const MatchUpdateModule = () => {
   useEffect(() => {
     if (matchData) {
       const fetchedMatch = matchData as IMatch;
-      setMatch({
+      setMatch((prev) => ({
+        ...prev,
         matchdayId: fetchedMatch.matchdayId,
         startTime: fetchedMatch.startTime,
         endTime: fetchedMatch.endTime,
@@ -57,9 +61,53 @@ export const MatchUpdateModule = () => {
         stadiumId: fetchedMatch.stadiumId,
         eventId: fetchedMatch.eventId,
         active: fetchedMatch.active,
-      });
+      }));
     }
   }, [matchData]);
+
+  const { data: homeTeamsData } = useGetList<IMatchTeam[]>({
+    key: `match-home-team-${id}`,
+    resource: ["match-home-teams"],
+    keyResults: "data",
+    params: id ? { matchId: id } : undefined,
+    enabled: Boolean(id),
+  });
+
+  const { data: awayTeamsData } = useGetList<IMatchTeam[]>({
+    key: `match-away-team-${id}`,
+    resource: ["match-away-teams"],
+    keyResults: "data",
+    params: id ? { matchId: id } : undefined,
+    enabled: Boolean(id),
+  });
+
+  useEffect(() => {
+    if (
+      homeTeamsData &&
+      Array.isArray(homeTeamsData) &&
+      homeTeamsData.length > 0
+    ) {
+      const teamId = homeTeamsData[0].teamId;
+      setMatch((prev) => ({
+        ...prev,
+        homeTeamId: prev.homeTeamId ?? teamId,
+      }));
+    }
+  }, [homeTeamsData]);
+
+  useEffect(() => {
+    if (
+      awayTeamsData &&
+      Array.isArray(awayTeamsData) &&
+      awayTeamsData.length > 0
+    ) {
+      const teamId = awayTeamsData[0].teamId;
+      setMatch((prev) => ({
+        ...prev,
+        awayTeamId: prev.awayTeamId ?? teamId,
+      }));
+    }
+  }, [awayTeamsData]);
 
   const resource = [`matches/${id}`];
   const { mutate } = useMutateService(resource, "", "PUT");
@@ -70,6 +118,23 @@ export const MatchUpdateModule = () => {
       e.preventDefault();
       setIsLoading(true);
 
+      if (
+        match.homeTeamId === null ||
+        match.awayTeamId === null ||
+        match.homeTeamId === undefined ||
+        match.awayTeamId === undefined
+      ) {
+        toast.error("Debes seleccionar los equipos local y visitante");
+        setIsLoading(false);
+        return;
+      }
+
+      if (match.homeTeamId === match.awayTeamId) {
+        toast.error("Los equipos deben ser diferentes");
+        setIsLoading(false);
+        return;
+      }
+
       // Data already matches API expectations (no transformation needed)
       const matchData = {
         matchdayId: match.matchdayId,
@@ -78,6 +143,8 @@ export const MatchUpdateModule = () => {
         date: match.date,
         stadiumId: match.stadiumId,
         eventId: match.eventId,
+        homeTeamId: match.homeTeamId,
+        awayTeamId: match.awayTeamId,
         active: match.active,
       };
 

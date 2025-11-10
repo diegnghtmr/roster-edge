@@ -21,6 +21,16 @@ const filters: FilterConfig[] = [
     type: "text",
     placeholder: "Buscar por mensaje...",
   },
+  {
+    key: "sendFrom",
+    label: "Enviado desde",
+    type: "date",
+  },
+  {
+    key: "sendTo",
+    label: "Enviado hasta",
+    type: "date",
+  },
 ];
 
 export const NotificationsList: React.FC = () => {
