@@ -1,7 +1,7 @@
-import useGetList from "@/api/services/getServices/useGetList";
-import type { Club } from "@/interface/IClub";
-import type { Team } from "@/interface/ITeam";
-import type { IRoster } from "@/interface/IRoster";
+import useGetList from '@/api/services/getServices/useGetList';
+import type { Club } from '@/interface/IClub';
+import type { Team } from '@/interface/ITeam';
+import type { IRoster } from '@/interface/IRoster';
 
 interface DashboardStats {
   totalClubs: number;
@@ -25,25 +25,25 @@ interface DashboardStats {
 export const useDashboardData = () => {
   // Obtener datos de clubs
   const { data: clubsData, isLoading: isLoadingClubs } = useGetList<Club>({
-    key: "dashboard-clubs",
-    resource: ["clubs"],
-    keyResults: "data",
+    key: 'dashboard-clubs',
+    resource: ['clubs'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Obtener datos de equipos
   const { data: teamsData, isLoading: isLoadingTeams } = useGetList<Team>({
-    key: "dashboard-teams",
-    resource: ["teams"],
-    keyResults: "data",
+    key: 'dashboard-teams',
+    resource: ['teams'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Obtener datos del usuario actual (roster)
   const { data: rosterData, isLoading: isLoadingRoster } = useGetList<IRoster>({
-    key: "roster-me",
-    resource: ["roster/me"],
-    keyResults: "data",
+    key: 'roster-me',
+    resource: ['roster/me'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -57,40 +57,40 @@ export const useDashboardData = () => {
     totalClubs,
     totalTeams,
     activeUsers: rosterData ? 1 : 0, // Por ahora solo el usuario actual
-    systemPerformance: "98%",
+    systemPerformance: '98%',
     recentActivities: [
       {
         id: 1,
-        action: "Sistema iniciado",
-        time: "Hace 2 minutos",
-        type: "system",
+        action: 'Sistema iniciado',
+        time: 'Hace 2 minutos',
+        type: 'system',
       },
       {
         id: 2,
-        action: "Usuario autenticado",
-        time: "Hace 5 minutos",
-        type: "user",
+        action: 'Usuario autenticado',
+        time: 'Hace 5 minutos',
+        type: 'user',
       },
       {
         id: 3,
-        action: "Datos cargados",
-        time: "Hace 10 minutos",
-        type: "data",
+        action: 'Datos cargados',
+        time: 'Hace 10 minutos',
+        type: 'data',
       },
     ],
     systemStatus: {
       database: {
-        status: "operational",
-        message: "Base de datos funcionando correctamente",
+        status: 'operational',
+        message: 'Base de datos funcionando correctamente',
       },
-      api: { status: "operational", message: "API respondiendo normalmente" },
+      api: { status: 'operational', message: 'API respondiendo normalmente' },
       authentication: {
-        status: "operational",
-        message: "Sistema de autenticación activo",
+        status: 'operational',
+        message: 'Sistema de autenticación activo',
       },
       fileStorage: {
-        status: "operational",
-        message: "Almacenamiento de archivos disponible",
+        status: 'operational',
+        message: 'Almacenamiento de archivos disponible',
       },
     },
   };
@@ -100,8 +100,8 @@ export const useDashboardData = () => {
     stats.recentActivities.unshift({
       id: Date.now(),
       action: `Club "${clubsData[0].name}" actualizado`,
-      time: "Hace 1 minuto",
-      type: "club",
+      time: 'Hace 1 minuto',
+      type: 'club',
     });
   }
 
@@ -109,8 +109,8 @@ export const useDashboardData = () => {
     stats.recentActivities.unshift({
       id: Date.now() + 1,
       action: `Equipo "${teamsData[0].name}" registrado`,
-      time: "Hace 3 minutos",
-      type: "team",
+      time: 'Hace 3 minutos',
+      type: 'team',
     });
   }
 

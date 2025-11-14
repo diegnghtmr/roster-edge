@@ -1,6 +1,6 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export interface INewCountry {
   name: string;
@@ -35,9 +35,7 @@ export const CountryForm: React.FC<CountryFormProps> = ({
           name="name"
           type="text"
           value={country.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ingrese el nombre del país"
           required
         />
@@ -45,7 +43,7 @@ export const CountryForm: React.FC<CountryFormProps> = ({
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

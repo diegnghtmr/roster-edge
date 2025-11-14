@@ -1,16 +1,16 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { CountryForm, type INewCountry } from "./components/Form";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CountryForm, type INewCountry } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { Country } from "@/interface/ICountry";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { Country } from '@/interface/ICountry';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
 
 interface IField {
   name: string;
@@ -21,16 +21,16 @@ export const CountryUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [country, setCountry] = useState<INewCountry>({
-    name: "",
+    name: '',
   });
 
   // Fetch the country data
   const { data: countryData, isLoading: loadingCountry } = useGetList({
     key: `country-${id}`,
     resource: [`countries/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -45,7 +45,7 @@ export const CountryUpdateModule = () => {
   }, [countryData]);
 
   const resource = [`countries/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -62,18 +62,15 @@ export const CountryUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el countries",
-            );
+            toast.error(errorMessage || 'Error al actualizar el countries');
           } else {
-            toast.success("Countries actualizado exitosamente");
-            navigate("/countries");
+            toast.success('Countries actualizado exitosamente');
+            navigate('/countries');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el countries. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar el countries. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -96,7 +93,7 @@ export const CountryUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingCountry && "Obteniendo información del país"}
+            {loadingCountry && 'Obteniendo información del país'}
           </div>
         </div>
       </div>
@@ -120,8 +117,6 @@ export const CountryUpdateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

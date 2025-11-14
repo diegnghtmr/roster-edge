@@ -1,6 +1,13 @@
-import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFMultiBarChart, PDFPieChart } from "./PDFDocument";
-import { REPORT_COLORS } from "@/constants/reportColors";
-import type { TeamStaffRatioResponse } from "@/interface/IReports";
+import {
+  PDFDocument,
+  PDFTable,
+  PDFSection,
+  PDFStatCards,
+  PDFMultiBarChart,
+  PDFPieChart,
+} from './PDFDocument';
+import { REPORT_COLORS } from '@/constants/reportColors';
+import type { TeamStaffRatioResponse } from '@/interface/IReports';
 
 interface StaffRatioPDFProps {
   data: TeamStaffRatioResponse[];
@@ -10,19 +17,22 @@ export const StaffRatioPDF = ({ data }: StaffRatioPDFProps) => {
   // Calculate overall stats
   const totalStaff = data.reduce((sum, team) => sum + (team.staff || 0), 0);
   const totalPlayers = data.reduce((sum, team) => sum + (team.players || 0), 0);
-  const avgRatio = data.length > 0
-    ? (data.reduce((sum, team) => sum + (team.staffToPlayerRatio || 0), 0) / data.length).toFixed(2)
-    : "0.00";
+  const avgRatio =
+    data.length > 0
+      ? (data.reduce((sum, team) => sum + (team.staffToPlayerRatio || 0), 0) / data.length).toFixed(
+          2
+        )
+      : '0.00';
 
   const stats = [
-    { label: "Personal Total", value: totalStaff },
-    { label: "Jugadores Total", value: totalPlayers },
-    { label: "Ratio Promedio", value: avgRatio },
+    { label: 'Personal Total', value: totalStaff },
+    { label: 'Jugadores Total', value: totalPlayers },
+    { label: 'Ratio Promedio', value: avgRatio },
   ];
 
   // Chart data - staff vs players (top 10 teams)
-  const chartData = data.slice(0, 10).map(team => ({
-    name: (team.teamName || "Sin nombre").substring(0, 12),
+  const chartData = data.slice(0, 10).map((team) => ({
+    name: (team.teamName || 'Sin nombre').substring(0, 12),
     staff: team.staff || 0,
     jugadores: team.players || 0,
   }));
@@ -31,8 +41,8 @@ export const StaffRatioPDF = ({ data }: StaffRatioPDFProps) => {
   const rolesMap = new Map<string, number>();
   data.forEach((team) => {
     team.roleBreakdown?.forEach((role) => {
-      const current = rolesMap.get(role.roleName || "Desconocido") || 0;
-      rolesMap.set(role.roleName || "Desconocido", current + (role.staffCount || 0));
+      const current = rolesMap.get(role.roleName || 'Desconocido') || 0;
+      rolesMap.set(role.roleName || 'Desconocido', current + (role.staffCount || 0));
     });
   });
 
@@ -42,13 +52,13 @@ export const StaffRatioPDF = ({ data }: StaffRatioPDFProps) => {
   }));
 
   // Table data
-  const tableHeaders = ["Equipo", "Personal", "Jugadores", "Ratio", "Antigüedad"];
+  const tableHeaders = ['Equipo', 'Personal', 'Jugadores', 'Ratio', 'Antigüedad'];
   const tableData = data.map((team) => [
-    team.teamName || "-",
+    team.teamName || '-',
     team.staff || 0,
     team.players || 0,
-    team.staffToPlayerRatio ? team.staffToPlayerRatio.toFixed(2) : "-",
-    team.averageStaffTenure ? `${team.averageStaffTenure.toFixed(1)} años` : "-",
+    team.staffToPlayerRatio ? team.staffToPlayerRatio.toFixed(2) : '-',
+    team.averageStaffTenure ? `${team.averageStaffTenure.toFixed(1)} años` : '-',
   ]);
 
   return (
@@ -64,8 +74,8 @@ export const StaffRatioPDF = ({ data }: StaffRatioPDFProps) => {
         <PDFMultiBarChart
           data={chartData}
           bars={[
-            { key: "staff", name: "Personal", color: REPORT_COLORS.primary.main },
-            { key: "jugadores", name: "Jugadores", color: REPORT_COLORS.chart.blue },
+            { key: 'staff', name: 'Personal', color: REPORT_COLORS.primary.main },
+            { key: 'jugadores', name: 'Jugadores', color: REPORT_COLORS.chart.blue },
           ]}
           height={180}
         />

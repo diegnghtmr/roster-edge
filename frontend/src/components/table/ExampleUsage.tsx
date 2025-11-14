@@ -1,8 +1,8 @@
-import React from "react";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { DataTable, type TableColumn } from "./DataTable";
-import type { FilterConfig } from "./SearchComponent";
-import { Button } from "../ui/button";
+import React from 'react';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { DataTable, type TableColumn } from './DataTable';
+import type { FilterConfig } from './SearchComponent';
+import { Button } from '../ui/button';
 
 // Example interface for your data
 interface User {
@@ -19,52 +19,52 @@ export const ExampleTable: React.FC = () => {
   const users: User[] = [
     {
       id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Admin",
-      createdAt: "2024-01-01",
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'Admin',
+      createdAt: '2024-01-01',
     },
     {
       id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "User",
-      createdAt: "2024-01-02",
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'User',
+      createdAt: '2024-01-02',
     },
   ];
 
   // Define table headers
   const headers: TableColumn[] = [
-    { title: "ID", key: "id" },
-    { title: "Nombre", key: "name" },
-    { title: "Email", key: "email" },
-    { title: "Rol", key: "role" },
-    { title: "Fecha de creación", key: "createdAt" },
-    { title: "Acciones", key: "actions" },
+    { title: 'ID', key: 'id' },
+    { title: 'Nombre', key: 'name' },
+    { title: 'Email', key: 'email' },
+    { title: 'Rol', key: 'role' },
+    { title: 'Fecha de creación', key: 'createdAt' },
+    { title: 'Acciones', key: 'actions' },
   ];
 
   // Define filters for search component
   const filters: FilterConfig[] = [
     {
-      key: "name",
-      label: "Nombre",
-      type: "text",
-      placeholder: "Buscar por nombre...",
+      key: 'name',
+      label: 'Nombre',
+      type: 'text',
+      placeholder: 'Buscar por nombre...',
     },
     {
-      key: "role",
-      label: "Rol",
-      type: "select",
+      key: 'role',
+      label: 'Rol',
+      type: 'select',
       options: [
-        { key: "admin", value: "Admin" },
-        { key: "user", value: "User" },
+        { key: 'admin', value: 'Admin' },
+        { key: 'user', value: 'User' },
       ],
-      placeholder: "Seleccionar rol",
+      placeholder: 'Seleccionar rol',
     },
     {
-      key: "active",
-      label: "Activo",
-      type: "button",
+      key: 'active',
+      label: 'Activo',
+      type: 'button',
     },
   ];
 
@@ -77,9 +77,7 @@ export const ExampleTable: React.FC = () => {
       <TableCell className="text-start">
         <span
           className={`px-2 py-1 rounded-full text-xs ${
-            user.role === "Admin"
-              ? "bg-blue-100 text-blue-800"
-              : "bg-gray-100 text-gray-800"
+            user.role === 'Admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
           }`}
         >
           {user.role}

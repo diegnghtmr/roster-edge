@@ -1,28 +1,28 @@
-import { useState, useMemo } from "react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { ExportButton } from "@/components/reports/ExportButton";
-import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
-import { StatCard } from "@/components/reports/StatCard";
-import { LineChartComponent } from "@/components/reports/charts/LineChartComponent";
-import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import { ScheduleDensityPDF } from "@/components/reports/pdf/ScheduleDensityPDF";
-import { useScheduleDensityReport } from "@/api/services/reports/useReportsData";
-import { useSeasonsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
-import { ArrowLeft, Calendar, AlertTriangle, Clock } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ScheduleDensityResponse } from "@/interface/IReports";
+import { useState, useMemo } from 'react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { ExportButton } from '@/components/reports/ExportButton';
+import { ReportFilters, type FilterField } from '@/components/reports/ReportFilters';
+import { StatCard } from '@/components/reports/StatCard';
+import { LineChartComponent } from '@/components/reports/charts/LineChartComponent';
+import { DataTable, type TableColumn } from '@/components/table/DataTable';
+import { ScheduleDensityPDF } from '@/components/reports/pdf/ScheduleDensityPDF';
+import { useScheduleDensityReport } from '@/api/services/reports/useReportsData';
+import { useSeasonsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
+import { ArrowLeft, Calendar, AlertTriangle, Clock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { ScheduleDensityResponse } from '@/interface/IReports';
 
 const tableHeaders: TableColumn[] = [
-  { title: "Fecha", key: "matchDate" },
-  { title: "Dias Descanso", key: "restDays", className: "w-32" },
-  { title: "Ultimos 7d", key: "matchesLastSevenDays", className: "w-28" },
-  { title: "Proximos 7d", key: "matchesNextSevenDays", className: "w-28" },
-  { title: "Duracion (min)", key: "matchDurationMinutes", className: "w-28" },
-  { title: "Estado", key: "belowRestThreshold", className: "w-24" },
+  { title: 'Fecha', key: 'matchDate' },
+  { title: 'Dias Descanso', key: 'restDays', className: 'w-32' },
+  { title: 'Ultimos 7d', key: 'matchesLastSevenDays', className: 'w-28' },
+  { title: 'Proximos 7d', key: 'matchesNextSevenDays', className: 'w-28' },
+  { title: 'Duracion (min)', key: 'matchDurationMinutes', className: 'w-28' },
+  { title: 'Estado', key: 'belowRestThreshold', className: 'w-24' },
 ];
 
 const parseNumber = (value: unknown): number | undefined => {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return undefined;
   }
   const parsed = Number(value);
@@ -33,19 +33,16 @@ const parseBoolean = (value: unknown): boolean => {
   if (value === null || value === undefined) {
     return false;
   }
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     return value;
   }
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     return value !== 0;
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
     return (
-      normalized === "true" ||
-      normalized === "1" ||
-      normalized === "yes" ||
-      normalized === "si"
+      normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'si'
     );
   }
   return false;
@@ -55,11 +52,11 @@ const normalizeDateValue = (value: unknown): string | undefined => {
   if (!value) {
     return undefined;
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return value;
   }
   if (value instanceof Date) {
-    return value.toISOString().split("T")[0];
+    return value.toISOString().split('T')[0];
   }
   return undefined;
 };
@@ -72,60 +69,65 @@ const formatDateLabel = (value?: string): string | undefined => {
   if (Number.isNaN(parsed.getTime())) {
     return value;
   }
-  return parsed.toLocaleDateString("es-CO", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+  return parsed.toLocaleDateString('es-CO', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
   });
 };
 
 export const ScheduleDensityReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | boolean | undefined>
+  >({});
 
   const { options: teamOptions, isLoading: teamsLoading } = useTeamsForFilter();
   const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter();
 
-  const filterFields: FilterField[] = useMemo(() => [
-    {
-      key: "teamId",
-      label: "Equipo (Requerido)",
-      type: "select",
-      options: teamOptions,
-      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo",
-    },
-    {
-      key: "seasonId",
-      label: "Temporada",
-      type: "select",
-      options: seasonOptions,
-      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
-    },
-    {
-      key: "fromDate",
-      label: "Desde",
-      type: "date",
-      placeholder: "YYYY-MM-DD",
-    },
-    {
-      key: "toDate",
-      label: "Hasta",
-      type: "date",
-      placeholder: "YYYY-MM-DD",
-    },
-    {
-      key: "alertThresholdDays",
-      label: "Umbral de descanso (dias)",
-      type: "number",
-      placeholder: "Ej: 3 (opcional, default: 3)",
-    },
-  ], [teamOptions, teamsLoading, seasonOptions, seasonsLoading]);
+  const filterFields: FilterField[] = useMemo(
+    () => [
+      {
+        key: 'teamId',
+        label: 'Equipo (Requerido)',
+        type: 'select',
+        options: teamOptions,
+        placeholder: teamsLoading ? 'Cargando...' : 'Seleccionar equipo',
+      },
+      {
+        key: 'seasonId',
+        label: 'Temporada',
+        type: 'select',
+        options: seasonOptions,
+        placeholder: seasonsLoading ? 'Cargando...' : 'Seleccionar temporada (opcional)',
+      },
+      {
+        key: 'fromDate',
+        label: 'Desde',
+        type: 'date',
+        placeholder: 'YYYY-MM-DD',
+      },
+      {
+        key: 'toDate',
+        label: 'Hasta',
+        type: 'date',
+        placeholder: 'YYYY-MM-DD',
+      },
+      {
+        key: 'alertThresholdDays',
+        label: 'Umbral de descanso (dias)',
+        type: 'number',
+        placeholder: 'Ej: 3 (opcional, default: 3)',
+      },
+    ],
+    [teamOptions, teamsLoading, seasonOptions, seasonsLoading]
+  );
 
   const selectedTeamId = useMemo(() => {
-    if (typeof appliedFilters.teamId === "number") {
+    if (typeof appliedFilters.teamId === 'number') {
       return appliedFilters.teamId;
     }
-    if (typeof appliedFilters.teamId === "string" && appliedFilters.teamId.trim() !== "") {
+    if (typeof appliedFilters.teamId === 'string' && appliedFilters.teamId.trim() !== '') {
       const parsed = Number(appliedFilters.teamId);
       return Number.isNaN(parsed) ? undefined : parsed;
     }
@@ -147,12 +149,12 @@ export const ScheduleDensityReport = () => {
   const handleApplyFilters = () => {
     const processedFilters: Record<string, string | number | boolean | undefined> = {};
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === "" || value === null || value === undefined) {
+      if (value === '' || value === null || value === undefined) {
         return;
       }
-      if (key.endsWith("Id") && typeof value === "string") {
+      if (key.endsWith('Id') && typeof value === 'string') {
         processedFilters[key] = Number(value);
-      } else if (key === "alertThresholdDays" && typeof value === "string") {
+      } else if (key === 'alertThresholdDays' && typeof value === 'string') {
         processedFilters[key] = Number(value);
       } else {
         processedFilters[key] = value;
@@ -169,23 +171,25 @@ export const ScheduleDensityReport = () => {
     const normalized = data.map((item) => {
       const raw = item as Record<string, unknown>;
       return {
-        teamId: parseNumber(raw.teamId ?? raw["team_id"]),
-        teamName: typeof (raw.teamName ?? raw["team_name"]) === "string"
-          ? String(raw.teamName ?? raw["team_name"])
-          : undefined,
-        seasonId: parseNumber(raw.seasonId ?? raw["season_id"]),
-        seasonName: typeof (raw.seasonName ?? raw["season_name"]) === "string"
-          ? String(raw.seasonName ?? raw["season_name"])
-          : undefined,
-        matchId: parseNumber(raw.matchId ?? raw["match_id"]),
-        matchDate: normalizeDateValue(raw.matchDate ?? raw["match_date"]),
-        restDays: parseNumber(raw.restDays ?? raw["rest_days"]),
-        matchesLastSevenDays: parseNumber(raw.matchesLastSevenDays ?? raw["matches_last_seven"]),
-        matchesNextSevenDays: parseNumber(raw.matchesNextSevenDays ?? raw["matches_next_seven"]),
+        teamId: parseNumber(raw.teamId ?? raw['team_id']),
+        teamName:
+          typeof (raw.teamName ?? raw['team_name']) === 'string'
+            ? String(raw.teamName ?? raw['team_name'])
+            : undefined,
+        seasonId: parseNumber(raw.seasonId ?? raw['season_id']),
+        seasonName:
+          typeof (raw.seasonName ?? raw['season_name']) === 'string'
+            ? String(raw.seasonName ?? raw['season_name'])
+            : undefined,
+        matchId: parseNumber(raw.matchId ?? raw['match_id']),
+        matchDate: normalizeDateValue(raw.matchDate ?? raw['match_date']),
+        restDays: parseNumber(raw.restDays ?? raw['rest_days']),
+        matchesLastSevenDays: parseNumber(raw.matchesLastSevenDays ?? raw['matches_last_seven']),
+        matchesNextSevenDays: parseNumber(raw.matchesNextSevenDays ?? raw['matches_next_seven']),
         matchDurationMinutes: parseNumber(
-          raw.matchDurationMinutes ?? raw["match_duration_minutes"] ?? raw["duration_minutes"],
+          raw.matchDurationMinutes ?? raw['match_duration_minutes'] ?? raw['duration_minutes']
         ),
-        belowRestThreshold: parseBoolean(raw.belowRestThreshold ?? raw["below_rest_threshold"]),
+        belowRestThreshold: parseBoolean(raw.belowRestThreshold ?? raw['below_rest_threshold']),
       };
     });
 
@@ -203,21 +207,25 @@ export const ScheduleDensityReport = () => {
 
   const matchesWithLowRest = useMemo(
     () => density.filter((match) => match.belowRestThreshold).length,
-    [density],
+    [density]
   );
 
   const avgRestDays = useMemo(() => {
     if (density.length === 0) {
-      return "0.0";
+      return '0.0';
     }
     const total = density.reduce((sum, match) => sum + (match.restDays ?? 0), 0);
     return (total / density.length).toFixed(1);
   }, [density]);
 
-  const maxDensity = useMemo(() => density.reduce((max, match) => {
-    const current = (match.matchesLastSevenDays ?? 0) + (match.matchesNextSevenDays ?? 0);
-    return Math.max(max, current);
-  }, 0), [density]);
+  const maxDensity = useMemo(
+    () =>
+      density.reduce((max, match) => {
+        const current = (match.matchesLastSevenDays ?? 0) + (match.matchesNextSevenDays ?? 0);
+        return Math.max(max, current);
+      }, 0),
+    [density]
+  );
 
   const chartData = useMemo(
     () =>
@@ -227,33 +235,27 @@ export const ScheduleDensityReport = () => {
         ultimos7d: match.matchesLastSevenDays ?? 0,
         proximos7d: match.matchesNextSevenDays ?? 0,
       })),
-    [density],
+    [density]
   );
 
   const renderRow = (match: ScheduleDensityResponse) => {
-    const formattedDate = formatDateLabel(match.matchDate) ?? "-";
+    const formattedDate = formatDateLabel(match.matchDate) ?? '-';
     const restDaysValue = match.restDays ?? 0;
-    const rowKey = `${match.teamId ?? "team"}-${match.matchId ?? match.matchDate ?? "match"}`;
+    const rowKey = `${match.teamId ?? 'team'}-${match.matchId ?? match.matchDate ?? 'match'}`;
 
     return (
-      <tr key={rowKey} className={match.belowRestThreshold ? "bg-red-50" : ""}>
+      <tr key={rowKey} className={match.belowRestThreshold ? 'bg-red-50' : ''}>
         <td className="px-4 py-3 font-medium">{formattedDate}</td>
         <td
           className={`px-4 py-3 text-center font-semibold ${
-            restDaysValue < 3 ? "text-red-600" : "text-green-600"
+            restDaysValue < 3 ? 'text-red-600' : 'text-green-600'
           }`}
         >
           {restDaysValue}
         </td>
-        <td className="px-4 py-3 text-center text-blue-600">
-          {match.matchesLastSevenDays ?? 0}
-        </td>
-        <td className="px-4 py-3 text-center text-purple-600">
-          {match.matchesNextSevenDays ?? 0}
-        </td>
-        <td className="px-4 py-3 text-center text-gray-700">
-          {match.matchDurationMinutes ?? 0}
-        </td>
+        <td className="px-4 py-3 text-center text-blue-600">{match.matchesLastSevenDays ?? 0}</td>
+        <td className="px-4 py-3 text-center text-purple-600">{match.matchesNextSevenDays ?? 0}</td>
+        <td className="px-4 py-3 text-center text-gray-700">{match.matchDurationMinutes ?? 0}</td>
         <td className="px-4 py-3 text-center">
           {match.belowRestThreshold ? (
             <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
@@ -277,15 +279,15 @@ export const ScheduleDensityReport = () => {
       <InternalHeader
         title="Reporte de Densidad del Calendario"
         breadcrumbs={[
-          { label: "Reportes", href: "/reports" },
-          { label: "Densidad del Calendario" },
+          { label: 'Reportes', href: '/reports' },
+          { label: 'Densidad del Calendario' },
         ]}
         buttons={[
           {
-            text: "Volver",
+            text: 'Volver',
             icon: <ArrowLeft className="h-4 w-4" />,
-            link: "/reports",
-            variant: "outline",
+            link: '/reports',
+            variant: 'outline',
           },
         ]}
       />
@@ -304,7 +306,7 @@ export const ScheduleDensityReport = () => {
             title="Partidos con Poco Descanso"
             value={matchesWithLowRest}
             subtitle="bajo el umbral"
-            trend={matchesWithLowRest > 0 ? "down" : "neutral"}
+            trend={matchesWithLowRest > 0 ? 'down' : 'neutral'}
             icon={<AlertTriangle className="h-5 w-5" />}
           />
           <StatCard
@@ -322,13 +324,8 @@ export const ScheduleDensityReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={
-              <ScheduleDensityPDF
-                data={density}
-                teamName={teamNameForExport}
-              />
-            }
-            fileName={`densidad-calendario-${teamNameForExport || "reporte"}`}
+            document={<ScheduleDensityPDF data={density} teamName={teamNameForExport} />}
+            fileName={`densidad-calendario-${teamNameForExport || 'reporte'}`}
             disabled={density.length === 0}
           />
         </div>
@@ -343,9 +340,9 @@ export const ScheduleDensityReport = () => {
                 data={chartData}
                 xKey="name"
                 lines={[
-                  { key: "descanso", name: "Dias de Descanso", color: "#10b981" },
-                  { key: "ultimos7d", name: "Partidos Ultimos 7d", color: "#3b82f6" },
-                  { key: "proximos7d", name: "Partidos Proximos 7d", color: "#8b5cf6" },
+                  { key: 'descanso', name: 'Dias de Descanso', color: '#10b981' },
+                  { key: 'ultimos7d', name: 'Partidos Ultimos 7d', color: '#3b82f6' },
+                  { key: 'proximos7d', name: 'Partidos Proximos 7d', color: '#8b5cf6' },
                 ]}
                 yAxisLabel="Cantidad"
                 height={400}
@@ -358,7 +355,8 @@ export const ScheduleDensityReport = () => {
           <Card className="border-blue-200 bg-blue-50">
             <CardContent className="py-6">
               <p className="text-center text-blue-800">
-                Selecciona un <strong>equipo</strong> y aplica los filtros para ver el analisis de densidad del calendario.
+                Selecciona un <strong>equipo</strong> y aplica los filtros para ver el analisis de
+                densidad del calendario.
               </p>
             </CardContent>
           </Card>
@@ -368,7 +366,8 @@ export const ScheduleDensityReport = () => {
           <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="py-6">
               <p className="text-center text-yellow-800">
-                No se encontraron partidos para el equipo seleccionado. Intenta con otro equipo o temporada.
+                No se encontraron partidos para el equipo seleccionado. Intenta con otro equipo o
+                temporada.
               </p>
             </CardContent>
           </Card>

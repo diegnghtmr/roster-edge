@@ -1,29 +1,29 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
-import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { useState } from 'react';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Aquí iría la lógica para enviar el formulario
-    console.log("Formulario enviado:", formData);
-    alert("¡Mensaje enviado! Nos pondremos en contacto contigo pronto.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    console.log('Formulario enviado:', formData);
+    alert('¡Mensaje enviado! Nos pondremos en contacto contigo pronto.');
+    setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -93,20 +93,18 @@ const Contact = () => {
           <Card>
             <CardHeader>
               <CardTitle>Soporte Técnico</CardTitle>
-              <CardDescription>
-                Atención especializada para problemas técnicos
-              </CardDescription>
+              <CardDescription>Atención especializada para problemas técnicos</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Para reportar problemas técnicos o solicitar asistencia con la plataforma,
-                  nuestro equipo de soporte está disponible durante el horario comercial.
+                  Para reportar problemas técnicos o solicitar asistencia con la plataforma, nuestro
+                  equipo de soporte está disponible durante el horario comercial.
                 </p>
                 <Button
                   variant="outline"
                   className="w-full border-red-200 hover:bg-red-50"
-                  onClick={() => window.location.href = '/support'}
+                  onClick={() => (window.location.href = '/support')}
                 >
                   Ir a Soporte Técnico
                 </Button>

@@ -3,7 +3,7 @@
  * Used in report filters and other dropdowns
  */
 
-import useGetList from "../getServices/useGetList";
+import useGetList from '../getServices/useGetList';
 
 export interface SelectOption {
   value: number | string;
@@ -15,9 +15,9 @@ export interface SelectOption {
  */
 export const useClubsForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["clubs-filter"],
-    resource: ["clubs"],
-    keyResults: "data",
+    key: ['clubs-filter'],
+    resource: ['clubs'],
+    keyResults: 'data',
     enabled,
   });
 
@@ -37,17 +37,21 @@ export const useTeamsForFilter = (clubId?: number, enabled = true) => {
   const params = clubId ? { clubId } : undefined;
 
   const { data, isLoading } = useGetList({
-    key: clubId ? ["teams-filter", clubId] : ["teams-filter"],
-    resource: ["teams"],
+    key: clubId ? ['teams-filter', clubId] : ['teams-filter'],
+    resource: ['teams'],
     params,
-    keyResults: "data",
+    keyResults: 'data',
     enabled,
   });
 
-  const options: SelectOption[] = (data || []).map((team: { id: number; name: string; clubName?: string }) => ({
-    value: team.id,
-    label: team.clubName ? `${team.name} - ${team.clubName} (ID: ${team.id})` : `${team.name} (ID: ${team.id})`,
-  }));
+  const options: SelectOption[] = (data || []).map(
+    (team: { id: number; name: string; clubName?: string }) => ({
+      value: team.id,
+      label: team.clubName
+        ? `${team.name} - ${team.clubName} (ID: ${team.id})`
+        : `${team.name} (ID: ${team.id})`,
+    })
+  );
 
   return { options, isLoading };
 };
@@ -60,17 +64,21 @@ export const useSeasonsForFilter = (clubId?: number, enabled = true) => {
   const params = clubId ? { clubId } : undefined;
 
   const { data, isLoading } = useGetList({
-    key: clubId ? ["seasons-filter", clubId] : ["seasons-filter"],
-    resource: ["seasons"],
+    key: clubId ? ['seasons-filter', clubId] : ['seasons-filter'],
+    resource: ['seasons'],
     params,
-    keyResults: "data",
+    keyResults: 'data',
     enabled,
   });
 
-  const options: SelectOption[] = (data || []).map((season: { id: number; name: string; clubName?: string }) => ({
-    value: season.id,
-    label: season.clubName ? `${season.name} - ${season.clubName} (ID: ${season.id})` : `${season.name} (ID: ${season.id})`,
-  }));
+  const options: SelectOption[] = (data || []).map(
+    (season: { id: number; name: string; clubName?: string }) => ({
+      value: season.id,
+      label: season.clubName
+        ? `${season.name} - ${season.clubName} (ID: ${season.id})`
+        : `${season.name} (ID: ${season.id})`,
+    })
+  );
 
   return { options, isLoading };
 };
@@ -80,9 +88,9 @@ export const useSeasonsForFilter = (clubId?: number, enabled = true) => {
  */
 export const useCategoriesForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["categories-filter"],
-    resource: ["team-categories"],
-    keyResults: "data",
+    key: ['categories-filter'],
+    resource: ['team-categories'],
+    keyResults: 'data',
     enabled,
   });
 
@@ -99,9 +107,9 @@ export const useCategoriesForFilter = (enabled = true) => {
  */
 export const useGendersForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["genders-filter"],
-    resource: ["team-genders"],
-    keyResults: "data",
+    key: ['genders-filter'],
+    resource: ['team-genders'],
+    keyResults: 'data',
     enabled,
   });
 
@@ -118,9 +126,9 @@ export const useGendersForFilter = (enabled = true) => {
  */
 export const usePlansForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["plans-filter"],
-    resource: ["plans"],
-    keyResults: "data",
+    key: ['plans-filter'],
+    resource: ['plans'],
+    keyResults: 'data',
     enabled,
   });
 
@@ -137,9 +145,9 @@ export const usePlansForFilter = (enabled = true) => {
  */
 export const usePaymentMethodsForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["payment-methods-filter"],
-    resource: ["payment-methods"],
-    keyResults: "data",
+    key: ['payment-methods-filter'],
+    resource: ['payment-methods'],
+    keyResults: 'data',
     enabled,
   });
 
@@ -156,16 +164,20 @@ export const usePaymentMethodsForFilter = (enabled = true) => {
  */
 export const useCurrenciesForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["currencies-filter"],
-    resource: ["currencies"],
-    keyResults: "data",
+    key: ['currencies-filter'],
+    resource: ['currencies'],
+    keyResults: 'data',
     enabled,
   });
 
-  const options: SelectOption[] = (data || []).map((currency: { id: number; name: string; symbol?: string }) => ({
-    value: currency.id,
-    label: currency.symbol ? `${currency.name} (${currency.symbol})` : `${currency.name} (ID: ${currency.id})`,
-  }));
+  const options: SelectOption[] = (data || []).map(
+    (currency: { id: number; name: string; symbol?: string }) => ({
+      value: currency.id,
+      label: currency.symbol
+        ? `${currency.name} (${currency.symbol})`
+        : `${currency.name} (ID: ${currency.id})`,
+    })
+  );
 
   return { options, isLoading };
 };
@@ -175,9 +187,9 @@ export const useCurrenciesForFilter = (enabled = true) => {
  */
 export const useSubscriptionStatusesForFilter = (enabled = true) => {
   const { data, isLoading } = useGetList({
-    key: ["subscription-statuses-filter"],
-    resource: ["subscription-statuses"],
-    keyResults: "data",
+    key: ['subscription-statuses-filter'],
+    resource: ['subscription-statuses'],
+    keyResults: 'data',
     enabled,
   });
 

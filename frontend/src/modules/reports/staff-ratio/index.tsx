@@ -1,23 +1,25 @@
-import { useState, useMemo } from "react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { ExportButton } from "@/components/reports/ExportButton";
-import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
-import { StatCard } from "@/components/reports/StatCard";
-import { BarChartComponent } from "@/components/reports/charts/BarChartComponent";
-import { PieChartComponent } from "@/components/reports/charts/PieChartComponent";
-import { StaffRatioPDF } from "@/components/reports/pdf/StaffRatioPDF";
-import { useStaffRatioReport } from "@/api/services/reports/useReportsData";
-import { useClubsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
-import { translateStaffRole } from "@/utils/translations";
-import { ArrowLeft, Users, UserCheck, TrendingUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TeamStaffRatioResponse } from "@/interface/IReports";
+import { useState, useMemo } from 'react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { ExportButton } from '@/components/reports/ExportButton';
+import { ReportFilters, type FilterField } from '@/components/reports/ReportFilters';
+import { StatCard } from '@/components/reports/StatCard';
+import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
+import { PieChartComponent } from '@/components/reports/charts/PieChartComponent';
+import { StaffRatioPDF } from '@/components/reports/pdf/StaffRatioPDF';
+import { useStaffRatioReport } from '@/api/services/reports/useReportsData';
+import { useClubsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
+import { translateStaffRole } from '@/utils/translations';
+import { ArrowLeft, Users, UserCheck, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { TeamStaffRatioResponse } from '@/interface/IReports';
 
 export const StaffRatioReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({
     onlyActive: true,
   });
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | boolean | undefined>
+  >({
     onlyActive: true,
   });
 
@@ -28,33 +30,36 @@ export const StaffRatioReport = () => {
   );
 
   // Dynamic filter fields with loaded options
-  const filterFields: FilterField[] = useMemo(() => [
-    {
-      key: "clubId",
-      label: "Club",
-      type: "select",
-      options: clubOptions,
-      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
-    },
-    {
-      key: "teamId",
-      label: "Equipo",
-      type: "select",
-      options: teamOptions,
-      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo (opcional)",
-    },
-    {
-      key: "onlyActive",
-      label: "Solo activos",
-      type: "checkbox",
-      placeholder: "Mostrar solo personal y jugadores activos",
-    },
-  ], [clubOptions, clubsLoading, teamOptions, teamsLoading]);
+  const filterFields: FilterField[] = useMemo(
+    () => [
+      {
+        key: 'clubId',
+        label: 'Club',
+        type: 'select',
+        options: clubOptions,
+        placeholder: clubsLoading ? 'Cargando...' : 'Seleccionar club (opcional)',
+      },
+      {
+        key: 'teamId',
+        label: 'Equipo',
+        type: 'select',
+        options: teamOptions,
+        placeholder: teamsLoading ? 'Cargando...' : 'Seleccionar equipo (opcional)',
+      },
+      {
+        key: 'onlyActive',
+        label: 'Solo activos',
+        type: 'checkbox',
+        placeholder: 'Mostrar solo personal y jugadores activos',
+      },
+    ],
+    [clubOptions, clubsLoading, teamOptions, teamsLoading]
+  );
 
   const { data, isLoading } = useStaffRatioReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    if (key === "clubId") {
+    if (key === 'clubId') {
       setFilters({ ...filters, clubId: value, teamId: undefined });
     } else {
       setFilters((prev) => ({ ...prev, [key]: value }));
@@ -69,8 +74,8 @@ export const StaffRatioReport = () => {
   const handleApplyFilters = () => {
     const processedFilters: Record<string, string | number | boolean | undefined> = {};
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === "" || value === null || value === undefined) return;
-      if (key.endsWith("Id") && typeof value === "string") {
+      if (value === '' || value === null || value === undefined) return;
+      if (key.endsWith('Id') && typeof value === 'string') {
         processedFilters[key] = Number(value);
       } else {
         processedFilters[key] = value;
@@ -84,13 +89,16 @@ export const StaffRatioReport = () => {
   // Calculate stats
   const totalStaff = ratios.reduce((sum, team) => sum + (team.staff || 0), 0);
   const totalPlayers = ratios.reduce((sum, team) => sum + (team.players || 0), 0);
-  const avgRatio = ratios.length > 0
-    ? (ratios.reduce((sum, team) => sum + (team.staffToPlayerRatio || 0), 0) / ratios.length).toFixed(2)
-    : "0.00";
+  const avgRatio =
+    ratios.length > 0
+      ? (
+          ratios.reduce((sum, team) => sum + (team.staffToPlayerRatio || 0), 0) / ratios.length
+        ).toFixed(2)
+      : '0.00';
 
   // Chart data
   const ratioChartData = ratios.map((team) => ({
-    name: team.teamName || "Sin nombre",
+    name: team.teamName || 'Sin nombre',
     staff: team.staff || 0,
     jugadores: team.players || 0,
   }));
@@ -117,10 +125,10 @@ export const StaffRatioReport = () => {
         description="Proporción de staff técnico por jugador en cada equipo"
         buttons={[
           {
-            text: "Volver",
+            text: 'Volver',
             icon: <ArrowLeft className="h-4 w-4" />,
-            link: "/reports",
-            variant: "outline",
+            link: '/reports',
+            variant: 'outline',
           },
         ]}
       />
@@ -156,7 +164,7 @@ export const StaffRatioReport = () => {
         <div className="flex justify-end">
           <ExportButton
             document={<StaffRatioPDF data={ratios} />}
-            fileName={`ratio-personal-${new Date().toISOString().split("T")[0]}`}
+            fileName={`ratio-personal-${new Date().toISOString().split('T')[0]}`}
             disabled={ratios.length === 0}
           />
         </div>
@@ -172,8 +180,8 @@ export const StaffRatioReport = () => {
                   data={ratioChartData}
                   xKey="name"
                   bars={[
-                    { key: "staff", name: "Personal", color: "#f97316" },
-                    { key: "jugadores", name: "Jugadores", color: "#3b82f6" },
+                    { key: 'staff', name: 'Personal', color: '#f97316' },
+                    { key: 'jugadores', name: 'Jugadores', color: '#3b82f6' },
                   ]}
                   yAxisLabel="Cantidad"
                   height={400}
@@ -187,11 +195,7 @@ export const StaffRatioReport = () => {
                   <CardTitle>Distribución por Rol</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <PieChartComponent
-                    data={rolesData}
-                    nameKey="name"
-                    valueKey="value"
-                  />
+                  <PieChartComponent data={rolesData} nameKey="name" valueKey="value" />
                 </CardContent>
               </Card>
             )}
@@ -224,13 +228,15 @@ export const StaffRatioReport = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Ratio:</span>
                       <span className="font-medium text-blue-600">
-                        {team.staffToPlayerRatio ? team.staffToPlayerRatio.toFixed(2) : "-"}
+                        {team.staffToPlayerRatio ? team.staffToPlayerRatio.toFixed(2) : '-'}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Antigüedad promedio:</span>
                       <span className="font-medium">
-                        {team.averageStaffTenure ? `${team.averageStaffTenure.toFixed(1)} años` : "-"}
+                        {team.averageStaffTenure
+                          ? `${team.averageStaffTenure.toFixed(1)} años`
+                          : '-'}
                       </span>
                     </div>
                   </CardContent>

@@ -1,6 +1,6 @@
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Plus, Briefcase } from "lucide-react";
-import { StaffList } from "./components/List";
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Plus, Briefcase } from 'lucide-react';
+import { StaffList } from './components/List';
 
 export const StaffModule = () => {
   return (
@@ -10,16 +10,16 @@ export const StaffModule = () => {
         description="Gestiona el personal de tu organización"
         buttons={[
           {
-            text: "Roles",
+            text: 'Roles',
             icon: <Briefcase className="h-4 w-4" />,
-            link: "/staff-roles",
-            variant: "outline",
+            link: '/staff-roles',
+            variant: 'outline',
           },
           {
-            text: "Nuevo Personal",
+            text: 'Nuevo Personal',
             icon: <Plus className="h-4 w-4" />,
-            link: "/staff-create",
-            variant: "default",
+            link: '/staff-create',
+            variant: 'default',
           },
         ]}
       />

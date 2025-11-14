@@ -1,15 +1,15 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import useGetList from "@/api/services/getServices/useGetList";
-import type { Club } from "@/interface/IClub";
+} from '@/components/ui/select';
+import useGetList from '@/api/services/getServices/useGetList';
+import type { Club } from '@/interface/IClub';
 
 export interface INewSeason {
   clubId: number;
@@ -39,9 +39,9 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
 }) => {
   // Fetch clubs for the dropdown
   const { data: clubs = [], isLoading: clubsLoading } = useGetList<Club[]>({
-    key: "clubs",
-    resource: ["clubs"],
-    keyResults: "data",
+    key: 'clubs',
+    resource: ['clubs'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -54,20 +54,17 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
   // Format the date array to a string for the date input
   const formatDateArray = (dateArray: number[]): string => {
     if (!dateArray || dateArray.length !== 3) {
-      return "";
+      return '';
     }
     const [year, month, day] = dateArray;
     // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, "0");
-    const paddedDay = day.toString().padStart(2, "0");
+    const paddedMonth = month.toString().padStart(2, '0');
+    const paddedDay = day.toString().padStart(2, '0');
     return `${year}-${paddedMonth}-${paddedDay}`;
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre de la Temporada
@@ -77,9 +74,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
           name="name"
           type="text"
           value={season.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ej. Temporada 2024-I"
           required
         />
@@ -91,9 +86,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
         </label>
         <Select
           value={season.clubId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "clubId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'clubId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un club" />
@@ -115,10 +108,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="startDate"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="startDate" className="text-sm font-medium text-gray-700">
           Fecha de Inicio
         </label>
         <Input
@@ -128,7 +118,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
           value={formatDateArray(season.startDate)}
           onChange={(e) =>
             onChangeValue({
-              name: "startDate",
+              name: 'startDate',
               value: parseDateToArray(e.target.value),
             })
           }
@@ -147,7 +137,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
           value={formatDateArray(season.endDate)}
           onChange={(e) =>
             onChangeValue({
-              name: "endDate",
+              name: 'endDate',
               value: parseDateToArray(e.target.value),
             })
           }
@@ -160,10 +150,8 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
           Estado
         </label>
         <Select
-          value={season.active ? "true" : "false"}
-          onValueChange={(value) =>
-            onChangeValue({ name: "active", value: value === "true" })
-          }
+          value={season.active ? 'true' : 'false'}
+          onValueChange={(value) => onChangeValue({ name: 'active', value: value === 'true' })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione el estado" />
@@ -177,7 +165,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

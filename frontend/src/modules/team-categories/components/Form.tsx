@@ -1,13 +1,13 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 export interface INewTeamCategory {
   name: string;
@@ -35,10 +35,7 @@ export const TeamCategoryForm: React.FC<TeamCategoryFormProps> = ({
   isEdit = false,
 }) => {
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre de la categoría
@@ -48,9 +45,7 @@ export const TeamCategoryForm: React.FC<TeamCategoryFormProps> = ({
           name="name"
           type="text"
           value={category.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ingrese el nombre de la categoría"
           required
         />
@@ -62,10 +57,8 @@ export const TeamCategoryForm: React.FC<TeamCategoryFormProps> = ({
             Estado
           </label>
           <Select
-            value={category.active?.toString() || "true"}
-            onValueChange={(value) =>
-              onChangeValue({ name: "active", value: value === "true" })
-            }
+            value={category.active?.toString() || 'true'}
+            onValueChange={(value) => onChangeValue({ name: 'active', value: value === 'true' })}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Seleccionar estado" />
@@ -80,7 +73,7 @@ export const TeamCategoryForm: React.FC<TeamCategoryFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

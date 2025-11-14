@@ -1,29 +1,35 @@
-import { useState, useMemo } from "react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { ExportButton } from "@/components/reports/ExportButton";
-import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
-import { StatCard } from "@/components/reports/StatCard";
-import { BarChartComponent } from "@/components/reports/charts/BarChartComponent";
-import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import { MatchLoadPDF } from "@/components/reports/pdf/MatchLoadPDF";
-import { useMatchLoadReport } from "@/api/services/reports/useReportsData";
-import { useSeasonsForFilter, useClubsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
-import { ArrowLeft, Home, Plane, Activity } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TeamMatchLoadResponse } from "@/interface/IReports";
+import { useState, useMemo } from 'react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { ExportButton } from '@/components/reports/ExportButton';
+import { ReportFilters, type FilterField } from '@/components/reports/ReportFilters';
+import { StatCard } from '@/components/reports/StatCard';
+import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
+import { DataTable, type TableColumn } from '@/components/table/DataTable';
+import { MatchLoadPDF } from '@/components/reports/pdf/MatchLoadPDF';
+import { useMatchLoadReport } from '@/api/services/reports/useReportsData';
+import {
+  useSeasonsForFilter,
+  useClubsForFilter,
+  useTeamsForFilter,
+} from '@/api/services/filters/useFilterOptions';
+import { ArrowLeft, Home, Plane, Activity } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { TeamMatchLoadResponse } from '@/interface/IReports';
 
 const tableHeaders: TableColumn[] = [
-  { title: "Equipo", key: "teamName" },
-  { title: "Club", key: "clubName" },
-  { title: "Local", key: "homeMatches", className: "w-24" },
-  { title: "Visitante", key: "awayMatches", className: "w-24" },
-  { title: "Total", key: "totalMatches", className: "w-24" },
-  { title: "% Local", key: "homePercentage", className: "w-24" },
+  { title: 'Equipo', key: 'teamName' },
+  { title: 'Club', key: 'clubName' },
+  { title: 'Local', key: 'homeMatches', className: 'w-24' },
+  { title: 'Visitante', key: 'awayMatches', className: 'w-24' },
+  { title: 'Total', key: 'totalMatches', className: 'w-24' },
+  { title: '% Local', key: 'homePercentage', className: 'w-24' },
 ];
 
 export const MatchLoadReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | boolean | undefined>
+  >({});
 
   // Fetch filter options
   const { options: clubOptions, isLoading: clubsLoading } = useClubsForFilter();
@@ -35,34 +41,37 @@ export const MatchLoadReport = () => {
   );
 
   // Dynamic filter fields with loaded options
-  const filterFields: FilterField[] = useMemo(() => [
-    {
-      key: "clubId",
-      label: "Club",
-      type: "select",
-      options: clubOptions,
-      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
-    },
-    {
-      key: "seasonId",
-      label: "Temporada",
-      type: "select",
-      options: seasonOptions,
-      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
-    },
-    {
-      key: "teamId",
-      label: "Equipo",
-      type: "select",
-      options: teamOptions,
-      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo (opcional)",
-    },
-  ], [clubOptions, clubsLoading, seasonOptions, seasonsLoading, teamOptions, teamsLoading]);
+  const filterFields: FilterField[] = useMemo(
+    () => [
+      {
+        key: 'clubId',
+        label: 'Club',
+        type: 'select',
+        options: clubOptions,
+        placeholder: clubsLoading ? 'Cargando...' : 'Seleccionar club (opcional)',
+      },
+      {
+        key: 'seasonId',
+        label: 'Temporada',
+        type: 'select',
+        options: seasonOptions,
+        placeholder: seasonsLoading ? 'Cargando...' : 'Seleccionar temporada (opcional)',
+      },
+      {
+        key: 'teamId',
+        label: 'Equipo',
+        type: 'select',
+        options: teamOptions,
+        placeholder: teamsLoading ? 'Cargando...' : 'Seleccionar equipo (opcional)',
+      },
+    ],
+    [clubOptions, clubsLoading, seasonOptions, seasonsLoading, teamOptions, teamsLoading]
+  );
 
   const { data, isLoading } = useMatchLoadReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    if (key === "clubId") {
+    if (key === 'clubId') {
       setFilters({ clubId: value });
     } else {
       setFilters((prev) => ({ ...prev, [key]: value }));
@@ -77,8 +86,8 @@ export const MatchLoadReport = () => {
   const handleApplyFilters = () => {
     const processedFilters: Record<string, string | number | boolean | undefined> = {};
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === "" || value === null || value === undefined) return;
-      if (key.endsWith("Id") && typeof value === "string") {
+      if (value === '' || value === null || value === undefined) return;
+      if (key.endsWith('Id') && typeof value === 'string') {
         processedFilters[key] = Number(value);
       } else {
         processedFilters[key] = value;
@@ -93,20 +102,23 @@ export const MatchLoadReport = () => {
   const totalHomeMatches = matchLoad.reduce((sum, team) => sum + (team.homeMatches || 0), 0);
   const totalAwayMatches = matchLoad.reduce((sum, team) => sum + (team.awayMatches || 0), 0);
   const totalMatches = totalHomeMatches + totalAwayMatches;
-  const homePercentage = totalMatches > 0 ? ((totalHomeMatches / totalMatches) * 100).toFixed(1) : "0.0";
+  const homePercentage =
+    totalMatches > 0 ? ((totalHomeMatches / totalMatches) * 100).toFixed(1) : '0.0';
 
   // Chart data
   const barChartData = matchLoad.map((team, index) => ({
-    id: `${team.teamId ?? "team"}-${team.seasonId ?? "season"}-${team.clubId ?? "club"}-${index}`,
-    name: team.teamName || "Sin nombre",
+    id: `${team.teamId ?? 'team'}-${team.seasonId ?? 'season'}-${team.clubId ?? 'club'}-${index}`,
+    name: team.teamName || 'Sin nombre',
     local: team.homeMatches || 0,
     visitante: team.awayMatches || 0,
   }));
 
   const renderRow = (team: TeamMatchLoadResponse) => {
-    const homePerc = team.totalMatches ? ((team.homeMatches || 0) / team.totalMatches * 100).toFixed(1) : "0.0";
+    const homePerc = team.totalMatches
+      ? (((team.homeMatches || 0) / team.totalMatches) * 100).toFixed(1)
+      : '0.0';
     return (
-      <tr key={`${team.teamId ?? "team"}-${team.seasonId ?? "season"}-${team.clubId ?? "club"}`}>
+      <tr key={`${team.teamId ?? 'team'}-${team.seasonId ?? 'season'}-${team.clubId ?? 'club'}`}>
         <td className="px-4 py-3 font-medium">{team.teamName}</td>
         <td className="px-4 py-3 text-gray-600">{team.clubName}</td>
         <td className="px-4 py-3 text-center font-semibold text-blue-600">
@@ -115,12 +127,8 @@ export const MatchLoadReport = () => {
         <td className="px-4 py-3 text-center font-semibold text-purple-600">
           {team.awayMatches || 0}
         </td>
-        <td className="px-4 py-3 text-center font-bold">
-          {team.totalMatches || 0}
-        </td>
-        <td className="px-4 py-3 text-center text-gray-700">
-          {homePerc}%
-        </td>
+        <td className="px-4 py-3 text-center font-bold">{team.totalMatches || 0}</td>
+        <td className="px-4 py-3 text-center text-gray-700">{homePerc}%</td>
       </tr>
     );
   };
@@ -132,10 +140,10 @@ export const MatchLoadReport = () => {
         description="Distribución de partidos de local y visitante por equipo"
         buttons={[
           {
-            text: "Volver",
+            text: 'Volver',
             icon: <ArrowLeft className="h-4 w-4" />,
-            link: "/reports",
-            variant: "outline",
+            link: '/reports',
+            variant: 'outline',
           },
         ]}
       />
@@ -171,13 +179,8 @@ export const MatchLoadReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={
-              <MatchLoadPDF
-                data={matchLoad}
-                seasonName={matchLoad[0]?.seasonName}
-              />
-            }
-            fileName={`carga-partidos-${matchLoad[0]?.seasonName || "reporte"}`}
+            document={<MatchLoadPDF data={matchLoad} seasonName={matchLoad[0]?.seasonName} />}
+            fileName={`carga-partidos-${matchLoad[0]?.seasonName || 'reporte'}`}
             disabled={matchLoad.length === 0}
           />
         </div>
@@ -192,8 +195,8 @@ export const MatchLoadReport = () => {
                 data={barChartData}
                 xKey="name"
                 bars={[
-                  { key: "local", name: "Local", color: "#3b82f6" },
-                  { key: "visitante", name: "Visitante", color: "#8b5cf6" },
+                  { key: 'local', name: 'Local', color: '#3b82f6' },
+                  { key: 'visitante', name: 'Visitante', color: '#8b5cf6' },
                 ]}
                 yAxisLabel="Número de Partidos"
                 height={400}

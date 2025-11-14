@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -6,12 +6,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { SearchComponent } from "./SearchComponent";
-import type { FilterConfig } from "./SearchComponent";
-import { cn } from "@/lib/utils";
-import { TableSkeleton } from "./TableSkeleton";
-import { EmptyState } from "./EmptyState";
+} from '@/components/ui/table';
+import { SearchComponent } from './SearchComponent';
+import type { FilterConfig } from './SearchComponent';
+import { cn } from '@/lib/utils';
+import { TableSkeleton } from './TableSkeleton';
+import { EmptyState } from './EmptyState';
 export interface TableColumn {
   title: string;
   key: string;
@@ -36,7 +36,7 @@ export function DataTable<T>({
   filters = [],
   renderRow,
   loading = false,
-  emptyMessage = "No se encontraron registros",
+  emptyMessage = 'No se encontraron registros',
   className,
   showSearch = true,
 }: DataTableProps<T>) {
@@ -47,20 +47,15 @@ export function DataTable<T>({
   const hasData = data && data.length > 0;
 
   return (
-    <div className={cn("space-y-4", className)}>
-      {showSearch && filters.length > 0 && (
-        <SearchComponent filters={filters} />
-      )}
+    <div className={cn('space-y-4', className)}>
+      {showSearch && filters.length > 0 && <SearchComponent filters={filters} />}
 
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               {headers.map((header) => (
-                <TableHead
-                  key={header.key}
-                  className={cn("font-semibold", header.className)}
-                >
+                <TableHead key={header.key} className={cn('font-semibold', header.className)}>
                   {header.title}
                 </TableHead>
               ))}

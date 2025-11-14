@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { TeamGenderForm, type INewTeamGender } from "./components/Form";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { TeamGenderForm, type INewTeamGender } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { TeamGender } from "@/interface/ITeamGender";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { TeamGender } from '@/interface/ITeamGender';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 
 interface IField {
   name: string;
@@ -22,9 +22,9 @@ export const TeamGenderUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [gender, setGender] = useState<INewTeamGender>({
-    name: "",
+    name: '',
     active: true,
   });
 
@@ -32,7 +32,7 @@ export const TeamGenderUpdateModule = () => {
   const { data: genderData, isLoading: loadingGender } = useGetList({
     key: `team-gender-${id}`,
     resource: [`team-genders/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -40,17 +40,17 @@ export const TeamGenderUpdateModule = () => {
   useEffect(() => {
     if (genderData) {
       const fetchedGender = genderData as TeamGender;
-      
+
       setGender({
         name: fetchedGender.name,
-        active: fetchedGender.active
+        active: fetchedGender.active,
       });
     }
   }, [genderData]);
 
   const resource = [`team-genders/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
-  
+  const { mutate } = useMutateService(resource, '', 'PUT');
+
   // Handle the form submit event
   const handleOnSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -59,7 +59,7 @@ export const TeamGenderUpdateModule = () => {
 
       // Validate required fields
       if (!gender.name) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -67,25 +67,22 @@ export const TeamGenderUpdateModule = () => {
       // Data for update
       const genderData = {
         name: gender.name,
-        active: gender.active
+        active: gender.active,
       };
 
       mutate(genderData, {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el team-genders",
-            );
+            toast.error(errorMessage || 'Error al actualizar el team-genders');
           } else {
-            toast.success("Team-genders actualizado exitosamente");
-            navigate("/team-genderss");
+            toast.success('Team-genders actualizado exitosamente');
+            navigate('/team-genderss');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el team-genders. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar el team-genders. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -131,8 +128,6 @@ export const TeamGenderUpdateModule = () => {
           isEdit={true}
         />
       </div>
-
-      
     </div>
   );
 };

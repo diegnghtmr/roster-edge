@@ -1,13 +1,20 @@
-import { PDFDocument, PDFSection, PDFStatCards, PDFTable, PDFBarChart, PDFPieChart } from "./PDFDocument";
-import type { PaymentMethodPerformanceResponse } from "@/interface/IReports";
+import {
+  PDFDocument,
+  PDFSection,
+  PDFStatCards,
+  PDFTable,
+  PDFBarChart,
+  PDFPieChart,
+} from './PDFDocument';
+import type { PaymentMethodPerformanceResponse } from '@/interface/IReports';
 
 interface PaymentMethodPerformancePDFProps {
   data: PaymentMethodPerformanceResponse[];
 }
 
-const currencyFormatter = new Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
+const currencyFormatter = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
   maximumFractionDigits: 0,
 });
 
@@ -15,10 +22,10 @@ const formatCurrency = (value?: number) => currencyFormatter.format(value ?? 0);
 const formatPercent = (value?: number) => `${(value ?? 0).toFixed(1)}%`;
 const formatDate = (value?: string) => {
   if (!value) {
-    return "-";
+    return '-';
   }
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString("es-CO");
+  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleDateString('es-CO');
 };
 
 export const PaymentMethodPerformancePDF = ({ data }: PaymentMethodPerformancePDFProps) => {
@@ -36,36 +43,36 @@ export const PaymentMethodPerformancePDF = ({ data }: PaymentMethodPerformancePD
   }, undefined);
 
   const stats = [
-    { label: "Ingresos netos", value: formatCurrency(totalNetRevenue) },
-    { label: "Pagos procesados", value: totalPayments },
-    { label: "Ticket promedio", value: formatCurrency(averageTicket) },
+    { label: 'Ingresos netos', value: formatCurrency(totalNetRevenue) },
+    { label: 'Pagos procesados', value: totalPayments },
+    { label: 'Ticket promedio', value: formatCurrency(averageTicket) },
   ];
 
   const barChartData = data.map((item) => ({
-    name: item.paymentMethodName ?? "Metodo",
+    name: item.paymentMethodName ?? 'Metodo',
     value: Number(item.netRevenue ?? 0),
   }));
 
   const pieChartData = data
     .filter((item) => (item.revenueSharePercentage ?? 0) > 0)
     .map((item) => ({
-      name: item.paymentMethodName ?? "Metodo",
+      name: item.paymentMethodName ?? 'Metodo',
       value: Number(item.revenueSharePercentage ?? 0),
     }));
 
   const tableHeaders = [
-    "Metodo",
-    "Pagos",
-    "Clientes",
-    "Planes",
-    "Ingresos netos",
-    "Ticket",
-    "% Revenue",
-    "% Descuento",
-    "Ultimo pago",
+    'Metodo',
+    'Pagos',
+    'Clientes',
+    'Planes',
+    'Ingresos netos',
+    'Ticket',
+    '% Revenue',
+    '% Descuento',
+    'Ultimo pago',
   ];
   const tableData = data.map((item) => [
-    item.paymentMethodName ?? "-",
+    item.paymentMethodName ?? '-',
     item.totalPayments ?? 0,
     item.uniqueCustomers ?? 0,
     item.plansCovered ?? 0,
@@ -81,8 +88,8 @@ export const PaymentMethodPerformancePDF = ({ data }: PaymentMethodPerformancePD
       title="Rendimiento por Metodo de Pago"
       subtitle={
         topMethod
-          ? `Top: ${topMethod.paymentMethodName ?? "-"} (${formatPercent(topMethod.revenueSharePercentage)})`
-          : "Resumen de comportamientos por metodo de pago"
+          ? `Top: ${topMethod.paymentMethodName ?? '-'} (${formatPercent(topMethod.revenueSharePercentage)})`
+          : 'Resumen de comportamientos por metodo de pago'
       }
     >
       <PDFSection title="Resumen General">
@@ -106,15 +113,15 @@ export const PaymentMethodPerformancePDF = ({ data }: PaymentMethodPerformancePD
       <PDFSection title="Indicadores adicionales">
         <PDFStatCards
           stats={[
-            { label: "Descuentos aplicados", value: formatCurrency(totalDiscount) },
+            { label: 'Descuentos aplicados', value: formatCurrency(totalDiscount) },
             {
-              label: "Metodo lider",
+              label: 'Metodo lider',
               value: topMethod
                 ? `${topMethod.paymentMethodName} (${formatPercent(topMethod.revenueSharePercentage)})`
-                : "-",
+                : '-',
             },
             {
-              label: "Clientes unicos",
+              label: 'Clientes unicos',
               value: data.reduce((sum, item) => sum + (item.uniqueCustomers ?? 0), 0),
             },
           ]}
@@ -123,4 +130,3 @@ export const PaymentMethodPerformancePDF = ({ data }: PaymentMethodPerformancePD
     </PDFDocument>
   );
 };
-

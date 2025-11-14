@@ -8,7 +8,14 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@features/*": ["./src/modules/*"],
+      "@components/*": ["./src/components/*"],
+      "@api/*": ["./src/api/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@i18n/*": ["./src/i18n/*"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

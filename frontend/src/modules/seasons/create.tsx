@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { SeasonForm, type INewSeason } from "./components/Form";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { SeasonForm, type INewSeason } from './components/Form';
 
 interface IField {
   name: string;
@@ -21,13 +21,13 @@ export const SeasonCreateModule = () => {
 
   const [season, setSeason] = useState<INewSeason>({
     clubId: 0,
-    name: "",
+    name: '',
     startDate: [new Date().getFullYear(), 1, 1],
     endDate: [new Date().getFullYear(), 12, 31],
     active: true,
   });
 
-  const resource = ["seasons"];
+  const resource = ['seasons'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -39,8 +39,8 @@ export const SeasonCreateModule = () => {
       // Transform data to match API expectations
       const formatDateArray = (dateArray: number[]): string => {
         const [year, month, day] = dateArray;
-        const paddedMonth = month.toString().padStart(2, "0");
-        const paddedDay = day.toString().padStart(2, "0");
+        const paddedMonth = month.toString().padStart(2, '0');
+        const paddedDay = day.toString().padStart(2, '0');
         return `${year}-${paddedMonth}-${paddedDay}`;
       };
 
@@ -56,16 +56,15 @@ export const SeasonCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear la temporada");
+            toast.error(errorMessage || 'Error al crear la temporada');
           } else {
-            toast.success("Temporada creada exitosamente");
-            navigate("/seasons");
+            toast.success('Temporada creada exitosamente');
+            navigate('/seasons');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear la temporada. Por favor, intenta nuevamente."
+            error?.message || 'Error al crear la temporada. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {

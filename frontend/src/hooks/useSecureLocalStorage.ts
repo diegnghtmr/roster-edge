@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-import StringCrypto from "string-crypto";
+import StringCrypto from 'string-crypto';
 
 const options = {
   salt: import.meta.env.VITE_SECURE_LOCAL_STORAGE_SALT,
@@ -33,12 +33,8 @@ const useSecureLocalStorage = () => {
   const getSecureLocalStorage = (key: string) => {
     // Check if there's a current value, in other case will return an empty string
     const value = localStorage.getItem(key);
-    if (value)
-      return sc.decryptString(
-        value,
-        import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD
-      );
-    return "";
+    if (value) return sc.decryptString(value, import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD);
+    return '';
   };
 
   // Remove an item from localstorage

@@ -1,16 +1,10 @@
-import React from "react";
-import useGetList from "@/api/services/getServices/useGetList";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Flame, TrendingDown } from "lucide-react";
-import type { Streak } from "@/interface/IStreak";
-import type { Team } from "@/interface/ITeam";
+import React from 'react';
+import useGetList from '@/api/services/getServices/useGetList';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Flame, TrendingDown } from 'lucide-react';
+import type { Streak } from '@/interface/IStreak';
+import type { Team } from '@/interface/ITeam';
 
 interface StreakWithTeam extends Streak {
   teamName: string;
@@ -20,20 +14,18 @@ interface StreakWithTeam extends Streak {
 
 export const StreakView: React.FC = () => {
   // Fetch streaks data
-  const { data: streaksData, isLoading: isLoadingStreaks } = useGetList<
-    Streak[]
-  >({
-    key: "streaksList",
-    resource: ["streaks"],
-    keyResults: "data",
+  const { data: streaksData, isLoading: isLoadingStreaks } = useGetList<Streak[]>({
+    key: 'streaksList',
+    resource: ['streaks'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch teams data
   const { data: teamsData, isLoading: isLoadingTeams } = useGetList<Team[]>({
-    key: "teamsList",
-    resource: ["teams"],
-    keyResults: "data",
+    key: 'teamsList',
+    resource: ['teams'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -43,9 +35,7 @@ export const StreakView: React.FC = () => {
     endDate: [number, number, number] | null
   ): number => {
     const start = new Date(startDate[0], startDate[1] - 1, startDate[2]);
-    const end = endDate
-      ? new Date(endDate[0], endDate[1] - 1, endDate[2])
-      : new Date();
+    const end = endDate ? new Date(endDate[0], endDate[1] - 1, endDate[2]) : new Date();
 
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -101,15 +91,13 @@ export const StreakView: React.FC = () => {
               <div
                 key={streak.id}
                 className={`flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-all ${
-                  streak.isActive
-                    ? "bg-green-50 border-green-200"
-                    : "bg-red-50 border-red-200"
+                  streak.isActive ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
                 }`}
               >
                 <div className="flex items-center gap-3 flex-1">
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      streak.isActive ? "bg-green-100" : "bg-red-100"
+                      streak.isActive ? 'bg-green-100' : 'bg-red-100'
                     }`}
                   >
                     {streak.isActive ? (
@@ -121,12 +109,10 @@ export const StreakView: React.FC = () => {
                   <div className="flex-1">
                     <p className="font-semibold text-base">{streak.teamName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {streak.isActive
-                        ? "Racha activa en curso"
-                        : "Racha terminada"}
+                      {streak.isActive ? 'Racha activa en curso' : 'Racha terminada'}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Inicio:{" "}
+                      Inicio:{' '}
                       {new Date(
                         streak.startDate[0],
                         streak.startDate[1] - 1,
@@ -144,16 +130,13 @@ export const StreakView: React.FC = () => {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <Badge
-                    variant={streak.isActive ? "default" : "destructive"}
+                    variant={streak.isActive ? 'default' : 'destructive'}
                     className="text-lg px-3 py-1"
                   >
-                    {streak.streakDays}{" "}
-                    {streak.streakDays === 1 ? "día" : "días"}
+                    {streak.streakDays} {streak.streakDays === 1 ? 'día' : 'días'}
                   </Badge>
                   {streak.isActive && (
-                    <span className="text-xs text-green-600 font-medium">
-                      ⚡ Activa
-                    </span>
+                    <span className="text-xs text-green-600 font-medium">⚡ Activa</span>
                   )}
                 </div>
               </div>
@@ -162,12 +145,9 @@ export const StreakView: React.FC = () => {
         ) : (
           <div className="text-center py-8">
             <Flame className="h-16 w-16 text-gray-300 mx-auto mb-3" />
-            <p className="text-base text-muted-foreground font-medium">
-              No hay rachas disponibles
-            </p>
+            <p className="text-base text-muted-foreground font-medium">No hay rachas disponibles</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Las rachas se mostrarán cuando los equipos tengan datos
-              registrados
+              Las rachas se mostrarán cuando los equipos tengan datos registrados
             </p>
           </div>
         )}

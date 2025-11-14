@@ -1,19 +1,19 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { StaffForm, type INewStaff } from "./components/Form";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { StaffForm, type INewStaff } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import type { StaffRole } from "@/interface/IStaffRole";
-import type { Team } from "@/interface/ITeam";
-import type { City } from "@/interface/ICity";
-import { Spinner } from "@/components/ui/spinner";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import type { StaffRole } from '@/interface/IStaffRole';
+import type { Team } from '@/interface/ITeam';
+import type { City } from '@/interface/ICity';
+import { Spinner } from '@/components/ui/spinner';
 
 interface IField {
   name: string;
@@ -23,46 +23,44 @@ interface IField {
 export const StaffCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [staff, setStaff] = useState<INewStaff>({
-    name: "",
-    lastName: "",
-    email: "",
-    password: "",
-    phone: "",
-    birthDate: "",
-    hireDate: "",
+    name: '',
+    lastName: '',
+    email: '',
+    password: '',
+    phone: '',
+    birthDate: '',
+    hireDate: '',
     cityId: 0,
     staffRoleId: 0,
     teamId: 0,
   });
 
-  const resource = ["staff"];
+  const resource = ['staff'];
   const { mutate } = useMutateService(resource);
 
   // Fetch cities
   const { data: cities = [], isLoading: isLoadingCities } = useGetList<City[]>({
-    key: "cities",
-    resource: ["cities"],
-    keyResults: "data",
+    key: 'cities',
+    resource: ['cities'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch staff roles
-  const { data: staffRoles = [], isLoading: isLoadingStaffRoles } = useGetList<
-    StaffRole[]
-  >({
-    key: "staff-roles",
-    resource: ["staff-roles"],
-    keyResults: "data",
+  const { data: staffRoles = [], isLoading: isLoadingStaffRoles } = useGetList<StaffRole[]>({
+    key: 'staff-roles',
+    resource: ['staff-roles'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch teams
   const { data: teams = [], isLoading: isLoadingTeams } = useGetList<Team[]>({
-    key: "teams",
-    resource: ["teams"],
-    keyResults: "data",
+    key: 'teams',
+    resource: ['teams'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -74,7 +72,7 @@ export const StaffCreateModule = () => {
 
       // Validate that required IDs are selected
       if (!staff.cityId || !staff.staffRoleId || !staff.teamId) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -97,17 +95,14 @@ export const StaffCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear el staff");
+            toast.error(errorMessage || 'Error al crear el staff');
           } else {
-            toast.success("Staff creado exitosamente");
-            navigate("/staff");
+            toast.success('Staff creado exitosamente');
+            navigate('/staff');
           }
         },
         onError: (error: Error) => {
-          toast.error(
-            error?.message ||
-              "Error al crear el staff. Por favor, intenta nuevamente.",
-          );
+          toast.error(error?.message || 'Error al crear el staff. Por favor, intenta nuevamente.');
         },
         onSettled: () => {
           setIsLoading(false);
@@ -152,8 +147,6 @@ export const StaffCreateModule = () => {
           teams={teams}
         />
       </div>
-
-      
     </div>
   );
 };

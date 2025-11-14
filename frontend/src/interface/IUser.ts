@@ -1,11 +1,7 @@
 export interface User {
   id: number;
-  createdAt:
-    | string
-    | [number, number, number, number, number, number, number];
-  updatedAt:
-    | string
-    | [number, number, number, number, number, number, number];
+  createdAt: string | [number, number, number, number, number, number, number];
+  updatedAt: string | [number, number, number, number, number, number, number];
   active: boolean;
   name: string;
   lastName?: string | null;

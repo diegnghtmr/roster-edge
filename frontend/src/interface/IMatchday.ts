@@ -7,7 +7,4 @@ export interface IMatchday {
   description: string;
 }
 
-export type MatchdayFormData = Omit<
-  IMatchday,
-  "id" | "createdAt" | "updatedAt"
->;
+export type MatchdayFormData = Omit<IMatchday, 'id' | 'createdAt' | 'updatedAt'>;

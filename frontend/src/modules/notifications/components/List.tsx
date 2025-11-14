@@ -1,72 +1,45 @@
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import useGetList from "@/api/services/getServices/useGetList";
-import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import type { FilterConfig } from "@/components/table/SearchComponent";
-import type { Notification } from "@/interface/INotification";
-import { NotificationItemList } from "./ItemList";
+import React from 'react';
+import { useResourceList } from '@shared/hooks';
+import { DataTable, type TableColumn } from '@/components/table/DataTable';
+import type { FilterConfig } from '@/components/table/SearchComponent';
+import type { Notification } from '@/interface/INotification';
+import { NotificationItemList } from './ItemList';
 
 const headers: TableColumn[] = [
-  { title: "ID", key: "id", className: "w-16" },
-  { title: "Mensaje", key: "message" },
-  { title: "Enviado", key: "sendDate" },
-  { title: "Clubes", key: "relatedClubs" },
-  { title: "Eventos", key: "relatedEvents" },
+  { title: 'ID', key: 'id', className: 'w-16' },
+  { title: 'Mensaje', key: 'message' },
+  { title: 'Enviado', key: 'sendDate' },
+  { title: 'Clubes', key: 'relatedClubs' },
+  { title: 'Eventos', key: 'relatedEvents' },
 ];
 
 const filters: FilterConfig[] = [
   {
-    key: "message",
-    label: "Mensaje",
-    type: "text",
-    placeholder: "Buscar por mensaje...",
+    key: 'message',
+    label: 'Mensaje',
+    type: 'text',
+    placeholder: 'Buscar por mensaje...',
   },
   {
-    key: "sendFrom",
-    label: "Enviado desde",
-    type: "date",
+    key: 'sendFrom',
+    label: 'Enviado desde',
+    type: 'date',
   },
   {
-    key: "sendTo",
-    label: "Enviado hasta",
-    type: "date",
+    key: 'sendTo',
+    label: 'Enviado hasta',
+    type: 'date',
   },
 ];
 
 export const NotificationsList: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const [shouldRefetch, setShouldRefetch] = useState(false);
-
-  const { data, isLoading, refetch, isFetching } = useGetList({
-    key: "notificationsList",
-    resource: ["notifications"],
-    keyResults: "data",
-    enabled: true,
-    params: searchParams,
+  // All duplicate logic extracted to reusable hook
+  const { items: notifications, isLoading } = useResourceList<Notification>({
+    resource: ['notifications'],
+    queryKey: 'notificationsList',
+    keyResults: 'data',
+    resourceName: 'notificación',
   });
-
-  // Avoid infinity loops handle manually refetch
-  useEffect(() => {
-    if (!isLoading && !isFetching && shouldRefetch) {
-      refetch();
-      setShouldRefetch(false);
-    }
-  }, [isLoading, isFetching, refetch, shouldRefetch]);
-
-  // Detect changes in searchparams to do the refetch
-  useEffect(() => {
-    setShouldRefetch(true);
-  }, [searchParams]);
-
-  // Ensure data is properly typed as Notification array
-  const notifications: Notification[] = React.useMemo(() => {
-    if (!data) return [];
-    if (Array.isArray(data)) {
-      return data;
-    }
-    console.warn("Unexpected data structure:", data);
-    return [];
-  }, [data]);
 
   // Render function for each row
   const renderRow = (notification: Notification) => (
@@ -74,7 +47,11 @@ export const NotificationsList: React.FC = () => {
   );
 
   return (
-    <div className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4">
+    <div
+      className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4"
+      role="region"
+      aria-label="Lista de notificaciones"
+    >
       <DataTable
         data={notifications}
         headers={headers}
@@ -83,6 +60,7 @@ export const NotificationsList: React.FC = () => {
         loading={isLoading}
         emptyMessage="No se encontraron notificaciones"
         className="mt-6"
+        aria-label="Tabla de notificaciones"
       />
     </div>
   );

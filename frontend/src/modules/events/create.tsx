@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { EventForm, type INewEvent } from "./components/Form";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { EventForm, type INewEvent } from './components/Form';
 
 interface IField {
   name: string;
@@ -22,17 +22,13 @@ export const EventCreateModule = () => {
   const [event, setEvent] = useState<INewEvent>({
     seasonId: 0,
     venueId: 0,
-    name: "",
-    description: "",
-    date: [
-      new Date().getFullYear(),
-      new Date().getMonth() + 1,
-      new Date().getDate(),
-    ],
+    name: '',
+    description: '',
+    date: [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()],
     active: true,
   });
 
-  const resource = ["events"];
+  const resource = ['events'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -44,8 +40,8 @@ export const EventCreateModule = () => {
       // Transform data to match API expectations
       const formatDateArray = (dateArray: number[]): string => {
         const [year, month, day] = dateArray;
-        const paddedMonth = month.toString().padStart(2, "0");
-        const paddedDay = day.toString().padStart(2, "0");
+        const paddedMonth = month.toString().padStart(2, '0');
+        const paddedDay = day.toString().padStart(2, '0');
         return `${year}-${paddedMonth}-${paddedDay}`;
       };
 
@@ -62,17 +58,14 @@ export const EventCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear el evento");
+            toast.error(errorMessage || 'Error al crear el evento');
           } else {
-            toast.success("Evento creado exitosamente");
-            navigate("/events");
+            toast.success('Evento creado exitosamente');
+            navigate('/events');
           }
         },
         onError: (error: Error) => {
-          toast.error(
-            error?.message ||
-              "Error al crear el evento. Por favor, intenta nuevamente."
-          );
+          toast.error(error?.message || 'Error al crear el evento. Por favor, intenta nuevamente.');
         },
         onSettled: () => {
           setIsLoading(false);

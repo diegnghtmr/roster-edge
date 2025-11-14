@@ -1,18 +1,18 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import useGetList from "@/api/services/getServices/useGetList";
-import type { IStadium } from "@/interface/IStadium";
-import type { IMatchday } from "@/interface/IMatchday";
-import type { IEvent } from "@/interface/IEvent";
-import type { Team } from "@/interface/ITeam";
+} from '@/components/ui/select';
+import useGetList from '@/api/services/getServices/useGetList';
+import type { IStadium } from '@/interface/IStadium';
+import type { IMatchday } from '@/interface/IMatchday';
+import type { IEvent } from '@/interface/IEvent';
+import type { Team } from '@/interface/ITeam';
 
 export interface INewMatch {
   matchdayId: number;
@@ -45,37 +45,33 @@ export const MatchForm: React.FC<MatchFormProps> = ({
   isLoading,
 }) => {
   // Fetch stadiums for the dropdown
-  const { data: stadiums = [], isLoading: stadiumsLoading } = useGetList<
-    IStadium[]
-  >({
-    key: "stadiums",
-    resource: ["stadiums"],
-    keyResults: "data",
+  const { data: stadiums = [], isLoading: stadiumsLoading } = useGetList<IStadium[]>({
+    key: 'stadiums',
+    resource: ['stadiums'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch matchdays for the dropdown
-  const { data: matchdays = [], isLoading: matchdaysLoading } = useGetList<
-    IMatchday[]
-  >({
-    key: "matchdays",
-    resource: ["matchdays"],
-    keyResults: "data",
+  const { data: matchdays = [], isLoading: matchdaysLoading } = useGetList<IMatchday[]>({
+    key: 'matchdays',
+    resource: ['matchdays'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch events for the dropdown
   const { data: events = [], isLoading: eventsLoading } = useGetList<IEvent[]>({
-    key: "events",
-    resource: ["events"],
-    keyResults: "data",
+    key: 'events',
+    resource: ['events'],
+    keyResults: 'data',
     enabled: true,
   });
 
   const { data: teams = [], isLoading: teamsLoading } = useGetList<Team[]>({
-    key: "teams",
-    resource: ["teams"],
-    keyResults: "data",
+    key: 'teams',
+    resource: ['teams'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -88,39 +84,32 @@ export const MatchForm: React.FC<MatchFormProps> = ({
   // Format the date array to a string for the date input
   const formatDateArray = (dateArray: number[]): string => {
     if (!dateArray || dateArray.length !== 3) {
-      return "";
+      return '';
     }
     const [year, month, day] = dateArray;
     // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, "0");
-    const paddedDay = day.toString().padStart(2, "0");
+    const paddedMonth = month.toString().padStart(2, '0');
+    const paddedDay = day.toString().padStart(2, '0');
     return `${year}-${paddedMonth}-${paddedDay}`;
   };
 
   // Parse time string (HH:MM) to array format [hour, minute]
   const parseTimeToArray = (timeString: string): number[] => {
-    const [hour, minute] = timeString
-      .split(":")
-      .map((num) => parseInt(num, 10));
+    const [hour, minute] = timeString.split(':').map((num) => parseInt(num, 10));
     return [hour, minute];
   };
 
   // Format time array [hour, minute] to string "HH:MM"
   const formatTimeArray = (timeArray: number[]): string => {
     if (!timeArray || timeArray.length !== 2) {
-      return "";
+      return '';
     }
     const [hour, minute] = timeArray;
-    return `${hour.toString().padStart(2, "0")}:${minute
-      .toString()
-      .padStart(2, "0")}`;
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="date" className="text-sm font-medium text-gray-700">
           Fecha del Partido
@@ -132,7 +121,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           value={formatDateArray(match.date)}
           onChange={(e) =>
             onChangeValue({
-              name: "date",
+              name: 'date',
               value: parseDateToArray(e.target.value),
             })
           }
@@ -141,10 +130,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="startTime"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="startTime" className="text-sm font-medium text-gray-700">
           Hora de Inicio
         </label>
         <Input
@@ -154,7 +140,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           value={formatTimeArray(match.startTime)}
           onChange={(e) =>
             onChangeValue({
-              name: "startTime",
+              name: 'startTime',
               value: parseTimeToArray(e.target.value),
             })
           }
@@ -173,7 +159,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           value={formatTimeArray(match.endTime)}
           onChange={(e) =>
             onChangeValue({
-              name: "endTime",
+              name: 'endTime',
               value: parseTimeToArray(e.target.value),
             })
           }
@@ -182,17 +168,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="stadiumId"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="stadiumId" className="text-sm font-medium text-gray-700">
           Estadio
         </label>
         <Select
           value={match.stadiumId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "stadiumId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'stadiumId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un estadio" />
@@ -214,17 +195,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="matchdayId"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="matchdayId" className="text-sm font-medium text-gray-700">
           Jornada
         </label>
         <Select
           value={match.matchdayId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "matchdayId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'matchdayId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione una jornada" />
@@ -251,9 +227,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
         </label>
         <Select
           value={match.eventId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "eventId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'eventId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un evento" />
@@ -275,16 +249,13 @@ export const MatchForm: React.FC<MatchFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="homeTeamId"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="homeTeamId" className="text-sm font-medium text-gray-700">
           Equipo local
         </label>
         <Select
           value={match.homeTeamId ? match.homeTeamId.toString() : undefined}
           onValueChange={(value) =>
-            onChangeValue({ name: "homeTeamId", value: parseInt(value, 10) })
+            onChangeValue({ name: 'homeTeamId', value: parseInt(value, 10) })
           }
         >
           <SelectTrigger className="w-full">
@@ -299,7 +270,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
               (teams as Team[]).map((team) => (
                 <SelectItem key={team.id} value={team.id.toString()}>
                   {team.name}
-                  {team.clubName ? ` - ${team.clubName}` : ""}
+                  {team.clubName ? ` - ${team.clubName}` : ''}
                 </SelectItem>
               ))
             )}
@@ -308,16 +279,13 @@ export const MatchForm: React.FC<MatchFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="awayTeamId"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="awayTeamId" className="text-sm font-medium text-gray-700">
           Equipo visitante
         </label>
         <Select
           value={match.awayTeamId ? match.awayTeamId.toString() : undefined}
           onValueChange={(value) =>
-            onChangeValue({ name: "awayTeamId", value: parseInt(value, 10) })
+            onChangeValue({ name: 'awayTeamId', value: parseInt(value, 10) })
           }
         >
           <SelectTrigger className="w-full">
@@ -333,12 +301,10 @@ export const MatchForm: React.FC<MatchFormProps> = ({
                 <SelectItem
                   key={team.id}
                   value={team.id.toString()}
-                  disabled={
-                    match.homeTeamId != null && team.id === match.homeTeamId
-                  }
+                  disabled={match.homeTeamId != null && team.id === match.homeTeamId}
                 >
                   {team.name}
-                  {team.clubName ? ` - ${team.clubName}` : ""}
+                  {team.clubName ? ` - ${team.clubName}` : ''}
                 </SelectItem>
               ))
             )}
@@ -358,10 +324,8 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           Estado
         </label>
         <Select
-          value={match.active ? "true" : "false"}
-          onValueChange={(value) =>
-            onChangeValue({ name: "active", value: value === "true" })
-          }
+          value={match.active ? 'true' : 'false'}
+          onValueChange={(value) => onChangeValue({ name: 'active', value: value === 'true' })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione el estado" />
@@ -375,7 +339,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

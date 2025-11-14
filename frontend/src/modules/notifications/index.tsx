@@ -1,5 +1,5 @@
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { NotificationsList } from "./components/List";
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { NotificationsList } from './components/List';
 
 export const NotificationsModule = () => {
   return (

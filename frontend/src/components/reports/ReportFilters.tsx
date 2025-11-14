@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Filter, X } from "lucide-react";
-import { useState } from "react";
+import { Button } from '@/components/ui/button';
+import { Filter, X } from 'lucide-react';
+import { useState } from 'react';
 
 export interface FilterField {
   key: string;
   label: string;
-  type: "select" | "number" | "date" | "checkbox";
+  type: 'select' | 'number' | 'date' | 'checkbox';
   options?: { value: string | number; label: string }[];
   placeholder?: string;
 }
@@ -28,7 +28,7 @@ export const ReportFilters = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const hasActiveFilters = Object.values(filters).some(
-    (value) => value !== undefined && value !== null && value !== ""
+    (value) => value !== undefined && value !== null && value !== ''
   );
 
   return (
@@ -43,12 +43,8 @@ export const ReportFilters = ({
             </span>
           )}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          {isExpanded ? "Ocultar" : "Mostrar"}
+        <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+          {isExpanded ? 'Ocultar' : 'Mostrar'}
         </Button>
       </div>
 
@@ -57,18 +53,14 @@ export const ReportFilters = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {fields.map((field) => (
               <div key={field.key} className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  {field.label}
-                </label>
-                {field.type === "select" && field.options && (
+                <label className="text-sm font-medium text-gray-700">{field.label}</label>
+                {field.type === 'select' && field.options && (
                   <select
-                    value={String(filters[field.key] || "")}
+                    value={String(filters[field.key] || '')}
                     onChange={(e) => onFilterChange(field.key, e.target.value)}
                     className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">
-                      {field.placeholder || "Seleccionar..."}
-                    </option>
+                    <option value="">{field.placeholder || 'Seleccionar...'}</option>
                     {field.options.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -76,31 +68,31 @@ export const ReportFilters = ({
                     ))}
                   </select>
                 )}
-                {field.type === "number" && (
+                {field.type === 'number' && (
                   <input
                     type="number"
-                    value={String(filters[field.key] || "")}
-                    onChange={(e) => onFilterChange(field.key, Number(e.target.value) || e.target.value)}
+                    value={String(filters[field.key] || '')}
+                    onChange={(e) =>
+                      onFilterChange(field.key, Number(e.target.value) || e.target.value)
+                    }
                     placeholder={field.placeholder}
                     className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 )}
-                {field.type === "date" && (
+                {field.type === 'date' && (
                   <input
                     type="date"
-                    value={String(filters[field.key] || "")}
+                    value={String(filters[field.key] || '')}
                     onChange={(e) => onFilterChange(field.key, e.target.value)}
                     className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 )}
-                {field.type === "checkbox" && (
+                {field.type === 'checkbox' && (
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={Boolean(filters[field.key])}
-                      onChange={(e) =>
-                        onFilterChange(field.key, e.target.checked)
-                      }
+                      onChange={(e) => onFilterChange(field.key, e.target.checked)}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <span className="text-sm text-gray-700">
@@ -117,11 +109,7 @@ export const ReportFilters = ({
               Aplicar filtros
             </Button>
             {hasActiveFilters && (
-              <Button
-                onClick={onClearFilters}
-                variant="outline"
-                size="sm"
-              >
+              <Button onClick={onClearFilters} variant="outline" size="sm">
                 <X className="h-4 w-4" />
                 Limpiar
               </Button>

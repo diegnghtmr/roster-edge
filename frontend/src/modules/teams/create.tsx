@@ -1,18 +1,18 @@
-import useGetList from "@/api/services/getServices/useGetList";
+import useGetList from '@/api/services/getServices/useGetList';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Spinner } from "@/components/ui/spinner";
-import type { Club } from "@/interface/IClub";
-import type { TeamCategory } from "@/interface/ITeamCategory";
-import { BookmarkCheck } from "lucide-react";
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { TeamForm, type INewTeam } from "./components/Form";
+} from '@/api/services/useMutation';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Spinner } from '@/components/ui/spinner';
+import type { Club } from '@/interface/IClub';
+import type { TeamCategory } from '@/interface/ITeamCategory';
+import { BookmarkCheck } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { TeamForm, type INewTeam } from './components/Form';
 
 interface IField {
   name: string;
@@ -22,34 +22,32 @@ interface IField {
 export const TeamCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [team, setTeam] = useState<INewTeam>({
-    name: "",
-    mascot: "",
-    foundation: "",
+    name: '',
+    mascot: '',
+    foundation: '',
     genderId: 0,
     categoryId: 0,
     clubId: 0,
   });
 
-  const resource = ["teams"];
+  const resource = ['teams'];
   const { mutate } = useMutateService(resource);
 
   // Fetch categories
-  const { data: categories = [], isLoading: isLoadingCategories } = useGetList<
-    TeamCategory[]
-  >({
-    key: "team-categories",
-    resource: ["team-categories"],
-    keyResults: "data",
+  const { data: categories = [], isLoading: isLoadingCategories } = useGetList<TeamCategory[]>({
+    key: 'team-categories',
+    resource: ['team-categories'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch clubs
   const { data: clubs = [], isLoading: isLoadingClubs } = useGetList<Club[]>({
-    key: "clubs",
-    resource: ["clubs"],
-    keyResults: "data",
+    key: 'clubs',
+    resource: ['clubs'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -61,7 +59,7 @@ export const TeamCreateModule = () => {
 
       // Validate that required IDs are selected
       if (!team.genderId || !team.categoryId || !team.clubId) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -80,17 +78,14 @@ export const TeamCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear el teams");
+            toast.error(errorMessage || 'Error al crear el teams');
           } else {
-            toast.success("Teams creado exitosamente");
-            navigate("/teams");
+            toast.success('Teams creado exitosamente');
+            navigate('/teams');
           }
         },
         onError: (error: Error) => {
-          toast.error(
-            error?.message ||
-              "Error al crear el teams. Por favor, intenta nuevamente.",
-          );
+          toast.error(error?.message || 'Error al crear el teams. Por favor, intenta nuevamente.');
         },
         onSettled: () => {
           setIsLoading(false);
@@ -134,8 +129,6 @@ export const TeamCreateModule = () => {
           clubs={clubs}
         />
       </div>
-
-      
     </div>
   );
 };

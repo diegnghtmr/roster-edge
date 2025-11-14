@@ -1,52 +1,57 @@
-import { useState, useMemo } from "react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { ExportButton } from "@/components/reports/ExportButton";
-import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
-import { StatCard } from "@/components/reports/StatCard";
-import { LineChartComponent } from "@/components/reports/charts/LineChartComponent";
-import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import { PointsProgressPDF } from "@/components/reports/pdf/PointsProgressPDF";
-import { usePointsProgressReport } from "@/api/services/reports/useReportsData";
-import { useSeasonsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
-import { ArrowLeft, TrendingUp, Trophy, Target } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TeamPointsProgressResponse } from "@/interface/IReports";
+import { useState, useMemo } from 'react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { ExportButton } from '@/components/reports/ExportButton';
+import { ReportFilters, type FilterField } from '@/components/reports/ReportFilters';
+import { StatCard } from '@/components/reports/StatCard';
+import { LineChartComponent } from '@/components/reports/charts/LineChartComponent';
+import { DataTable, type TableColumn } from '@/components/table/DataTable';
+import { PointsProgressPDF } from '@/components/reports/pdf/PointsProgressPDF';
+import { usePointsProgressReport } from '@/api/services/reports/useReportsData';
+import { useSeasonsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
+import { ArrowLeft, TrendingUp, Trophy, Target } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { TeamPointsProgressResponse } from '@/interface/IReports';
 
 const tableHeaders: TableColumn[] = [
-  { title: "Jornada", key: "matchdayName" },
-  { title: "Fecha", key: "matchDate", className: "w-32" },
-  { title: "GF", key: "goalsFor", className: "w-16" },
-  { title: "GC", key: "goalsAgainst", className: "w-16" },
-  { title: "DG", key: "goalDifference", className: "w-16" },
-  { title: "Pts Ganados", key: "pointsEarned", className: "w-24" },
-  { title: "Pts Acumulados", key: "cumulativePoints", className: "w-28" },
+  { title: 'Jornada', key: 'matchdayName' },
+  { title: 'Fecha', key: 'matchDate', className: 'w-32' },
+  { title: 'GF', key: 'goalsFor', className: 'w-16' },
+  { title: 'GC', key: 'goalsAgainst', className: 'w-16' },
+  { title: 'DG', key: 'goalDifference', className: 'w-16' },
+  { title: 'Pts Ganados', key: 'pointsEarned', className: 'w-24' },
+  { title: 'Pts Acumulados', key: 'cumulativePoints', className: 'w-28' },
 ];
 
 export const PointsProgressReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | boolean | undefined>
+  >({});
 
   // Fetch filter options
   const { options: teamOptions, isLoading: teamsLoading } = useTeamsForFilter();
   const { options: seasonOptions, isLoading: seasonsLoading } = useSeasonsForFilter();
 
   // Dynamic filter fields with loaded options
-  const filterFields: FilterField[] = useMemo(() => [
-    {
-      key: "teamId",
-      label: "Equipo (Requerido)",
-      type: "select",
-      options: teamOptions,
-      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo",
-    },
-    {
-      key: "seasonId",
-      label: "Temporada",
-      type: "select",
-      options: seasonOptions,
-      placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
-    },
-  ], [teamOptions, teamsLoading, seasonOptions, seasonsLoading]);
+  const filterFields: FilterField[] = useMemo(
+    () => [
+      {
+        key: 'teamId',
+        label: 'Equipo (Requerido)',
+        type: 'select',
+        options: teamOptions,
+        placeholder: teamsLoading ? 'Cargando...' : 'Seleccionar equipo',
+      },
+      {
+        key: 'seasonId',
+        label: 'Temporada',
+        type: 'select',
+        options: seasonOptions,
+        placeholder: seasonsLoading ? 'Cargando...' : 'Seleccionar temporada (opcional)',
+      },
+    ],
+    [teamOptions, teamsLoading, seasonOptions, seasonsLoading]
+  );
 
   const { data, isLoading } = usePointsProgressReport(appliedFilters, true);
 
@@ -63,8 +68,8 @@ export const PointsProgressReport = () => {
     // Convert string IDs to numbers for API
     const processedFilters: Record<string, string | number | boolean | undefined> = {};
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === "" || value === null || value === undefined) return;
-      if (key.endsWith("Id") && typeof value === "string") {
+      if (value === '' || value === null || value === undefined) return;
+      if (key.endsWith('Id') && typeof value === 'string') {
         processedFilters[key] = Number(value);
       } else {
         processedFilters[key] = value;
@@ -76,35 +81,34 @@ export const PointsProgressReport = () => {
   const progress = (data || []) as TeamPointsProgressResponse[];
 
   // Calculate stats
-  const totalPoints = progress.length > 0 ? progress[progress.length - 1]?.cumulativePoints || 0 : 0;
+  const totalPoints =
+    progress.length > 0 ? progress[progress.length - 1]?.cumulativePoints || 0 : 0;
   const totalMatches = progress.length;
-  const avgPointsPerMatch = totalMatches > 0 ? (totalPoints / totalMatches).toFixed(2) : "0.00";
+  const avgPointsPerMatch = totalMatches > 0 ? (totalPoints / totalMatches).toFixed(2) : '0.00';
 
   // Chart data
   const chartData = progress.map((match, index) => ({
-    id: `${match.matchId ?? "match"}-${match.seasonId ?? "season"}-${match.teamId ?? "team"}-${index}`,
+    id: `${match.matchId ?? 'match'}-${match.seasonId ?? 'season'}-${match.teamId ?? 'team'}-${index}`,
     name: match.matchdayName || `J${match.matchNumber || index + 1}`,
     puntos: match.cumulativePoints || 0,
-    fecha: match.matchDate || "",
+    fecha: match.matchDate || '',
   }));
 
   const renderRow = (match: TeamPointsProgressResponse, index: number) => (
-    <tr key={`${match.matchId ?? "match"}-${match.seasonId ?? "season"}-${match.teamId ?? "team"}-${index}`}>
+    <tr
+      key={`${match.matchId ?? 'match'}-${match.seasonId ?? 'season'}-${match.teamId ?? 'team'}-${index}`}
+    >
       <td className="px-4 py-3">{match.matchdayName || `Jornada ${match.matchNumber}`}</td>
       <td className="px-4 py-3 text-gray-600">{match.matchDate}</td>
-      <td className="px-4 py-3 text-center text-green-600 font-medium">
-        {match.goalsFor || 0}
-      </td>
-      <td className="px-4 py-3 text-center text-red-600 font-medium">
-        {match.goalsAgainst || 0}
-      </td>
+      <td className="px-4 py-3 text-center text-green-600 font-medium">{match.goalsFor || 0}</td>
+      <td className="px-4 py-3 text-center text-red-600 font-medium">{match.goalsAgainst || 0}</td>
       <td
         className={`px-4 py-3 text-center font-medium ${
           (match.goalDifference || 0) > 0
-            ? "text-green-600"
+            ? 'text-green-600'
             : (match.goalDifference || 0) < 0
-            ? "text-red-600"
-            : "text-gray-600"
+              ? 'text-red-600'
+              : 'text-gray-600'
         }`}
       >
         {match.goalDifference || 0}
@@ -125,10 +129,10 @@ export const PointsProgressReport = () => {
         description="Evolución de puntos acumulados a lo largo de la temporada"
         buttons={[
           {
-            text: "Volver",
+            text: 'Volver',
             icon: <ArrowLeft className="h-4 w-4" />,
-            link: "/reports",
-            variant: "outline",
+            link: '/reports',
+            variant: 'outline',
           },
         ]}
       />
@@ -163,13 +167,8 @@ export const PointsProgressReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={
-              <PointsProgressPDF
-                data={progress}
-                teamName={progress[0]?.teamName}
-              />
-            }
-            fileName={`progreso-puntos-${progress[0]?.teamName || "reporte"}`}
+            document={<PointsProgressPDF data={progress} teamName={progress[0]?.teamName} />}
+            fileName={`progreso-puntos-${progress[0]?.teamName || 'reporte'}`}
             disabled={progress.length === 0}
           />
         </div>
@@ -179,17 +178,15 @@ export const PointsProgressReport = () => {
             <CardHeader>
               <CardTitle>Evolución de Puntos Acumulados</CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Este gráfico muestra cómo se acumulan los puntos del equipo jornada tras jornada.
-                La línea ascendente indica el total de puntos acumulados a lo largo de la temporada.
+                Este gráfico muestra cómo se acumulan los puntos del equipo jornada tras jornada. La
+                línea ascendente indica el total de puntos acumulados a lo largo de la temporada.
               </p>
             </CardHeader>
             <CardContent>
               <LineChartComponent
                 data={chartData}
                 xKey="name"
-                lines={[
-                  { key: "puntos", name: "Puntos Acumulados", color: "#8b5cf6" },
-                ]}
+                lines={[{ key: 'puntos', name: 'Puntos Acumulados', color: '#8b5cf6' }]}
                 yAxisLabel="Puntos Totales"
                 xAxisLabel="Jornadas"
               />

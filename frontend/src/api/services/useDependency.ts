@@ -1,12 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
-import type { UseMutationResult } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { fetchGet } from "../endPoints/fetchGet.ts";
-import useUserStore from "@/storage/storeUser.ts";
-import { toast } from "sonner";
+import { useMutation } from '@tanstack/react-query';
+import type { UseMutationResult } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { fetchGet } from '../endPoints/fetchGet.ts';
+import useUserStore from '@/storage/storeUser.ts';
+import { toast } from 'sonner';
 
 export const useDependencyService = (
-  resource: string[],
+  resource: string[]
 ): UseMutationResult<unknown, Error, string> => {
   const { clearUser } = useUserStore();
   const navigate = useNavigate();
@@ -14,20 +14,20 @@ export const useDependencyService = (
   const handleError = (error: string) => {
     const lowerError = error.toLowerCase();
     const isTokenError =
-      lowerError.includes("token") ||
-      lowerError.includes("signature") ||
-      lowerError.includes("expired") ||
-      lowerError.includes("unauthorized") ||
-      lowerError.includes("no autorizado") ||
-      lowerError.includes("authentication") ||
-      lowerError.includes("auth") ||
-      lowerError.includes("jwt") ||
-      lowerError.includes("session");
+      lowerError.includes('token') ||
+      lowerError.includes('signature') ||
+      lowerError.includes('expired') ||
+      lowerError.includes('unauthorized') ||
+      lowerError.includes('no autorizado') ||
+      lowerError.includes('authentication') ||
+      lowerError.includes('auth') ||
+      lowerError.includes('jwt') ||
+      lowerError.includes('session');
 
     if (isTokenError) {
       clearUser();
-      toast.error("Sesión expirada. Por favor, inicia sesión nuevamente.");
-      navigate("/login?error=session");
+      toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      navigate('/login?error=session');
     }
   };
   const response = useMutation<unknown, Error, string>({
@@ -38,7 +38,7 @@ export const useDependencyService = (
   });
 
   if (response.data) {
-    if (response.data?.error && typeof response.data?.error === "string") {
+    if (response.data?.error && typeof response.data?.error === 'string') {
       handleError(response.data.error);
     }
   }

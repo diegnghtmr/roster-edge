@@ -1,15 +1,15 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { TeamCategory } from "@/interface/ITeamCategory";
-import type { Club } from "@/interface/IClub";
+} from '@/components/ui/select';
+import type { TeamCategory } from '@/interface/ITeamCategory';
+import type { Club } from '@/interface/IClub';
 
 export interface INewTeam {
   name: string;
@@ -49,9 +49,9 @@ export const TeamForm: React.FC<TeamFormProps> = ({
 }) => {
   // Gender options (constant)
   const genderOptions: IGenderOption[] = [
-    { id: 1, name: "MALE" },
-    { id: 2, name: "FEMALE" },
-    { id: 3, name: "MIXED" },
+    { id: 1, name: 'MALE' },
+    { id: 2, name: 'FEMALE' },
+    { id: 3, name: 'MIXED' },
   ];
 
   return (
@@ -68,9 +68,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({
           name="name"
           type="text"
           value={team.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ingrese el nombre del equipo"
           required
         />
@@ -85,19 +83,14 @@ export const TeamForm: React.FC<TeamFormProps> = ({
           name="mascot"
           type="text"
           value={team.mascot}
-          onChange={(e) =>
-            onChangeValue({ name: "mascot", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'mascot', value: e.target.value })}
           placeholder="Ingrese la mascota del equipo"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="foundation"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="foundation" className="text-sm font-medium text-gray-700">
           Fecha de fundación
         </label>
         <Input
@@ -105,9 +98,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({
           name="foundation"
           type="date"
           value={team.foundation}
-          onChange={(e) =>
-            onChangeValue({ name: "foundation", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'foundation', value: e.target.value })}
           required
         />
       </div>
@@ -118,9 +109,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({
         </label>
         <Select
           value={team.genderId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "genderId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'genderId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un género" />
@@ -136,17 +125,12 @@ export const TeamForm: React.FC<TeamFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="categoryId"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="categoryId" className="text-sm font-medium text-gray-700">
           Categoría
         </label>
         <Select
           value={team.categoryId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "categoryId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'categoryId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione una categoría" />
@@ -167,9 +151,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({
         </label>
         <Select
           value={team.clubId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "clubId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'clubId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un club" />
@@ -186,7 +168,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2 xl:col-span-3">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

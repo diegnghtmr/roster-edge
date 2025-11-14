@@ -1,5 +1,5 @@
-import { Document, Page, Text, View, StyleSheet, Canvas } from "@react-pdf/renderer";
-import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING, PDF_RADIUS } from "@/constants/reportColors";
+import { Document, Page, Text, View, StyleSheet, Canvas } from '@react-pdf/renderer';
+import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING, PDF_RADIUS } from '@/constants/reportColors';
 
 const styles = StyleSheet.create({
   page: {
@@ -52,18 +52,18 @@ const styles = StyleSheet.create({
     borderBottom: `1 solid ${REPORT_COLORS.neutral.gray200}`,
   },
   table: {
-    width: "100%",
+    width: '100%',
     borderWidth: 1,
     borderColor: REPORT_COLORS.pdf.tableBorder,
     borderRadius: PDF_RADIUS.sm,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   tableRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: REPORT_COLORS.pdf.tableBorder,
     minHeight: 32,
-    alignItems: "center",
+    alignItems: 'center',
   },
   tableHeader: {
     backgroundColor: REPORT_COLORS.pdf.tableHeaderBg,
@@ -88,11 +88,11 @@ const styles = StyleSheet.create({
     backgroundColor: REPORT_COLORS.neutral.gray50,
   },
   footer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 30,
     left: 40,
     right: 40,
-    textAlign: "center",
+    textAlign: 'center',
     color: REPORT_COLORS.pdf.footerText,
     fontSize: PDF_TYPOGRAPHY.fontSize.tiny,
     borderTop: `1 solid ${REPORT_COLORS.neutral.gray200}`,
@@ -100,13 +100,13 @@ const styles = StyleSheet.create({
     fontFamily: PDF_TYPOGRAPHY.fontFamily.oblique,
   },
   statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     marginBottom: PDF_SPACING.md,
     gap: PDF_SPACING.sm,
   },
   statCard: {
-    flexBasis: "30%",
+    flexBasis: '30%',
     padding: PDF_SPACING.md,
     backgroundColor: REPORT_COLORS.pdf.sectionBg,
     borderWidth: 1,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     fontSize: PDF_TYPOGRAPHY.fontSize.small,
     color: REPORT_COLORS.neutral.gray600,
     marginBottom: PDF_SPACING.xs,
-    textTransform: "uppercase",
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   statValue: {
@@ -143,15 +143,15 @@ interface PDFDocumentProps {
 }
 
 export const PDFDocument = ({ title, subtitle, children }: PDFDocumentProps) => {
-  const currentDate = new Date().toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  const currentDate = new Date().toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 
-  const currentTime = new Date().toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
+  const currentTime = new Date().toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
   });
 
   return (
@@ -160,12 +160,12 @@ export const PDFDocument = ({ title, subtitle, children }: PDFDocumentProps) => 
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
-          <Text style={styles.metaInfo}>Generado el {currentDate} a las {currentTime}</Text>
+          <Text style={styles.metaInfo}>
+            Generado el {currentDate} a las {currentTime}
+          </Text>
         </View>
         {children}
-        <Text style={styles.footer}>
-          RosterEdge - Sistema de Gestión Deportiva | {currentDate}
-        </Text>
+        <Text style={styles.footer}>RosterEdge - Sistema de Gestión Deportiva | {currentDate}</Text>
       </Page>
     </Document>
   );
@@ -229,7 +229,7 @@ interface PDFBarChartProps {
 }
 
 export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => {
-  const maxValue = Math.max(...data.map(d => d.value));
+  const maxValue = Math.max(...data.map((d) => d.value));
 
   return (
     <View style={styles.chartContainer}>
@@ -243,7 +243,7 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
 
           // Draw background grid lines
           for (let i = 0; i <= 4; i++) {
-            const y = padding/2 + (chartHeight * i) / 4;
+            const y = padding / 2 + (chartHeight * i) / 4;
             painter
               .strokeColor(REPORT_COLORS.neutral.gray200)
               .lineWidth(0.5)
@@ -256,7 +256,7 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
           data.forEach((item, index) => {
             const barHeight = (item.value / maxValue) * chartHeight;
             const x = index * barWidth;
-            const y = availableHeight - barHeight - padding/2;
+            const y = availableHeight - barHeight - padding / 2;
 
             // Draw gradient-like bar with shadow effect (red theme)
             painter
@@ -287,7 +287,7 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
               .text(
                 item.name.length > 10 ? item.name.substring(0, 10) + '...' : item.name,
                 x,
-                availableHeight - padding/2 + 5,
+                availableHeight - padding / 2 + 5,
                 {
                   width: barWidth,
                   align: 'center',
@@ -299,8 +299,8 @@ export const PDFBarChart = ({ data, title, height = 200 }: PDFBarChartProps) => 
           painter
             .strokeColor(REPORT_COLORS.neutral.gray400)
             .lineWidth(1.5)
-            .moveTo(0, availableHeight - padding/2)
-            .lineTo(availableWidth, availableHeight - padding/2)
+            .moveTo(0, availableHeight - padding / 2)
+            .lineTo(availableWidth, availableHeight - padding / 2)
             .stroke();
 
           return null;
@@ -320,9 +320,7 @@ interface PDFMultiBarChartProps {
 export const PDFMultiBarChart = ({ data, bars, title, height = 200 }: PDFMultiBarChartProps) => {
   // Find max value across all bars
   const maxValue = Math.max(
-    ...data.flatMap(item =>
-      bars.map(bar => Number(item[bar.key]) || 0)
-    )
+    ...data.flatMap((item) => bars.map((bar) => Number(item[bar.key]) || 0))
   );
 
   return (
@@ -342,7 +340,7 @@ export const PDFMultiBarChart = ({ data, bars, title, height = 200 }: PDFMultiBa
               const value = Number(item[bar.key]) || 0;
               const barHeight = (value / maxValue) * chartHeight;
               const x = dataIndex * groupWidth + barIndex * barWidth + barWidth * 0.1;
-              const y = availableHeight - barHeight - padding/2;
+              const y = availableHeight - barHeight - padding / 2;
 
               // Draw bar
               painter
@@ -367,9 +365,11 @@ export const PDFMultiBarChart = ({ data, bars, title, height = 200 }: PDFMultiBa
               .fillColor('#6b7280')
               .fontSize(7)
               .text(
-                String(item.name).length > 8 ? String(item.name).substring(0, 8) + '...' : String(item.name),
+                String(item.name).length > 8
+                  ? String(item.name).substring(0, 8) + '...'
+                  : String(item.name),
                 dataIndex * groupWidth,
-                availableHeight - padding/2 + 5,
+                availableHeight - padding / 2 + 5,
                 {
                   width: groupWidth,
                   align: 'center',
@@ -380,18 +380,15 @@ export const PDFMultiBarChart = ({ data, bars, title, height = 200 }: PDFMultiBa
           // Draw axis
           painter
             .strokeColor('#e5e7eb')
-            .moveTo(0, availableHeight - padding/2)
-            .lineTo(availableWidth, availableHeight - padding/2)
+            .moveTo(0, availableHeight - padding / 2)
+            .lineTo(availableWidth, availableHeight - padding / 2)
             .stroke();
 
           // Draw legend
           const legendX = 10;
           let legendY = 5;
           bars.forEach((bar) => {
-            painter
-              .fillColor(bar.color)
-              .rect(legendX, legendY, 8, 8)
-              .fill();
+            painter.fillColor(bar.color).rect(legendX, legendY, 8, 8).fill();
 
             painter
               .fillColor('#374151')
@@ -449,22 +446,30 @@ export const PDFPieChart = ({ data, title, height = 180 }: PDFPieChartProps) => 
             painter.fillColor(color);
 
             // Move to center
-            painter.path(`
+            painter
+              .path(
+                `
               M ${centerX} ${centerY}
               L ${centerX + radius * Math.cos((currentAngle * Math.PI) / 180)} ${centerY + radius * Math.sin((currentAngle * Math.PI) / 180)}
               A ${radius} ${radius} 0 ${sliceAngle > 180 ? 1 : 0} 1 ${centerX + radius * Math.cos(((currentAngle + sliceAngle) * Math.PI) / 180)} ${centerY + radius * Math.sin(((currentAngle + sliceAngle) * Math.PI) / 180)}
               Z
-            `).fill();
+            `
+              )
+              .fill();
 
             // Draw slice border
             painter.strokeColor(REPORT_COLORS.neutral.white);
             painter.lineWidth(2);
-            painter.path(`
+            painter
+              .path(
+                `
               M ${centerX} ${centerY}
               L ${centerX + radius * Math.cos((currentAngle * Math.PI) / 180)} ${centerY + radius * Math.sin((currentAngle * Math.PI) / 180)}
               A ${radius} ${radius} 0 ${sliceAngle > 180 ? 1 : 0} 1 ${centerX + radius * Math.cos(((currentAngle + sliceAngle) * Math.PI) / 180)} ${centerY + radius * Math.sin(((currentAngle + sliceAngle) * Math.PI) / 180)}
               Z
-            `).stroke();
+            `
+              )
+              .stroke();
 
             painter.restore();
 
@@ -478,10 +483,7 @@ export const PDFPieChart = ({ data, title, height = 180 }: PDFPieChartProps) => 
             const percentage = ((item.value / total) * 100).toFixed(1);
 
             // Color box with border
-            painter
-              .fillColor(color)
-              .rect(10, legendY, 10, 10)
-              .fill();
+            painter.fillColor(color).rect(10, legendY, 10, 10).fill();
 
             painter
               .strokeColor(REPORT_COLORS.neutral.gray400)
@@ -515,9 +517,7 @@ interface PDFLineChartProps {
 export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartProps) => {
   // Find max value across all lines
   const maxValue = Math.max(
-    ...data.flatMap(item =>
-      lines.map(line => Number(item[line.key]) || 0)
-    ),
+    ...data.flatMap((item) => lines.map((line) => Number(item[line.key]) || 0)),
     1 // Ensure at least 1 to avoid division by zero
   );
 
@@ -576,7 +576,11 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
 
               // Draw point with border
               painter.circle(x, y, 4).fillColor(line.color).fill();
-              painter.circle(x, y, 4).strokeColor(REPORT_COLORS.neutral.white).lineWidth(1.5).stroke();
+              painter
+                .circle(x, y, 4)
+                .strokeColor(REPORT_COLORS.neutral.white)
+                .lineWidth(1.5)
+                .stroke();
             });
             painter.stroke();
           });
@@ -586,9 +590,10 @@ export const PDFLineChart = ({ data, lines, title, height = 180 }: PDFLineChartP
           data.forEach((item, index) => {
             if (index % labelInterval === 0 || index === data.length - 1) {
               const x = padding.left + index * pointSpacing;
-              const label = String(item.name).length > 10
-                ? String(item.name).substring(0, 8) + '...'
-                : String(item.name);
+              const label =
+                String(item.name).length > 10
+                  ? String(item.name).substring(0, 8) + '...'
+                  : String(item.name);
 
               painter
                 .fillColor(REPORT_COLORS.neutral.gray600)

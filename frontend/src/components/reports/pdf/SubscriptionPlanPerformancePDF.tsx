@@ -1,13 +1,20 @@
-import { PDFDocument, PDFSection, PDFStatCards, PDFTable, PDFBarChart, PDFPieChart } from "./PDFDocument";
-import type { SubscriptionPlanPerformanceResponse } from "@/interface/IReports";
+import {
+  PDFDocument,
+  PDFSection,
+  PDFStatCards,
+  PDFTable,
+  PDFBarChart,
+  PDFPieChart,
+} from './PDFDocument';
+import type { SubscriptionPlanPerformanceResponse } from '@/interface/IReports';
 
 interface SubscriptionPlanPerformancePDFProps {
   data: SubscriptionPlanPerformanceResponse[];
 }
 
-const currencyFormatter = new Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
+const currencyFormatter = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
   maximumFractionDigits: 0,
 });
 
@@ -29,40 +36,40 @@ export const SubscriptionPlanPerformancePDF = ({ data }: SubscriptionPlanPerform
   const revenuePerPlan = data.length > 0 ? totalNetRevenue / data.length : 0;
 
   const stats = [
-    { label: "Suscripciones activas", value: totalActive },
-    { label: "Retencion global", value: formatPercent(overallRetention) },
-    { label: "Ingresos netos", value: formatCurrency(totalNetRevenue) },
+    { label: 'Suscripciones activas', value: totalActive },
+    { label: 'Retencion global', value: formatPercent(overallRetention) },
+    { label: 'Ingresos netos', value: formatCurrency(totalNetRevenue) },
   ];
 
   const barChartData = data.map((plan) => ({
-    name: plan.planName ?? "Plan",
+    name: plan.planName ?? 'Plan',
     value: Number(plan.netRevenue ?? 0),
   }));
 
   const pieChartData = [
-    { name: "Activas", value: totalActive },
-    { name: "Trials", value: totalTrial },
-    { name: "Suspendidas", value: totalSuspended },
-    { name: "Inactivas", value: totalInactive },
+    { name: 'Activas', value: totalActive },
+    { name: 'Trials', value: totalTrial },
+    { name: 'Suspendidas', value: totalSuspended },
+    { name: 'Inactivas', value: totalInactive },
   ].filter((item) => item.value > 0);
 
   const tableHeaders = [
-    "Plan",
-    "Precio",
-    "Suscripciones",
-    "Activas",
-    "Trial",
-    "Suspendidas",
-    "Inactivas",
-    "Prox renov",
-    "Churn rec",
-    "Pagos",
-    "Ingresos netos",
-    "ARPU",
-    "Retencion",
+    'Plan',
+    'Precio',
+    'Suscripciones',
+    'Activas',
+    'Trial',
+    'Suspendidas',
+    'Inactivas',
+    'Prox renov',
+    'Churn rec',
+    'Pagos',
+    'Ingresos netos',
+    'ARPU',
+    'Retencion',
   ];
   const tableData = data.map((plan) => [
-    plan.planName ?? "-",
+    plan.planName ?? '-',
     formatCurrency(plan.planPrice ?? 0),
     plan.totalSubscriptions ?? 0,
     plan.activeSubscriptions ?? 0,
@@ -103,13 +110,12 @@ export const SubscriptionPlanPerformancePDF = ({ data }: SubscriptionPlanPerform
       <PDFSection title="Alertas y renovaciones">
         <PDFStatCards
           stats={[
-            { label: "Renovaciones proximas", value: totalUpcoming },
-            { label: "Churn reciente", value: totalChurn },
-            { label: "Trials activas", value: totalTrial },
+            { label: 'Renovaciones proximas', value: totalUpcoming },
+            { label: 'Churn reciente', value: totalChurn },
+            { label: 'Trials activas', value: totalTrial },
           ]}
         />
       </PDFSection>
     </PDFDocument>
   );
 };
-

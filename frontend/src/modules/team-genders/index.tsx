@@ -1,6 +1,6 @@
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Plus, Users } from "lucide-react";
-import { TeamGendersList } from "./components/List";
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Plus, Users } from 'lucide-react';
+import { TeamGendersList } from './components/List';
 
 export const TeamGendersModule = () => {
   return (
@@ -11,16 +11,16 @@ export const TeamGendersModule = () => {
         description="Gestiona los géneros para los equipos de tu organización"
         buttons={[
           {
-            text: "Equipos",
+            text: 'Equipos',
             icon: <Users className="h-4 w-4" />,
-            link: "/teams",
-            variant: "outline",
+            link: '/teams',
+            variant: 'outline',
           },
           {
-            text: "Nuevo Género",
+            text: 'Nuevo Género',
             icon: <Plus className="h-4 w-4" />,
-            link: "/team-genders-create",
-            variant: "default",
+            link: '/team-genders-create',
+            variant: 'default',
           },
         ]}
       />

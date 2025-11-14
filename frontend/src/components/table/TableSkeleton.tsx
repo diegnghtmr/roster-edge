@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -6,9 +6,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import type { TableColumn } from "./DataTable";
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import type { TableColumn } from './DataTable';
 
 interface TableSkeletonProps {
   headers: TableColumn[];
@@ -16,21 +16,14 @@ interface TableSkeletonProps {
   className?: string;
 }
 
-export const TableSkeleton: React.FC<TableSkeletonProps> = ({
-  headers,
-  rows = 5,
-  className,
-}) => {
+export const TableSkeleton: React.FC<TableSkeletonProps> = ({ headers, rows = 5, className }) => {
   return (
-    <div className={cn("rounded-md border", className)}>
+    <div className={cn('rounded-md border', className)}>
       <Table>
         <TableHeader>
           <TableRow>
             {headers.map((header) => (
-              <TableHead
-                key={header.key}
-                className={cn("font-semibold", header.className)}
-              >
+              <TableHead key={header.key} className={cn('font-semibold', header.className)}>
                 <div className="h-4 bg-gray-200 rounded animate-pulse" />
               </TableHead>
             ))}

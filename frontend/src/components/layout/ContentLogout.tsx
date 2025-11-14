@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { Button } from "../ui/button";
+import { memo } from 'react';
+import { Button } from '../ui/button';
 
 interface ContentLogoutProps {
   onOpenProfile: () => void;

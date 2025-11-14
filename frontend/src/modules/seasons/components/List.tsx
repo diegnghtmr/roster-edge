@@ -1,103 +1,48 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
-import useGetList from "@/api/services/getServices/useGetList";
-import { useMutateDeleteService } from "@/api/services/useDelete";
-import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import type { FilterConfig } from "@/components/table/SearchComponent";
-import type { ISeason } from "@/interface/ISeason";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
-import { SeasonItem } from "./ItemList";
+import React from 'react';
+import { useResourceList } from '@shared/hooks';
+import { DeleteConfirmDialog } from '@shared/components';
+import { DataTable, type TableColumn } from '@/components/table/DataTable';
+import type { FilterConfig } from '@/components/table/SearchComponent';
+import type { ISeason } from '@/interface/ISeason';
+import { SeasonItem } from './ItemList';
 
 const headers: TableColumn[] = [
-  { title: "ID", key: "id", className: "w-16" },
-  { title: "Nombre", key: "name" },
+  { title: 'ID', key: 'id', className: 'w-16' },
+  { title: 'Nombre', key: 'name' },
 
-  { title: "Fecha Inicio", key: "startDate" },
-  { title: "Fecha Fin", key: "endDate" },
+  { title: 'Fecha Inicio', key: 'startDate' },
+  { title: 'Fecha Fin', key: 'endDate' },
 
-  { title: "Acciones", key: "actions", className: "w-32" },
+  { title: 'Acciones', key: 'actions', className: 'w-32' },
 ];
 
 const filters: FilterConfig[] = [
   {
-    key: "name",
-    label: "Nombre",
-    type: "text",
-    placeholder: "Buscar por nombre...",
+    key: 'name',
+    label: 'Nombre',
+    type: 'text',
+    placeholder: 'Buscar por nombre...',
   },
 ];
 
 export const SeasonsList: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const [shouldRefetch, setShouldRefetch] = useState(false);
-  const [seasonToDelete, setSeasonToDelete] = useState<number | null>(null);
-
-  const { data, isLoading, refetch, isFetching } = useGetList<ISeason[]>({
-    key: "seasonsList",
-    resource: ["seasons"],
-    keyResults: "data",
-    enabled: true,
-    params: searchParams,
+  // All duplicate logic extracted to reusable hook
+  const {
+    items: seasons,
+    isLoading,
+    itemToDelete,
+    isDeleting,
+    handleDelete,
+    confirmDelete,
+    cancelDelete,
+  } = useResourceList<ISeason>({
+    resource: ['seasons'],
+    queryKey: 'seasonsList',
+    keyResults: 'data',
+    resourceName: 'temporada',
+    deleteSuccessMessage: 'Temporada eliminada exitosamente',
+    deleteErrorMessage: 'Error al eliminar la temporada',
   });
-
-  const deleteService = useMutateDeleteService(["seasons"]);
-
-  // Avoid infinity loops handle manually refetch
-  useEffect(() => {
-    if (!isLoading && !isFetching && shouldRefetch) {
-      refetch();
-      setShouldRefetch(false);
-    }
-  }, [isLoading, isFetching, refetch, shouldRefetch]);
-
-  // Detect changes in searchparams to do the refetch
-  useEffect(() => {
-    setShouldRefetch(true);
-  }, [searchParams]);
-
-  // Handle the delete button event
-  const handleDelete = useCallback((id: number) => {
-    setSeasonToDelete(id);
-  }, []);
-
-  // Confirm and delete season
-  const confirmDelete = () => {
-    if (seasonToDelete !== null) {
-      deleteItem(seasonToDelete.toString());
-      setSeasonToDelete(null);
-    }
-  };
-
-  // Delete season
-  const deleteItem = (id: string) => {
-    deleteService.mutate(id, {
-      onSuccess: () => {
-        toast.success("Temporada eliminada exitosamente");
-        setShouldRefetch(true);
-      },
-      onError: () => {
-        toast.error("Error al eliminar la temporada");
-      },
-    });
-  };
-
-  // Ensure data is properly typed as ISeason array
-  const seasons: ISeason[] = React.useMemo(() => {
-    if (!data) return [];
-    if (Array.isArray(data)) return data;
-    console.warn("Unexpected data structure:", data);
-    return [];
-  }, [data]);
 
   // Render function for each row
   const renderRow = (season: ISeason) => (
@@ -106,7 +51,11 @@ export const SeasonsList: React.FC = () => {
 
   return (
     <>
-      <div className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4">
+      <div
+        className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4"
+        role="region"
+        aria-label="Lista de temporadas"
+      >
         <DataTable
           data={seasons}
           headers={headers}
@@ -115,32 +64,19 @@ export const SeasonsList: React.FC = () => {
           loading={isLoading}
           emptyMessage="No se encontraron temporadas"
           className="mt-6"
+          aria-label="Tabla de temporadas"
         />
       </div>
 
-      <AlertDialog
-        open={seasonToDelete !== null}
-        onOpenChange={(open) => !open && setSeasonToDelete(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. La temporada será eliminada
-              permanentemente del sistema.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmDialog
+        isOpen={itemToDelete !== null}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        resourceName="temporada"
+        isDeleting={isDeleting}
+        title="¿Estás seguro?"
+        description="Esta acción no se puede deshacer. La temporada será eliminada permanentemente del sistema."
+      />
     </>
   );
 };

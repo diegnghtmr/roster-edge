@@ -1,6 +1,6 @@
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Plus } from "lucide-react";
-import { MatchdaysList } from "./components/List";
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Plus } from 'lucide-react';
+import { MatchdaysList } from './components/List';
 
 export const MatchdaysModule = () => {
   return (

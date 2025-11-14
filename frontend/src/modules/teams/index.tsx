@@ -1,6 +1,6 @@
-import { TeamsList } from "./components/List";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Plus, Tag, User } from "lucide-react";
+import { TeamsList } from './components/List';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Plus, Tag, User } from 'lucide-react';
 
 export const TeamsModule = () => {
   return (
@@ -10,22 +10,22 @@ export const TeamsModule = () => {
         description="Gestiona los equipos de tu organización"
         buttons={[
           {
-            text: "Categorías",
+            text: 'Categorías',
             icon: <Tag className="h-4 w-4" />,
-            link: "/team-categories",
-            variant: "outline",
+            link: '/team-categories',
+            variant: 'outline',
           },
           {
-            text: "Géneros",
+            text: 'Géneros',
             icon: <User className="h-4 w-4" />,
-            link: "/team-genders",
-            variant: "outline",
+            link: '/team-genders',
+            variant: 'outline',
           },
           {
-            text: "Nuevo Equipo",
+            text: 'Nuevo Equipo',
             icon: <Plus className="h-4 w-4" />,
-            link: "/teams-create",
-            variant: "default",
+            link: '/teams-create',
+            variant: 'default',
           },
         ]}
       />

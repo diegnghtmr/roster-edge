@@ -1,15 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationResult } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { fetchDelete } from "../endPoints/fetchDelete.ts";
-import useUserStore from "@/storage/storeUser.ts";
-import { toast } from "sonner";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationResult } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { fetchDelete } from '../endPoints/fetchDelete.ts';
+import useUserStore from '@/storage/storeUser.ts';
+import { toast } from 'sonner';
 
 type DeleteVariables = string | number;
 type DeleteResponse = { data: unknown; status: number };
 
 export const useMutateDeleteService = (
-  resource: string[],
+  resource: string[]
 ): UseMutationResult<DeleteResponse, Error, DeleteVariables> => {
   const queryClient = useQueryClient();
   const { clearUser } = useUserStore();
@@ -19,21 +19,21 @@ export const useMutateDeleteService = (
   const handleError = (error: string) => {
     const lowerError = error.toLowerCase();
     const isTokenError =
-      lowerError.includes("token") ||
-      lowerError.includes("signature") ||
-      lowerError.includes("expired") ||
-      lowerError.includes("unauthorized") ||
-      lowerError.includes("no autorizado") ||
-      lowerError.includes("authentication") ||
-      lowerError.includes("auth") ||
-      lowerError.includes("jwt") ||
-      lowerError.includes("session");
+      lowerError.includes('token') ||
+      lowerError.includes('signature') ||
+      lowerError.includes('expired') ||
+      lowerError.includes('unauthorized') ||
+      lowerError.includes('no autorizado') ||
+      lowerError.includes('authentication') ||
+      lowerError.includes('auth') ||
+      lowerError.includes('jwt') ||
+      lowerError.includes('session');
 
     if (isTokenError) {
       clearUser();
       queryClient.removeQueries();
-      toast.error("Sesión expirada. Por favor, inicia sesión nuevamente.");
-      navigate("/login?error=session");
+      toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      navigate('/login?error=session');
     }
   };
 
@@ -45,10 +45,7 @@ export const useMutateDeleteService = (
   });
 
   if (response?.data) {
-    if (
-      response?.data?.data.error &&
-      typeof response.data?.data.error === "string"
-    ) {
+    if (response?.data?.data.error && typeof response.data?.data.error === 'string') {
       handleError(response.data.data.error);
     }
   }

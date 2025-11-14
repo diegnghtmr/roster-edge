@@ -1,9 +1,9 @@
-import "./App.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import useRouterApp from "./router";
-import { CookiesProvider } from "react-cookie";
-import { RouterProvider } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
+import './App.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import useRouterApp from './router';
+import { CookiesProvider } from 'react-cookie';
+import { RouterProvider } from 'react-router-dom';
+import { Toaster } from '@/components/ui/sonner';
 
 const queryClient = new QueryClient();
 

@@ -1,16 +1,12 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { QueryKey } from "@tanstack/react-query";
-import dataTransform from "../../transforms/transformDataGet/index";
-import { fetchGet } from "../../endPoints/fetchGet";
-import { useNavigate } from "react-router-dom";
-import useUserStore from "@/storage/storeUser";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryKey } from '@tanstack/react-query';
+import dataTransform from '../../transforms/transformDataGet/index';
+import { fetchGet } from '../../endPoints/fetchGet';
+import { useNavigate } from 'react-router-dom';
+import useUserStore from '@/storage/storeUser';
 
 type QueryKeyInput = QueryKey | string;
-type RequestParams =
-  | Record<string, string>
-  | URLSearchParams
-  | string
-  | undefined;
+type RequestParams = Record<string, string> | URLSearchParams | string | undefined;
 
 interface IParamsService<TParams = RequestParams> {
   key: QueryKeyInput;
@@ -39,21 +35,15 @@ const useGetList = <TData = unknown>({
   const queryClient = useQueryClient();
   const { clearUser } = useUserStore();
 
-  const hasResource = Array.isArray(resource)
-    ? resource.length > 0
-    : Boolean(resource);
+  const hasResource = Array.isArray(resource) ? resource.length > 0 : Boolean(resource);
   const queryKeyValue = (Array.isArray(key) ? key : [key]) as QueryKey;
-  const paramsFetch = hasResource
-    ? { resource: resource as string[], params }
-    : null;
+  const paramsFetch = hasResource ? { resource: resource as string[], params } : null;
 
-  const { error, data, isLoading, refetch, isFetching } = useQuery<
-    ApiResponse<TData>
-  >({
+  const { error, data, isLoading, refetch, isFetching } = useQuery<ApiResponse<TData>>({
     queryKey: queryKeyValue,
     queryFn: () => {
       if (!paramsFetch) {
-        throw new Error("Resource is required to perform the request.");
+        throw new Error('Resource is required to perform the request.');
       }
       return fetchGet(paramsFetch);
     },
@@ -68,14 +58,14 @@ const useGetList = <TData = unknown>({
   const handleError = (error: string) => {
     const lowerError = error?.toLowerCase();
     const isTokenError =
-      lowerError.includes("token") ||
-      lowerError.includes("signature") ||
-      lowerError.includes("expired");
+      lowerError.includes('token') ||
+      lowerError.includes('signature') ||
+      lowerError.includes('expired');
 
     if (isTokenError) {
       clearUser();
       queryClient.removeQueries();
-      navigate("/login?error=session");
+      navigate('/login?error=session');
     }
   };
 
@@ -85,7 +75,7 @@ const useGetList = <TData = unknown>({
   }
 
   if (data) {
-    const { metaData, results } = dataTransform(data, keyResults || "");
+    const { metaData, results } = dataTransform(data, keyResults || '');
     return {
       error,
       data: results as TData,

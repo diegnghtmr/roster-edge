@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { IEvent } from "@/interface/IEvent";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { EventForm, type INewEvent } from "./components/Form";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { IEvent } from '@/interface/IEvent';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { EventForm, type INewEvent } from './components/Form';
 
 interface IField {
   name: string;
@@ -26,13 +26,9 @@ export const EventUpdateModule = () => {
   const [event, setEvent] = useState<INewEvent>({
     seasonId: 0,
     venueId: 0,
-    name: "",
-    description: "",
-    date: [
-      new Date().getFullYear(),
-      new Date().getMonth() + 1,
-      new Date().getDate(),
-    ],
+    name: '',
+    description: '',
+    date: [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()],
     active: true,
   });
 
@@ -40,7 +36,7 @@ export const EventUpdateModule = () => {
   const { data: eventData, isLoading: loadingEvent } = useGetList<IEvent>({
     key: `event-${id}`,
     resource: [`events/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -60,7 +56,7 @@ export const EventUpdateModule = () => {
   }, [eventData]);
 
   const resource = [`events/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -71,8 +67,8 @@ export const EventUpdateModule = () => {
       // Transform data to match API expectations
       const formatDateArray = (dateArray: number[]): string => {
         const [year, month, day] = dateArray;
-        const paddedMonth = month.toString().padStart(2, "0");
-        const paddedDay = day.toString().padStart(2, "0");
+        const paddedMonth = month.toString().padStart(2, '0');
+        const paddedDay = day.toString().padStart(2, '0');
         return `${year}-${paddedMonth}-${paddedDay}`;
       };
 
@@ -89,16 +85,15 @@ export const EventUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al actualizar el evento");
+            toast.error(errorMessage || 'Error al actualizar el evento');
           } else {
-            toast.success("Evento actualizado exitosamente");
-            navigate("/events");
+            toast.success('Evento actualizado exitosamente');
+            navigate('/events');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el evento. Por favor, intenta nuevamente."
+            error?.message || 'Error al actualizar el evento. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -121,7 +116,7 @@ export const EventUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingEvent && "Obteniendo información del evento"}
+            {loadingEvent && 'Obteniendo información del evento'}
           </div>
         </div>
       </div>

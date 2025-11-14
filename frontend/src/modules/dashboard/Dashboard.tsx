@@ -1,4 +1,4 @@
-import { StreakView } from "./StreakView";
+import { StreakView } from './StreakView';
 
 const Dashboard = () => {
   return (

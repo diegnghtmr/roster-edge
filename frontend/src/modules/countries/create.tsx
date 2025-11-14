@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { CountryForm, type INewCountry } from "./components/Form";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CountryForm, type INewCountry } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
 
 interface IField {
   name: string;
@@ -18,12 +18,12 @@ interface IField {
 export const CountryCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [country, setCountry] = useState<INewCountry>({
-    name: "",
+    name: '',
   });
 
-  const resource = ["countries"];
+  const resource = ['countries'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -41,16 +41,15 @@ export const CountryCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear el countries");
+            toast.error(errorMessage || 'Error al crear el countries');
           } else {
-            toast.success("Countries creado exitosamente");
-            navigate("/countries");
+            toast.success('Countries creado exitosamente');
+            navigate('/countries');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear el countries. Por favor, intenta nuevamente.",
+            error?.message || 'Error al crear el countries. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -84,8 +83,6 @@ export const CountryCreateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

@@ -1,11 +1,11 @@
-import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFBarChart } from "./PDFDocument";
-import { Text, View, StyleSheet } from "@react-pdf/renderer";
-import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING, PDF_RADIUS } from "@/constants/reportColors";
-import type { TeamRosterProfileResponse } from "@/interface/IReports";
+import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFBarChart } from './PDFDocument';
+import { Text, View, StyleSheet } from '@react-pdf/renderer';
+import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING, PDF_RADIUS } from '@/constants/reportColors';
+import type { TeamRosterProfileResponse } from '@/interface/IReports';
 
 const styles = StyleSheet.create({
   statBox: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: PDF_SPACING.sm,
     padding: PDF_SPACING.sm,
     backgroundColor: REPORT_COLORS.pdf.sectionBg,
@@ -41,19 +41,20 @@ export const RosterProfilePDF = ({ data }: RosterProfilePDFProps) => {
   // Calculate overall stats
   const totalPlayers = data.reduce((sum, team) => sum + (team.totalPlayers || 0), 0);
   const totalActive = data.reduce((sum, team) => sum + (team.activePlayers || 0), 0);
-  const avgAge = data.length > 0
-    ? (data.reduce((sum, team) => sum + (team.averageAge || 0), 0) / data.length).toFixed(1)
-    : "0";
+  const avgAge =
+    data.length > 0
+      ? (data.reduce((sum, team) => sum + (team.averageAge || 0), 0) / data.length).toFixed(1)
+      : '0';
 
   const overallStats = [
-    { label: "Total de Jugadores", value: totalPlayers },
-    { label: "Jugadores Activos", value: totalActive },
-    { label: "Edad Promedio", value: `${avgAge} años` },
+    { label: 'Total de Jugadores', value: totalPlayers },
+    { label: 'Jugadores Activos', value: totalActive },
+    { label: 'Edad Promedio', value: `${avgAge} años` },
   ];
 
   // Chart data for players by team
-  const chartData = data.slice(0, 10).map(team => ({
-    name: (team.teamName || "Sin nombre").substring(0, 12),
+  const chartData = data.slice(0, 10).map((team) => ({
+    name: (team.teamName || 'Sin nombre').substring(0, 12),
     value: team.totalPlayers || 0,
   }));
 
@@ -61,8 +62,11 @@ export const RosterProfilePDF = ({ data }: RosterProfilePDFProps) => {
   const physicalStatesMap = new Map<string, number>();
   data.forEach((team) => {
     team.physicalStates?.forEach((state) => {
-      const current = physicalStatesMap.get(state.physicalStateName || "Desconocido") || 0;
-      physicalStatesMap.set(state.physicalStateName || "Desconocido", current + (state.players || 0));
+      const current = physicalStatesMap.get(state.physicalStateName || 'Desconocido') || 0;
+      physicalStatesMap.set(
+        state.physicalStateName || 'Desconocido',
+        current + (state.players || 0)
+      );
     });
   });
 
@@ -74,10 +78,7 @@ export const RosterProfilePDF = ({ data }: RosterProfilePDFProps) => {
     .slice(0, 10);
 
   return (
-    <PDFDocument
-      title="Perfil de Plantilla"
-      subtitle="Análisis detallado de jugadores por equipo"
-    >
+    <PDFDocument title="Perfil de Plantilla" subtitle="Análisis detallado de jugadores por equipo">
       <PDFSection title="Resumen General">
         <PDFStatCards stats={overallStats} />
       </PDFSection>
@@ -105,19 +106,17 @@ export const RosterProfilePDF = ({ data }: RosterProfilePDFProps) => {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Edad Promedio:</Text>
             <Text style={styles.statValue}>
-              {team.averageAge ? team.averageAge.toFixed(1) : "-"} años
+              {team.averageAge ? team.averageAge.toFixed(1) : '-'} años
             </Text>
           </View>
 
           {team.physicalStates && team.physicalStates.length > 0 && (
             <>
-              <Text style={styles.sectionHeader}>
-                Estado Físico
-              </Text>
+              <Text style={styles.sectionHeader}>Estado Físico</Text>
               <PDFTable
-                headers={["Estado", "Jugadores"]}
+                headers={['Estado', 'Jugadores']}
                 data={team.physicalStates.map((state) => [
-                  state.physicalStateName || "-",
+                  state.physicalStateName || '-',
                   state.players || 0,
                 ])}
               />

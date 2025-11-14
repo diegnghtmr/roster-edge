@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { StaffRoleForm, type INewStaffRole } from "./components/Form";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { StaffRoleForm, type INewStaffRole } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
 
 interface IField {
   name: string;
@@ -18,12 +18,12 @@ interface IField {
 export const StaffRoleCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [staffRole, setStaffRole] = useState<INewStaffRole>({
-    name: "",
+    name: '',
   });
 
-  const resource = ["staff-roles"];
+  const resource = ['staff-roles'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -34,7 +34,7 @@ export const StaffRoleCreateModule = () => {
 
       // Validate that name is provided
       if (!staffRole.name.trim()) {
-        toast.error("Por favor ingrese el nombre del rol");
+        toast.error('Por favor ingrese el nombre del rol');
         setIsLoading(false);
         return;
       }
@@ -47,18 +47,15 @@ export const StaffRoleCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al crear el staff-roles",
-            );
+            toast.error(errorMessage || 'Error al crear el staff-roles');
           } else {
-            toast.success("Staff-roles creado exitosamente");
-            navigate("/staff-roles");
+            toast.success('Staff-roles creado exitosamente');
+            navigate('/staff-roles');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear el staff-roles. Por favor, intenta nuevamente.",
+            error?.message || 'Error al crear el staff-roles. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -92,8 +89,6 @@ export const StaffRoleCreateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

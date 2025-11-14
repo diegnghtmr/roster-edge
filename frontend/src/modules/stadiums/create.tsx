@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { StadiumForm, type INewStadium } from "./components/Form";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { StadiumForm, type INewStadium } from './components/Form';
 
 interface IField {
   name: string;
@@ -18,17 +18,17 @@ interface IField {
 export const StadiumCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [stadium, setStadium] = useState<INewStadium>({
     area: 0,
-    surface: "",
+    surface: '',
     totalCapacity: 0,
     foundation: [new Date().getFullYear(), 1, 1],
     venueId: 0,
     active: true,
   });
 
-  const resource = ["stadiums"];
+  const resource = ['stadiums'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -51,18 +51,15 @@ export const StadiumCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al crear el stadiums",
-            );
+            toast.error(errorMessage || 'Error al crear el stadiums');
           } else {
-            toast.success("Stadiums creado exitosamente");
-            navigate("/stadiums");
+            toast.success('Stadiums creado exitosamente');
+            navigate('/stadiums');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear el stadiums. Por favor, intenta nuevamente.",
+            error?.message || 'Error al crear el stadiums. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -96,8 +93,6 @@ export const StadiumCreateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

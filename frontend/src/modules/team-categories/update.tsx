@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { TeamCategoryForm, type INewTeamCategory } from "./components/Form";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { TeamCategoryForm, type INewTeamCategory } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { TeamCategory } from "@/interface/ITeamCategory";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { TeamCategory } from '@/interface/ITeamCategory';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 
 interface IField {
   name: string;
@@ -22,9 +22,9 @@ export const TeamCategoryUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [category, setCategory] = useState<INewTeamCategory>({
-    name: "",
+    name: '',
     active: true,
   });
 
@@ -32,7 +32,7 @@ export const TeamCategoryUpdateModule = () => {
   const { data: categoryData, isLoading: loadingCategory } = useGetList({
     key: `team-category-${id}`,
     resource: [`team-categories/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -40,17 +40,17 @@ export const TeamCategoryUpdateModule = () => {
   useEffect(() => {
     if (categoryData) {
       const fetchedCategory = categoryData as TeamCategory;
-      
+
       setCategory({
         name: fetchedCategory.name,
-        active: fetchedCategory.active
+        active: fetchedCategory.active,
       });
     }
   }, [categoryData]);
 
   const resource = [`team-categories/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
-  
+  const { mutate } = useMutateService(resource, '', 'PUT');
+
   // Handle the form submit event
   const handleOnSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -59,7 +59,7 @@ export const TeamCategoryUpdateModule = () => {
 
       // Validate required fields
       if (!category.name) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -67,25 +67,23 @@ export const TeamCategoryUpdateModule = () => {
       // Data for update
       const categoryData = {
         name: category.name,
-        active: category.active
+        active: category.active,
       };
 
       mutate(categoryData, {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el team-categories",
-            );
+            toast.error(errorMessage || 'Error al actualizar el team-categories');
           } else {
-            toast.success("Team-categories actualizado exitosamente");
-            navigate("/team-categories");
+            toast.success('Team-categories actualizado exitosamente');
+            navigate('/team-categories');
           }
         },
         onError: (error: Error) => {
           toast.error(
             error?.message ||
-              "Error al actualizar el team-categories. Por favor, intenta nuevamente.",
+              'Error al actualizar el team-categories. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -131,8 +129,6 @@ export const TeamCategoryUpdateModule = () => {
           isEdit={true}
         />
       </div>
-
-      
     </div>
   );
 };

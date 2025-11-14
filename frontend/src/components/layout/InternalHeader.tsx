@@ -1,13 +1,13 @@
-import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 interface HeaderButton {
   text: string;
   icon?: ReactNode;
   link?: string;
   onClick?: () => void;
-  variant?: "default" | "secondary" | "outline" | "ghost" | "link";
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link';
 }
 
 interface InternalHeaderProps {
@@ -39,7 +39,7 @@ export const InternalHeader = ({
             icon: buttonIcon,
             link: buttonLink,
             onClick: onButtonClick,
-            variant: "default" as const,
+            variant: 'default' as const,
           },
         ]
       : []),
@@ -49,7 +49,7 @@ export const InternalHeader = ({
     const buttonContent = (
       <Button
         className="flex items-center gap-2"
-        variant={button.variant || "default"}
+        variant={button.variant || 'default'}
         onClick={button.onClick}
       >
         {button.icon}
@@ -74,12 +74,7 @@ export const InternalHeader = ({
       <div className="absolute inset-0 opacity-20">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern
-              id="grid"
-              width="60"
-              height="60"
-              patternUnits="userSpaceOnUse"
-            >
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
               <path
                 d="M 60 0 L 0 0 0 60"
                 fill="none"
@@ -102,9 +97,7 @@ export const InternalHeader = ({
           <h1 className="text-xl font-bold text-gray-900">{title}</h1>
           <p className="text-gray-700 mt-2">{description}</p>
         </div>
-        {allButtons.length > 0 && (
-          <div className="flex gap-2">{allButtons.map(renderButton)}</div>
-        )}
+        {allButtons.length > 0 && <div className="flex gap-2">{allButtons.map(renderButton)}</div>}
       </div>
     </div>
   );

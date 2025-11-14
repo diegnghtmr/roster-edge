@@ -1,15 +1,15 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import useGetList from "@/api/services/getServices/useGetList";
-import type { IVenueResponse } from "@/interface/IVenue";
+} from '@/components/ui/select';
+import useGetList from '@/api/services/getServices/useGetList';
+import type { IVenueResponse } from '@/interface/IVenue';
 
 export interface INewStadium {
   area: number;
@@ -40,9 +40,9 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
 }) => {
   // Fetch venues for the dropdown
   const { data: venues = [], isLoading: venuesLoading } = useGetList({
-    key: "venues",
-    resource: ["venues"],
-    keyResults: "data",
+    key: 'venues',
+    resource: ['venues'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -55,20 +55,17 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
   // Format the foundation date array to a string for the date input
   const formatFoundationDate = (): string => {
     if (!stadium.foundation || stadium.foundation.length !== 3) {
-      return "";
+      return '';
     }
     const [year, month, day] = stadium.foundation;
     // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, "0");
-    const paddedDay = day.toString().padStart(2, "0");
+    const paddedMonth = month.toString().padStart(2, '0');
+    const paddedDay = day.toString().padStart(2, '0');
     return `${year}-${paddedMonth}-${paddedDay}`;
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="area" className="text-sm font-medium text-gray-700">
           Área (m²)
@@ -79,9 +76,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
           type="number"
           step="0.01"
           value={stadium.area}
-          onChange={(e) =>
-            onChangeValue({ name: "area", value: parseFloat(e.target.value) })
-          }
+          onChange={(e) => onChangeValue({ name: 'area', value: parseFloat(e.target.value) })}
           placeholder="Ingrese el área del estadio"
           required
         />
@@ -96,19 +91,14 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
           name="surface"
           type="text"
           value={stadium.surface}
-          onChange={(e) =>
-            onChangeValue({ name: "surface", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'surface', value: e.target.value })}
           placeholder="Tipo de superficie (ej. césped natural)"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="totalCapacity"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="totalCapacity" className="text-sm font-medium text-gray-700">
           Capacidad Total
         </label>
         <Input
@@ -118,7 +108,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
           value={stadium.totalCapacity}
           onChange={(e) =>
             onChangeValue({
-              name: "totalCapacity",
+              name: 'totalCapacity',
               value: parseInt(e.target.value),
             })
           }
@@ -128,10 +118,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="foundation"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="foundation" className="text-sm font-medium text-gray-700">
           Fecha de Fundación
         </label>
         <Input
@@ -141,7 +128,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
           value={formatFoundationDate()}
           onChange={(e) =>
             onChangeValue({
-              name: "foundation",
+              name: 'foundation',
               value: parseDateToArray(e.target.value),
             })
           }
@@ -155,9 +142,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
         </label>
         <Select
           value={stadium.venueId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "venueId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'venueId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione una sede" />
@@ -183,10 +168,8 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
           Estado
         </label>
         <Select
-          value={stadium.active ? "true" : "false"}
-          onValueChange={(value) =>
-            onChangeValue({ name: "active", value: value === "true" })
-          }
+          value={stadium.active ? 'true' : 'false'}
+          onValueChange={(value) => onChangeValue({ name: 'active', value: value === 'true' })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione el estado" />
@@ -200,7 +183,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

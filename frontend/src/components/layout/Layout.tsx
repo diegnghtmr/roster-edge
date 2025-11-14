@@ -1,10 +1,10 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "../sidebar/Sidebar.tsx";
-import { Topbar } from "./topbar/Topbar";
-import { useEffect, useState } from "react";
-import { navigationList } from "../sidebar/constants/navigationList.tsx";
-import useUserStore from "../../storage/storeUser.ts";
-import { Drawer } from "@mui/material";
+import { Outlet, useNavigate } from 'react-router-dom';
+import Sidebar from '../sidebar/Sidebar.tsx';
+import { Topbar } from './topbar/Topbar';
+import { useEffect, useState } from 'react';
+import { navigationList } from '../sidebar/constants/navigationList.tsx';
+import useUserStore from '../../storage/storeUser.ts';
+import { Drawer } from '@mui/material';
 
 export const Layout = () => {
   const { user } = useUserStore();
@@ -17,7 +17,7 @@ export const Layout = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      navigate('/login');
     }
   }, [user, navigate]);
 
@@ -36,9 +36,9 @@ export const Layout = () => {
         open={open}
         onClose={toggleDrawer(false)}
         sx={{
-          "& .MuiDrawer-paper": {
+          '& .MuiDrawer-paper': {
             width: 240,
-            boxSizing: "border-box",
+            boxSizing: 'border-box',
           },
         }}
         ModalProps={{

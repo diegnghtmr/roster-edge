@@ -1,7 +1,7 @@
-import { PDFDocument, PDFTable, PDFSection, PDFStatCards } from "./PDFDocument";
-import { Text, Canvas, StyleSheet, View } from "@react-pdf/renderer";
-import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING } from "@/constants/reportColors";
-import type { TeamPointsProgressResponse } from "@/interface/IReports";
+import { PDFDocument, PDFTable, PDFSection, PDFStatCards } from './PDFDocument';
+import { Text, Canvas, StyleSheet, View } from '@react-pdf/renderer';
+import { REPORT_COLORS, PDF_TYPOGRAPHY, PDF_SPACING } from '@/constants/reportColors';
+import type { TeamPointsProgressResponse } from '@/interface/IReports';
 
 const styles = StyleSheet.create({
   chartTitle: {
@@ -29,19 +29,11 @@ interface PointsProgressPDFProps {
 }
 
 export const PointsProgressPDF = ({ data, teamName }: PointsProgressPDFProps) => {
-  const tableHeaders = [
-    "Jornada",
-    "Fecha",
-    "GF",
-    "GC",
-    "DG",
-    "Pts Ganados",
-    "Pts Acumulados",
-  ];
+  const tableHeaders = ['Jornada', 'Fecha', 'GF', 'GC', 'DG', 'Pts Ganados', 'Pts Acumulados'];
 
   const tableData = data.map((match) => [
-    match.matchdayName || match.matchNumber || "-",
-    match.matchDate || "-",
+    match.matchdayName || match.matchNumber || '-',
+    match.matchDate || '-',
     match.goalsFor || 0,
     match.goalsAgainst || 0,
     match.goalDifference || 0,
@@ -52,21 +44,21 @@ export const PointsProgressPDF = ({ data, teamName }: PointsProgressPDFProps) =>
   // Calculate stats
   const totalPoints = data.length > 0 ? data[data.length - 1]?.cumulativePoints || 0 : 0;
   const totalMatches = data.length;
-  const avgPointsPerMatch = totalMatches > 0 ? (totalPoints / totalMatches).toFixed(2) : "0.00";
+  const avgPointsPerMatch = totalMatches > 0 ? (totalPoints / totalMatches).toFixed(2) : '0.00';
 
   const stats = [
-    { label: "Puntos Totales", value: totalPoints },
-    { label: "Partidos Jugados", value: totalMatches },
-    { label: "Promedio por Partido", value: avgPointsPerMatch },
+    { label: 'Puntos Totales', value: totalPoints },
+    { label: 'Partidos Jugados', value: totalMatches },
+    { label: 'Promedio por Partido', value: avgPointsPerMatch },
   ];
 
   // Line chart data
-  const maxPoints = Math.max(...data.map(m => m.cumulativePoints || 0));
+  const maxPoints = Math.max(...data.map((m) => m.cumulativePoints || 0));
 
   return (
     <PDFDocument
       title="Progreso de Puntos"
-      subtitle={teamName ? `Equipo: ${teamName}` : "Evolución de Puntos por Jornada"}
+      subtitle={teamName ? `Equipo: ${teamName}` : 'Evolución de Puntos por Jornada'}
     >
       <PDFSection title="Resumen General">
         <PDFStatCards stats={stats} />
@@ -120,7 +112,11 @@ export const PointsProgressPDF = ({ data, teamName }: PointsProgressPDFProps) =>
 
                 // Draw point with border (red theme)
                 painter.circle(x, y, 4).fillColor(REPORT_COLORS.primary.main).fill();
-                painter.circle(x, y, 4).strokeColor(REPORT_COLORS.neutral.white).lineWidth(1.5).stroke();
+                painter
+                  .circle(x, y, 4)
+                  .strokeColor(REPORT_COLORS.neutral.white)
+                  .lineWidth(1.5)
+                  .stroke();
               });
               painter.stroke();
 

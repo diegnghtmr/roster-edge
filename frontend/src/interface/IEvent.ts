@@ -14,5 +14,5 @@ export interface IEvent {
 
 export type EventFormData = Omit<
   IEvent,
-  "id" | "createdAt" | "updatedAt" | "seasonName" | "venueName"
+  'id' | 'createdAt' | 'updatedAt' | 'seasonName' | 'venueName'
 >;

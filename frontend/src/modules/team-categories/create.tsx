@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { TeamCategoryForm, type INewTeamCategory } from "./components/Form";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TeamCategoryForm, type INewTeamCategory } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
 
 interface IField {
   name: string;
@@ -18,12 +18,12 @@ interface IField {
 export const TeamCategoryCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [category, setCategory] = useState<INewTeamCategory>({
-    name: "",
+    name: '',
   });
 
-  const resource = ["team-categories"];
+  const resource = ['team-categories'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -34,7 +34,7 @@ export const TeamCategoryCreateModule = () => {
 
       // Validate required fields
       if (!category.name) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -48,18 +48,15 @@ export const TeamCategoryCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al crear el team-categories",
-            );
+            toast.error(errorMessage || 'Error al crear el team-categories');
           } else {
-            toast.success("Team-categories creado exitosamente");
-            navigate("/team-categories");
+            toast.success('Team-categories creado exitosamente');
+            navigate('/team-categories');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear el team-categories. Por favor, intenta nuevamente.",
+            error?.message || 'Error al crear el team-categories. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -93,8 +90,6 @@ export const TeamCategoryCreateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

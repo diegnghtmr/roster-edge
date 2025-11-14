@@ -1,9 +1,8 @@
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { ReportCard } from "@/components/reports/ReportCard";
-import { reportsData, getIconComponent } from "./ReportsData";
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { ReportCard } from '@/components/reports/ReportCard';
+import { reportsData, getIconComponent } from './ReportsData';
 
 export const ReportsModule = () => {
-
   return (
     <div className="w-full">
       <InternalHeader

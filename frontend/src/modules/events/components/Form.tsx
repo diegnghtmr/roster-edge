@@ -1,17 +1,17 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import useGetList from "@/api/services/getServices/useGetList";
-import type { ISeason } from "@/interface/ISeason";
-import type { IVenueResponse } from "@/interface/IVenue";
+} from '@/components/ui/select';
+import useGetList from '@/api/services/getServices/useGetList';
+import type { ISeason } from '@/interface/ISeason';
+import type { IVenueResponse } from '@/interface/IVenue';
 
 export interface INewEvent {
   seasonId: number;
@@ -41,22 +41,18 @@ export const EventForm: React.FC<EventFormProps> = ({
   isLoading,
 }) => {
   // Fetch seasons for the dropdown
-  const { data: seasons = [], isLoading: seasonsLoading } = useGetList<
-    ISeason[]
-  >({
-    key: "seasons",
-    resource: ["seasons"],
-    keyResults: "data",
+  const { data: seasons = [], isLoading: seasonsLoading } = useGetList<ISeason[]>({
+    key: 'seasons',
+    resource: ['seasons'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch venues for the dropdown
-  const { data: venues = [], isLoading: venuesLoading } = useGetList<
-    IVenueResponse[]
-  >({
-    key: "venues",
-    resource: ["venues"],
-    keyResults: "data",
+  const { data: venues = [], isLoading: venuesLoading } = useGetList<IVenueResponse[]>({
+    key: 'venues',
+    resource: ['venues'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -69,20 +65,17 @@ export const EventForm: React.FC<EventFormProps> = ({
   // Format the date array to a string for the date input
   const formatDateArray = (dateArray: number[]): string => {
     if (!dateArray || dateArray.length !== 3) {
-      return "";
+      return '';
     }
     const [year, month, day] = dateArray;
     // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, "0");
-    const paddedDay = day.toString().padStart(2, "0");
+    const paddedMonth = month.toString().padStart(2, '0');
+    const paddedDay = day.toString().padStart(2, '0');
     return `${year}-${paddedMonth}-${paddedDay}`;
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre del Evento
@@ -92,9 +85,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           name="name"
           type="text"
           value={event.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ej. Entrenamiento Táctico Semanal"
           required
         />
@@ -111,7 +102,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           value={formatDateArray(event.date)}
           onChange={(e) =>
             onChangeValue({
-              name: "date",
+              name: 'date',
               value: parseDateToArray(e.target.value),
             })
           }
@@ -125,9 +116,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         </label>
         <Select
           value={event.seasonId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "seasonId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'seasonId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione una temporada" />
@@ -154,9 +143,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         </label>
         <Select
           value={event.venueId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "venueId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'venueId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione una sede" />
@@ -178,19 +165,14 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
 
       <div className="space-y-2 col-span-1 md:col-span-2">
-        <label
-          htmlFor="description"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="description" className="text-sm font-medium text-gray-700">
           Descripción
         </label>
         <Textarea
           id="description"
           name="description"
           value={event.description}
-          onChange={(e) =>
-            onChangeValue({ name: "description", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'description', value: e.target.value })}
           placeholder="Ej. Sesión de entrenamiento enfocada en táctica defensiva y transiciones rápidas"
           rows={3}
           required
@@ -202,10 +184,8 @@ export const EventForm: React.FC<EventFormProps> = ({
           Estado
         </label>
         <Select
-          value={event.active ? "true" : "false"}
-          onValueChange={(value) =>
-            onChangeValue({ name: "active", value: value === "true" })
-          }
+          value={event.active ? 'true' : 'false'}
+          onValueChange={(value) => onChangeValue({ name: 'active', value: value === 'true' })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione el estado" />
@@ -219,7 +199,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

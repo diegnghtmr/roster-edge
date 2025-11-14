@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { IMatchday } from "@/interface/IMatchday";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { MatchdayForm, type INewMatchday } from "./components/Form";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { IMatchday } from '@/interface/IMatchday';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { MatchdayForm, type INewMatchday } from './components/Form';
 
 interface IField {
   name: string;
@@ -24,19 +24,18 @@ export const MatchdayUpdateModule = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [matchday, setMatchday] = useState<INewMatchday>({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     active: true,
   });
 
   // Fetch the matchday data
-  const { data: matchdayData, isLoading: loadingMatchday } =
-    useGetList<IMatchday>({
-      key: `matchday-${id}`,
-      resource: [`matchdays/${id}`],
-      keyResults: "data",
-      enabled: !!id,
-    });
+  const { data: matchdayData, isLoading: loadingMatchday } = useGetList<IMatchday>({
+    key: `matchday-${id}`,
+    resource: [`matchdays/${id}`],
+    keyResults: 'data',
+    enabled: !!id,
+  });
 
   // Populate form when matchday data is loaded
   useEffect(() => {
@@ -51,7 +50,7 @@ export const MatchdayUpdateModule = () => {
   }, [matchdayData]);
 
   const resource = [`matchdays/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -70,16 +69,15 @@ export const MatchdayUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al actualizar la jornada");
+            toast.error(errorMessage || 'Error al actualizar la jornada');
           } else {
-            toast.success("Jornada actualizada exitosamente");
-            navigate("/matchdays");
+            toast.success('Jornada actualizada exitosamente');
+            navigate('/matchdays');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar la jornada. Por favor, intenta nuevamente."
+            error?.message || 'Error al actualizar la jornada. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -102,7 +100,7 @@ export const MatchdayUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingMatchday && "Obteniendo información de la jornada"}
+            {loadingMatchday && 'Obteniendo información de la jornada'}
           </div>
         </div>
       </div>

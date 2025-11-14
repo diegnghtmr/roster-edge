@@ -11,4 +11,4 @@ export interface IMatch {
   eventId: number;
 }
 
-export type MatchFormData = Omit<IMatch, "id" | "createdAt" | "updatedAt">;
+export type MatchFormData = Omit<IMatch, 'id' | 'createdAt' | 'updatedAt'>;

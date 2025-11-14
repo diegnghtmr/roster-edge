@@ -1,6 +1,6 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export interface INewCurrency {
   name: string;
@@ -26,10 +26,7 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
   isLoading,
 }) => {
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre de la moneda
@@ -39,9 +36,7 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
           name="name"
           type="text"
           value={currency.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ingrese el nombre de la moneda"
           required
         />
@@ -56,9 +51,7 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
           name="symbol"
           type="text"
           value={currency.symbol}
-          onChange={(e) =>
-            onChangeValue({ name: "symbol", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'symbol', value: e.target.value })}
           placeholder="Ingrese el símbolo de la moneda"
           required
         />
@@ -66,7 +59,7 @@ export const CurrencyForm: React.FC<CurrencyFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

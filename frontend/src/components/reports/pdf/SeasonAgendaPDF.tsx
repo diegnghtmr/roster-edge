@@ -1,5 +1,5 @@
-import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFBarChart } from "./PDFDocument";
-import type { SeasonAgendaResponse } from "@/interface/IReports";
+import { PDFDocument, PDFTable, PDFSection, PDFStatCards, PDFBarChart } from './PDFDocument';
+import type { SeasonAgendaResponse } from '@/interface/IReports';
 
 interface SeasonAgendaPDFProps {
   data: SeasonAgendaResponse[];
@@ -8,44 +8,40 @@ interface SeasonAgendaPDFProps {
 
 export const SeasonAgendaPDF = ({ data, seasonName }: SeasonAgendaPDFProps) => {
   // Calculate stats
-  const upcomingEvents = data.filter(event => (event.daysToEvent || 0) >= 0).length;
-  const pastEvents = data.filter(event => (event.daysToEvent || 0) < 0).length;
-  const nextEvent = data.find(event => (event.daysToEvent || 0) >= 0);
+  const upcomingEvents = data.filter((event) => (event.daysToEvent || 0) >= 0).length;
+  const pastEvents = data.filter((event) => (event.daysToEvent || 0) < 0).length;
+  const nextEvent = data.find((event) => (event.daysToEvent || 0) >= 0);
 
   const stats = [
-    { label: "Eventos Próximos", value: upcomingEvents },
-    { label: "Eventos Pasados", value: pastEvents },
-    { label: "Próximo Evento", value: nextEvent ? `En ${nextEvent.daysToEvent} días` : "Sin eventos" },
+    { label: 'Eventos Próximos', value: upcomingEvents },
+    { label: 'Eventos Pasados', value: pastEvents },
+    {
+      label: 'Próximo Evento',
+      value: nextEvent ? `En ${nextEvent.daysToEvent} días` : 'Sin eventos',
+    },
   ];
 
   // Chart data - upcoming vs past
   const chartData = [
-    { name: "Próximos", value: upcomingEvents },
-    { name: "Pasados", value: pastEvents },
+    { name: 'Próximos', value: upcomingEvents },
+    { name: 'Pasados', value: pastEvents },
   ];
 
-  const tableHeaders = [
-    "Evento",
-    "Fecha",
-    "Días hasta",
-    "Fase",
-    "Sede",
-    "Ciudad",
-  ];
+  const tableHeaders = ['Evento', 'Fecha', 'Días hasta', 'Fase', 'Sede', 'Ciudad'];
 
   const tableData = data.map((event) => [
-    event.eventName || "-",
-    event.eventDate || "-",
+    event.eventName || '-',
+    event.eventDate || '-',
     event.daysToEvent || 0,
-    event.phase || "-",
-    event.venueName || "-",
-    event.cityName || "-",
+    event.phase || '-',
+    event.venueName || '-',
+    event.cityName || '-',
   ]);
 
   return (
     <PDFDocument
       title="Agenda de Temporada"
-      subtitle={seasonName ? `Temporada: ${seasonName}` : "Calendario de Eventos"}
+      subtitle={seasonName ? `Temporada: ${seasonName}` : 'Calendario de Eventos'}
     >
       <PDFSection title="Resumen General">
         <PDFStatCards stats={stats} />

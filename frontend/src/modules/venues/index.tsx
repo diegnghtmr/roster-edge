@@ -1,6 +1,6 @@
-import { VenuesList } from "./components/List";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Plus } from "lucide-react";
+import { VenuesList } from './components/List';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Plus } from 'lucide-react';
 
 export const VenuesModule = () => {
   return (

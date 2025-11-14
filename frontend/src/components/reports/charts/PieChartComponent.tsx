@@ -1,5 +1,5 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { CHART_PALETTES, REPORT_COLORS } from "@/constants/reportColors";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { CHART_PALETTES, REPORT_COLORS } from '@/constants/reportColors';
 
 interface PieChartComponentProps {
   data: Record<string, string | number>[];
@@ -41,7 +41,7 @@ const createLabelRenderer = (minLabelPercentage: number) => (props: CustomPieLab
     innerRadius = 0,
     outerRadius = 0,
     percent = 0,
-    name = "",
+    name = '',
   } = props;
 
   const percentage = percent * 100;
@@ -59,7 +59,7 @@ const createLabelRenderer = (minLabelPercentage: number) => (props: CustomPieLab
       x={x}
       y={y}
       fill={REPORT_COLORS.neutral.gray800}
-      textAnchor={x > cx ? "start" : "end"}
+      textAnchor={x > cx ? 'start' : 'end'}
       dominantBaseline="middle"
       fontSize={12}
       fontWeight={600}
@@ -161,10 +161,7 @@ export const PieChartComponent = ({
           stroke="#fff"
         >
           {data.map((_entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={colors[index % colors.length]}
-            />
+            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
           ))}
         </Pie>
         <Tooltip content={<CustomTooltip />} />
@@ -176,7 +173,7 @@ export const PieChartComponent = ({
           iconSize={10}
           wrapperStyle={{
             paddingTop: '20px',
-            fontSize: '14px'
+            fontSize: '14px',
           }}
         />
       </PieChart>

@@ -1,18 +1,18 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { Spinner } from "@/components/ui/spinner";
-import type { Country } from "@/interface/ICountry";
-import { type INewCity, CityForm } from "./components/Form";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { Spinner } from '@/components/ui/spinner';
+import type { Country } from '@/interface/ICountry';
+import { type INewCity, CityForm } from './components/Form';
 
 interface IField {
   name: string;
@@ -23,21 +23,19 @@ export const CityCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [city, setCity] = useState<INewCity>({
-    name: "",
+    name: '',
     countryId: 0,
   });
 
   // Fetch countries
-  const { data: countries = [], isLoading: isLoadingCountries } = useGetList<
-    Country[]
-  >({
-    key: "countries",
-    resource: ["countries"],
-    keyResults: "data",
+  const { data: countries = [], isLoading: isLoadingCountries } = useGetList<Country[]>({
+    key: 'countries',
+    resource: ['countries'],
+    keyResults: 'data',
     enabled: true,
   });
 
-  const resource = ["cities"];
+  const resource = ['cities'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -48,7 +46,7 @@ export const CityCreateModule = () => {
 
       // Validate that required IDs are selected
       if (!city.countryId) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -63,24 +61,21 @@ export const CityCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear la ciudad");
+            toast.error(errorMessage || 'Error al crear la ciudad');
           } else {
-            toast.success("Ciudad creada exitosamente");
-            navigate("/cities");
+            toast.success('Ciudad creada exitosamente');
+            navigate('/cities');
           }
         },
         onError: (error: Error) => {
-          toast.error(
-            error?.message ||
-              "Error al crear la ciudad. Por favor, intenta nuevamente.",
-          );
+          toast.error(error?.message || 'Error al crear la ciudad. Por favor, intenta nuevamente.');
         },
         onSettled: () => {
           setIsLoading(false);
         },
       });
     },
-    [city, mutate, navigate],
+    [city, mutate, navigate]
   );
 
   // Set the values after field changes

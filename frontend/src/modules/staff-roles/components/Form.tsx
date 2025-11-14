@@ -1,6 +1,6 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export interface INewStaffRole {
   name: string;
@@ -38,9 +38,7 @@ export const StaffRoleForm: React.FC<StaffRoleFormProps> = ({
           name="name"
           type="text"
           value={staffRole.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ingrese el nombre del rol"
           required
         />
@@ -48,7 +46,7 @@ export const StaffRoleForm: React.FC<StaffRoleFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2 xl:col-span-3">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

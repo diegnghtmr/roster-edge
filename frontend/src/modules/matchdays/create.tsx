@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { MatchdayForm, type INewMatchday } from "./components/Form";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { MatchdayForm, type INewMatchday } from './components/Form';
 
 interface IField {
   name: string;
@@ -20,12 +20,12 @@ export const MatchdayCreateModule = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [matchday, setMatchday] = useState<INewMatchday>({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     active: true,
   });
 
-  const resource = ["matchdays"];
+  const resource = ['matchdays'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -45,16 +45,15 @@ export const MatchdayCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al crear la jornada");
+            toast.error(errorMessage || 'Error al crear la jornada');
           } else {
-            toast.success("Jornada creada exitosamente");
-            navigate("/matchdays");
+            toast.success('Jornada creada exitosamente');
+            navigate('/matchdays');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear la jornada. Por favor, intenta nuevamente."
+            error?.message || 'Error al crear la jornada. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {

@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
-import useGetList from "@/api/services/getServices/useGetList";
-import { useMutateDeleteService } from "@/api/services/useDelete";
-import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import type { FilterConfig } from "@/components/table/SearchComponent";
-import type { Country } from "@/interface/ICountry";
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import useGetList from '@/api/services/getServices/useGetList';
+import { useMutateDeleteService } from '@/api/services/useDelete';
+import { DataTable, type TableColumn } from '@/components/table/DataTable';
+import type { FilterConfig } from '@/components/table/SearchComponent';
+import type { Country } from '@/interface/ICountry';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,23 +14,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
-import { CountryItemList } from "./ItemList";
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import { CountryItemList } from './ItemList';
 
 const headers: TableColumn[] = [
-  { title: "ID", key: "id", className: "w-16" },
-  { title: "Nombre", key: "name" },
-  { title: "Fecha de creación", key: "createdAt" },
-  { title: "Acciones", key: "actions", className: "w-32" },
+  { title: 'ID', key: 'id', className: 'w-16' },
+  { title: 'Nombre', key: 'name' },
+  { title: 'Fecha de creación', key: 'createdAt' },
+  { title: 'Acciones', key: 'actions', className: 'w-32' },
 ];
 
 const filters: FilterConfig[] = [
   {
-    key: "name",
-    label: "Nombre",
-    type: "text",
-    placeholder: "Buscar por nombre...",
+    key: 'name',
+    label: 'Nombre',
+    type: 'text',
+    placeholder: 'Buscar por nombre...',
   },
 ];
 
@@ -40,14 +40,14 @@ export const CountriesList: React.FC = () => {
   const [countryToDelete, setCountryToDelete] = useState<number | null>(null);
 
   const { data, isLoading, refetch, isFetching } = useGetList({
-    key: "countriesList",
-    resource: ["countries"],
-    keyResults: "data",
+    key: 'countriesList',
+    resource: ['countries'],
+    keyResults: 'data',
     enabled: true,
     params: searchParams,
   });
 
-  const deleteService = useMutateDeleteService(["countries"]);
+  const deleteService = useMutateDeleteService(['countries']);
 
   // Avoid infinity loops handle manually refetch
   useEffect(() => {
@@ -79,11 +79,11 @@ export const CountriesList: React.FC = () => {
   const deleteItem = (id: string) => {
     deleteService.mutate(id, {
       onSuccess: () => {
-        toast.success("País eliminado exitosamente");
+        toast.success('País eliminado exitosamente');
         setShouldRefetch(true);
       },
       onError: () => {
-        toast.error("Error al eliminar el país");
+        toast.error('Error al eliminar el país');
       },
     });
   };
@@ -92,17 +92,13 @@ export const CountriesList: React.FC = () => {
   const countries: Country[] = React.useMemo(() => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
-    console.warn("Unexpected data structure:", data);
+    console.warn('Unexpected data structure:', data);
     return [];
   }, [data]);
 
   // Render function for each row
   const renderRow = (country: Country) => (
-    <CountryItemList
-      key={country.id}
-      country={country}
-      onDelete={handleDelete}
-    />
+    <CountryItemList key={country.id} country={country} onDelete={handleDelete} />
   );
 
   return (
@@ -127,16 +123,12 @@ export const CountriesList: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. El país será eliminado
-              permanentemente del sistema.
+              Esta acción no se puede deshacer. El país será eliminado permanentemente del sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>

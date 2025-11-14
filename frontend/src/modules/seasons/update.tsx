@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { ISeason } from "@/interface/ISeason";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { SeasonForm, type INewSeason } from "./components/Form";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { ISeason } from '@/interface/ISeason';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { SeasonForm, type INewSeason } from './components/Form';
 
 interface IField {
   name: string;
@@ -25,7 +25,7 @@ export const SeasonUpdateModule = () => {
 
   const [season, setSeason] = useState<INewSeason>({
     clubId: 0,
-    name: "",
+    name: '',
     startDate: [new Date().getFullYear(), 1, 1],
     endDate: [new Date().getFullYear(), 12, 31],
     active: true,
@@ -35,7 +35,7 @@ export const SeasonUpdateModule = () => {
   const { data: seasonData, isLoading: loadingSeason } = useGetList<ISeason>({
     key: `season-${id}`,
     resource: [`seasons/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -54,7 +54,7 @@ export const SeasonUpdateModule = () => {
   }, [seasonData]);
 
   const resource = [`seasons/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -65,8 +65,8 @@ export const SeasonUpdateModule = () => {
       // Transform data to match API expectations
       const formatDateArray = (dateArray: number[]): string => {
         const [year, month, day] = dateArray;
-        const paddedMonth = month.toString().padStart(2, "0");
-        const paddedDay = day.toString().padStart(2, "0");
+        const paddedMonth = month.toString().padStart(2, '0');
+        const paddedDay = day.toString().padStart(2, '0');
         return `${year}-${paddedMonth}-${paddedDay}`;
       };
 
@@ -82,16 +82,15 @@ export const SeasonUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(errorMessage || "Error al actualizar la temporada");
+            toast.error(errorMessage || 'Error al actualizar la temporada');
           } else {
-            toast.success("Temporada actualizada exitosamente");
-            navigate("/seasons");
+            toast.success('Temporada actualizada exitosamente');
+            navigate('/seasons');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar la temporada. Por favor, intenta nuevamente."
+            error?.message || 'Error al actualizar la temporada. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -114,7 +113,7 @@ export const SeasonUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingSeason && "Obteniendo información de la temporada"}
+            {loadingSeason && 'Obteniendo información de la temporada'}
           </div>
         </div>
       </div>

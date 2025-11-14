@@ -9,4 +9,4 @@ export interface ISeason {
   endDate: number[];
 }
 
-export type SeasonFormData = Omit<ISeason, "id" | "createdAt" | "updatedAt">;
+export type SeasonFormData = Omit<ISeason, 'id' | 'createdAt' | 'updatedAt'>;

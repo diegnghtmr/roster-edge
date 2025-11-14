@@ -10,4 +10,4 @@ export interface IStadium {
   venueId: number;
 }
 
-export type StadiumFormData = Omit<IStadium, "id" | "createdAt" | "updatedAt">;
+export type StadiumFormData = Omit<IStadium, 'id' | 'createdAt' | 'updatedAt'>;

@@ -1,16 +1,16 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { StaffRoleForm, type INewStaffRole } from "./components/Form";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { StaffRoleForm, type INewStaffRole } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { StaffRole } from "@/interface/IStaffRole";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { StaffRole } from '@/interface/IStaffRole';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
 
 interface IField {
   name: string;
@@ -21,22 +21,22 @@ export const StaffRoleUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [staffRole, setStaffRole] = useState<INewStaffRole>({
-    name: "",
+    name: '',
   });
 
   // Fetch the staff role data
   const { data: staffRoleData, isLoading: loadingStaffRole } = useGetList({
     key: `staff-role-${id}`,
     resource: [`staff-roles/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
   // Populate form when staff role data is loaded
   useEffect(() => {
-    console.log("Fetched staff role data:", staffRoleData);
+    console.log('Fetched staff role data:', staffRoleData);
     if (staffRoleData && staffRoleData.id) {
       const fetchedStaffRole = staffRoleData as StaffRole;
 
@@ -47,7 +47,7 @@ export const StaffRoleUpdateModule = () => {
   }, [staffRoleData]);
 
   const resource = [`staff-roles/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -57,7 +57,7 @@ export const StaffRoleUpdateModule = () => {
 
       // Validate that name is provided
       if (!staffRole.name.trim()) {
-        toast.error("Por favor ingrese el nombre del rol");
+        toast.error('Por favor ingrese el nombre del rol');
         setIsLoading(false);
         return;
       }
@@ -70,18 +70,15 @@ export const StaffRoleUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el staff-roles",
-            );
+            toast.error(errorMessage || 'Error al actualizar el staff-roles');
           } else {
-            toast.success("Staff-roles actualizado exitosamente");
-            navigate("/staff-roles");
+            toast.success('Staff-roles actualizado exitosamente');
+            navigate('/staff-roles');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el staff-roles. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar el staff-roles. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -103,9 +100,7 @@ export const StaffRoleUpdateModule = () => {
       <div className="w-full flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
-          <div className="text-sm text-gray-500">
-            Obteniendo información del rol de personal
-          </div>
+          <div className="text-sm text-gray-500">Obteniendo información del rol de personal</div>
         </div>
       </div>
     );
@@ -128,8 +123,6 @@ export const StaffRoleUpdateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { Currency } from "@/interface/ICurrency";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { CurrencyForm, type INewCurrency } from "./components/Form";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { Currency } from '@/interface/ICurrency';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { CurrencyForm, type INewCurrency } from './components/Form';
 
 interface IField {
   name: string;
@@ -22,17 +22,17 @@ export const CurrencyUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [currency, setCurrency] = useState<INewCurrency>({
-    name: "",
-    symbol: "",
+    name: '',
+    symbol: '',
   });
 
   // Fetch the currency data
   const { data: currencyData, isLoading: loadingCurrency } = useGetList({
     key: `currency-${id}`,
     resource: [`currencies/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -48,7 +48,7 @@ export const CurrencyUpdateModule = () => {
   }, [currencyData]);
 
   const resource = [`currencies/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -66,18 +66,15 @@ export const CurrencyUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el currencies",
-            );
+            toast.error(errorMessage || 'Error al actualizar el currencies');
           } else {
-            toast.success("Currencies actualizado exitosamente");
-            navigate("/currencies");
+            toast.success('Currencies actualizado exitosamente');
+            navigate('/currencies');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el currencies. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar el currencies. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -100,7 +97,7 @@ export const CurrencyUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingCurrency && "Obteniendo información de la moneda"}
+            {loadingCurrency && 'Obteniendo información de la moneda'}
           </div>
         </div>
       </div>
@@ -124,8 +121,6 @@ export const CurrencyUpdateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

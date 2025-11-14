@@ -1,5 +1,14 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { REPORT_COLORS } from "@/constants/reportColors";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import { REPORT_COLORS } from '@/constants/reportColors';
 
 interface BarChartComponentProps {
   data: Record<string, string | number>[];
@@ -16,7 +25,7 @@ export const BarChartComponent = ({
   bars,
   height = 400,
   yAxisLabel,
-  xAxisLabel
+  xAxisLabel,
 }: BarChartComponentProps) => {
   // Custom tick component to handle long labels with rotation
   interface AxisTickProps {
@@ -39,9 +48,7 @@ export const BarChartComponent = ({
           fontSize={12}
           transform="rotate(-35)"
         >
-          {payload.value.length > 15
-            ? `${payload.value.substring(0, 15)}...`
-            : payload.value}
+          {payload.value.length > 15 ? `${payload.value.substring(0, 15)}...` : payload.value}
         </text>
       </g>
     );
@@ -61,10 +68,7 @@ export const BarChartComponent = ({
           <p className="font-bold text-gray-900 mb-2 text-base">{label}</p>
           {payload.map((entry, index: number) => (
             <div key={index} className="flex items-center gap-2 mb-1">
-              <div
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: entry.color }} />
               <p className="text-sm font-medium text-gray-700">
                 {entry.name}: <span className="font-bold">{entry.value}</span>
               </p>
@@ -78,10 +82,7 @@ export const BarChartComponent = ({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart
-        data={data}
-        margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
-      >
+      <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
         <CartesianGrid
           strokeDasharray="3 3"
           stroke={REPORT_COLORS.neutral.gray200}
@@ -94,30 +95,38 @@ export const BarChartComponent = ({
           axisLine={{ stroke: REPORT_COLORS.neutral.gray400, strokeWidth: 1.5 }}
           interval={0}
           height={80}
-          label={xAxisLabel ? {
-            value: xAxisLabel,
-            position: 'insideBottom',
-            offset: -60,
-            style: { fill: REPORT_COLORS.neutral.gray700, fontWeight: 600 }
-          } : undefined}
+          label={
+            xAxisLabel
+              ? {
+                  value: xAxisLabel,
+                  position: 'insideBottom',
+                  offset: -60,
+                  style: { fill: REPORT_COLORS.neutral.gray700, fontWeight: 600 },
+                }
+              : undefined
+          }
         />
         <YAxis
           tick={{ fill: REPORT_COLORS.neutral.gray600, fontSize: 12 }}
           tickLine={{ stroke: REPORT_COLORS.neutral.gray400 }}
           axisLine={{ stroke: REPORT_COLORS.neutral.gray400, strokeWidth: 1.5 }}
-          label={yAxisLabel ? {
-            value: yAxisLabel,
-            angle: -90,
-            position: 'insideLeft',
-            style: { fill: REPORT_COLORS.neutral.gray700, fontWeight: 600 }
-          } : undefined}
+          label={
+            yAxisLabel
+              ? {
+                  value: yAxisLabel,
+                  angle: -90,
+                  position: 'insideLeft',
+                  style: { fill: REPORT_COLORS.neutral.gray700, fontWeight: 600 },
+                }
+              : undefined
+          }
           domain={[0, 'auto']}
         />
         <Tooltip content={<CustomTooltip />} cursor={{ fill: REPORT_COLORS.neutral.gray100 }} />
         <Legend
           wrapperStyle={{
             paddingTop: '20px',
-            fontSize: '14px'
+            fontSize: '14px',
           }}
           iconType="rect"
           iconSize={12}

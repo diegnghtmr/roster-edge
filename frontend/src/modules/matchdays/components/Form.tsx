@@ -1,14 +1,14 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 export interface INewMatchday {
   name: string;
@@ -35,10 +35,7 @@ export const MatchdayForm: React.FC<MatchdayFormProps> = ({
   isLoading,
 }) => {
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
-    >
+    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre de la Jornada
@@ -48,9 +45,7 @@ export const MatchdayForm: React.FC<MatchdayFormProps> = ({
           name="name"
           type="text"
           value={matchday.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ej. Jornada 1"
           required
         />
@@ -61,10 +56,8 @@ export const MatchdayForm: React.FC<MatchdayFormProps> = ({
           Estado
         </label>
         <Select
-          value={matchday.active ? "true" : "false"}
-          onValueChange={(value) =>
-            onChangeValue({ name: "active", value: value === "true" })
-          }
+          value={matchday.active ? 'true' : 'false'}
+          onValueChange={(value) => onChangeValue({ name: 'active', value: value === 'true' })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione el estado" />
@@ -77,19 +70,14 @@ export const MatchdayForm: React.FC<MatchdayFormProps> = ({
       </div>
 
       <div className="space-y-2 col-span-1 md:col-span-2">
-        <label
-          htmlFor="description"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="description" className="text-sm font-medium text-gray-700">
           Descripción
         </label>
         <Textarea
           id="description"
           name="description"
           value={matchday.description}
-          onChange={(e) =>
-            onChangeValue({ name: "description", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'description', value: e.target.value })}
           placeholder="Ej. Primera jornada de la temporada regular"
           rows={3}
           required
@@ -98,7 +86,7 @@ export const MatchdayForm: React.FC<MatchdayFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>

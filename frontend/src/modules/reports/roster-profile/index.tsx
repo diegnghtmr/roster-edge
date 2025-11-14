@@ -1,24 +1,26 @@
-import { useState, useMemo } from "react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { ExportButton } from "@/components/reports/ExportButton";
-import { ReportFilters, type FilterField } from "@/components/reports/ReportFilters";
-import { StatCard } from "@/components/reports/StatCard";
-import { PieChartComponent } from "@/components/reports/charts/PieChartComponent";
-import { BarChartComponent } from "@/components/reports/charts/BarChartComponent";
-import { RosterProfilePDF } from "@/components/reports/pdf/RosterProfilePDF";
-import { useRosterProfileReport } from "@/api/services/reports/useReportsData";
-import { useClubsForFilter, useTeamsForFilter } from "@/api/services/filters/useFilterOptions";
-import { translatePhysicalState } from "@/utils/translations";
-import { ArrowLeft, Users, Activity, TrendingUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TeamRosterProfileResponse } from "@/interface/IReports";
+import { useState, useMemo } from 'react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { ExportButton } from '@/components/reports/ExportButton';
+import { ReportFilters, type FilterField } from '@/components/reports/ReportFilters';
+import { StatCard } from '@/components/reports/StatCard';
+import { PieChartComponent } from '@/components/reports/charts/PieChartComponent';
+import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
+import { RosterProfilePDF } from '@/components/reports/pdf/RosterProfilePDF';
+import { useRosterProfileReport } from '@/api/services/reports/useReportsData';
+import { useClubsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
+import { translatePhysicalState } from '@/utils/translations';
+import { ArrowLeft, Users, Activity, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { TeamRosterProfileResponse } from '@/interface/IReports';
 
 export const RosterProfileReport = () => {
   const [filters, setFilters] = useState<Record<string, string | number | boolean | undefined>>({
     onlyActiveTeams: true,
     onlyActivePlayers: true,
   });
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string | number | boolean | undefined>>({
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string | number | boolean | undefined>
+  >({
     onlyActiveTeams: true,
     onlyActivePlayers: true,
   });
@@ -30,39 +32,42 @@ export const RosterProfileReport = () => {
   );
 
   // Dynamic filter fields with loaded options
-  const filterFields: FilterField[] = useMemo(() => [
-    {
-      key: "clubId",
-      label: "Club",
-      type: "select",
-      options: clubOptions,
-      placeholder: clubsLoading ? "Cargando..." : "Seleccionar club (opcional)",
-    },
-    {
-      key: "teamId",
-      label: "Equipo",
-      type: "select",
-      options: teamOptions,
-      placeholder: teamsLoading ? "Cargando..." : "Seleccionar equipo (opcional)",
-    },
-    {
-      key: "onlyActiveTeams",
-      label: "Solo equipos activos",
-      type: "checkbox",
-      placeholder: "Mostrar solo equipos activos",
-    },
-    {
-      key: "onlyActivePlayers",
-      label: "Solo jugadores activos",
-      type: "checkbox",
-      placeholder: "Contar solo jugadores activos",
-    },
-  ], [clubOptions, clubsLoading, teamOptions, teamsLoading]);
+  const filterFields: FilterField[] = useMemo(
+    () => [
+      {
+        key: 'clubId',
+        label: 'Club',
+        type: 'select',
+        options: clubOptions,
+        placeholder: clubsLoading ? 'Cargando...' : 'Seleccionar club (opcional)',
+      },
+      {
+        key: 'teamId',
+        label: 'Equipo',
+        type: 'select',
+        options: teamOptions,
+        placeholder: teamsLoading ? 'Cargando...' : 'Seleccionar equipo (opcional)',
+      },
+      {
+        key: 'onlyActiveTeams',
+        label: 'Solo equipos activos',
+        type: 'checkbox',
+        placeholder: 'Mostrar solo equipos activos',
+      },
+      {
+        key: 'onlyActivePlayers',
+        label: 'Solo jugadores activos',
+        type: 'checkbox',
+        placeholder: 'Contar solo jugadores activos',
+      },
+    ],
+    [clubOptions, clubsLoading, teamOptions, teamsLoading]
+  );
 
   const { data, isLoading } = useRosterProfileReport(appliedFilters, true);
 
   const handleFilterChange = (key: string, value: string | number | boolean) => {
-    if (key === "clubId") {
+    if (key === 'clubId') {
       setFilters({ ...filters, clubId: value, teamId: undefined });
     } else {
       setFilters((prev) => ({ ...prev, [key]: value }));
@@ -77,8 +82,8 @@ export const RosterProfileReport = () => {
   const handleApplyFilters = () => {
     const processedFilters: Record<string, string | number | boolean | undefined> = {};
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === "" || value === null || value === undefined) return;
-      if (key.endsWith("Id") && typeof value === "string") {
+      if (value === '' || value === null || value === undefined) return;
+      if (key.endsWith('Id') && typeof value === 'string') {
         processedFilters[key] = Number(value);
       } else {
         processedFilters[key] = value;
@@ -92,13 +97,16 @@ export const RosterProfileReport = () => {
   // Calculate stats
   const totalPlayers = profiles.reduce((sum, team) => sum + (team.totalPlayers || 0), 0);
   const totalActive = profiles.reduce((sum, team) => sum + (team.activePlayers || 0), 0);
-  const avgAge = profiles.length > 0
-    ? (profiles.reduce((sum, team) => sum + (team.averageAge || 0), 0) / profiles.length).toFixed(1)
-    : "0";
+  const avgAge =
+    profiles.length > 0
+      ? (profiles.reduce((sum, team) => sum + (team.averageAge || 0), 0) / profiles.length).toFixed(
+          1
+        )
+      : '0';
 
   // Prepare chart data
   const playersData = profiles.map((team) => ({
-    name: team.teamName || "Sin nombre",
+    name: team.teamName || 'Sin nombre',
     total: team.totalPlayers || 0,
     activos: team.activePlayers || 0,
   }));
@@ -125,10 +133,10 @@ export const RosterProfileReport = () => {
         description="Análisis demográfico y físico de jugadores"
         buttons={[
           {
-            text: "Volver",
+            text: 'Volver',
             icon: <ArrowLeft className="h-4 w-4" />,
-            link: "/reports",
-            variant: "outline",
+            link: '/reports',
+            variant: 'outline',
           },
         ]}
       />
@@ -167,7 +175,7 @@ export const RosterProfileReport = () => {
         <div className="flex justify-end">
           <ExportButton
             document={<RosterProfilePDF data={profiles} />}
-            fileName={`perfil-plantilla-${new Date().toISOString().split("T")[0]}`}
+            fileName={`perfil-plantilla-${new Date().toISOString().split('T')[0]}`}
             disabled={profiles.length === 0}
           />
         </div>
@@ -184,8 +192,8 @@ export const RosterProfileReport = () => {
                   data={playersData}
                   xKey="name"
                   bars={[
-                    { key: "total", name: "Total", color: "#3b82f6" },
-                    { key: "activos", name: "Activos", color: "#10b981" },
+                    { key: 'total', name: 'Total', color: '#3b82f6' },
+                    { key: 'activos', name: 'Activos', color: '#10b981' },
                   ]}
                 />
               </CardContent>
@@ -197,11 +205,7 @@ export const RosterProfileReport = () => {
                   <CardTitle>Distribución por Estado Físico</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <PieChartComponent
-                    data={physicalStatesData}
-                    nameKey="name"
-                    valueKey="value"
-                  />
+                  <PieChartComponent data={physicalStatesData} nameKey="name" valueKey="value" />
                 </CardContent>
               </Card>
             )}
@@ -235,7 +239,7 @@ export const RosterProfileReport = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Edad promedio:</span>
                       <span className="font-medium">
-                        {team.averageAge ? `${team.averageAge.toFixed(1)} años` : "-"}
+                        {team.averageAge ? `${team.averageAge.toFixed(1)} años` : '-'}
                       </span>
                     </div>
                   </CardContent>

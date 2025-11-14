@@ -1,17 +1,17 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { IStadium } from "@/interface/IStadium";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import { StadiumForm, type INewStadium } from "./components/Form";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { IStadium } from '@/interface/IStadium';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import { StadiumForm, type INewStadium } from './components/Form';
 
 interface IField {
   name: string;
@@ -22,10 +22,10 @@ export const StadiumUpdateModule = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [stadium, setStadium] = useState<INewStadium>({
     area: 0,
-    surface: "",
+    surface: '',
     totalCapacity: 0,
     foundation: [new Date().getFullYear(), 1, 1],
     venueId: 0,
@@ -36,7 +36,7 @@ export const StadiumUpdateModule = () => {
   const { data: stadiumData, isLoading: loadingStadium } = useGetList({
     key: `stadium-${id}`,
     resource: [`stadiums/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
@@ -56,7 +56,7 @@ export const StadiumUpdateModule = () => {
   }, [stadiumData]);
 
   const resource = [`stadiums/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -78,18 +78,15 @@ export const StadiumUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el stadiums",
-            );
+            toast.error(errorMessage || 'Error al actualizar el stadiums');
           } else {
-            toast.success("Stadiums actualizado exitosamente");
-            navigate("/stadiums");
+            toast.success('Stadiums actualizado exitosamente');
+            navigate('/stadiums');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el stadiums. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar el stadiums. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -112,7 +109,7 @@ export const StadiumUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingStadium && "Obteniendo información del estadio"}
+            {loadingStadium && 'Obteniendo información del estadio'}
           </div>
         </div>
       </div>
@@ -136,8 +133,6 @@ export const StadiumUpdateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

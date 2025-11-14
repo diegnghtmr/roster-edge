@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { toast } from "sonner";
-import { BookmarkCheck } from "lucide-react";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { CurrencyForm, type INewCurrency } from "./components/Form";
+} from '@/api/services/useMutation';
+import { toast } from 'sonner';
+import { BookmarkCheck } from 'lucide-react';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { CurrencyForm, type INewCurrency } from './components/Form';
 
 interface IField {
   name: string;
@@ -18,13 +18,13 @@ interface IField {
 export const CurrencyCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [currency, setCurrency] = useState<INewCurrency>({
-    name: "",
-    symbol: "",
+    name: '',
+    symbol: '',
   });
 
-  const resource = ["currencies"];
+  const resource = ['currencies'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -43,18 +43,15 @@ export const CurrencyCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al crear el currencies",
-            );
+            toast.error(errorMessage || 'Error al crear el currencies');
           } else {
-            toast.success("Currencies creado exitosamente");
-            navigate("/currencies");
+            toast.success('Currencies creado exitosamente');
+            navigate('/currencies');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear el currencies. Por favor, intenta nuevamente.",
+            error?.message || 'Error al crear el currencies. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -88,8 +85,6 @@ export const CurrencyCreateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

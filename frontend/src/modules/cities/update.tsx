@@ -1,19 +1,19 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { City } from "@/interface/ICity";
-import type { Country } from "@/interface/ICountry";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { City } from '@/interface/ICity';
+import type { Country } from '@/interface/ICountry';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
 
-import { CityForm, type INewCity } from "./components/Form";
+import { CityForm, type INewCity } from './components/Form';
 
 interface IField {
   name: string;
@@ -26,7 +26,7 @@ export const CityUpdateModule = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [city, setCity] = useState<INewCity>({
-    name: "",
+    name: '',
     countryId: 0,
   });
 
@@ -34,17 +34,15 @@ export const CityUpdateModule = () => {
   const { data: cityData, isLoading: loadingCity } = useGetList({
     key: `city-${id}`,
     resource: [`cities/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
   // Fetch countries
-  const { data: countries = [], isLoading: isLoadingCountries } = useGetList<
-    Country[]
-  >({
-    key: "countries",
-    resource: ["countries"],
-    keyResults: "data",
+  const { data: countries = [], isLoading: isLoadingCountries } = useGetList<Country[]>({
+    key: 'countries',
+    resource: ['countries'],
+    keyResults: 'data',
     enabled: true,
   });
 
@@ -60,7 +58,7 @@ export const CityUpdateModule = () => {
   }, [cityData]);
 
   const resource = [`cities/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -70,7 +68,7 @@ export const CityUpdateModule = () => {
 
       // Validate that required IDs are selected
       if (!city.countryId) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -85,18 +83,15 @@ export const CityUpdateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar la ciudad",
-            );
+            toast.error(errorMessage || 'Error al actualizar la ciudad');
           } else {
-            toast.success("Ciudad actualizada exitosamente");
-            navigate("/cities");
+            toast.success('Ciudad actualizada exitosamente');
+            navigate('/cities');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar la ciudad. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar la ciudad. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -104,7 +99,7 @@ export const CityUpdateModule = () => {
         },
       });
     },
-    [city, mutate, navigate],
+    [city, mutate, navigate]
   );
 
   // Set the values after field changes
@@ -119,8 +114,8 @@ export const CityUpdateModule = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingCity && "Obteniendo información de la ciudad"}
-            {isLoadingCountries && "Cargando países"}
+            {loadingCity && 'Obteniendo información de la ciudad'}
+            {isLoadingCountries && 'Cargando países'}
           </div>
         </div>
       </div>

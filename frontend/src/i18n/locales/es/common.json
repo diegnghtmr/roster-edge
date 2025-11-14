@@ -1,0 +1,71 @@
+{
+  "actions": {
+    "create": "Crear",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "reset": "Restablecer",
+    "clear": "Limpiar"
+  },
+  "messages": {
+    "success": {
+      "created": "{{resource}} creado exitosamente",
+      "updated": "{{resource}} actualizado exitosamente",
+      "deleted": "{{resource}} eliminado exitosamente"
+    },
+    "error": {
+      "create": "Error al crear {{resource}}",
+      "update": "Error al actualizar {{resource}}",
+      "delete": "Error al eliminar {{resource}}",
+      "fetch": "Error al cargar los datos",
+      "generic": "Ha ocurrido un error inesperado"
+    },
+    "confirm": {
+      "delete": "¿Está seguro que desea eliminar este {{resource}}?"
+    }
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "minLength": "Debe tener al menos {{min}} caracteres",
+    "maxLength": "No puede exceder {{max}} caracteres",
+    "email": "Debe ser un correo electrónico válido",
+    "number": "Debe ser un número válido",
+    "positive": "Debe ser un número positivo"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "noResults": "No se encontraron resultados",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "name": "Nombre",
+    "description": "Descripción",
+    "status": "Estado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "date": "Fecha",
+    "actions": "Acciones"
+  },
+  "accessibility": {
+    "skipToContent": "Saltar al contenido principal",
+    "menu": "Menú",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "expand": "Expandir",
+    "collapse": "Contraer",
+    "loading": "Cargando contenido",
+    "search": "Buscar",
+    "clearSearch": "Limpiar búsqueda"
+  }
+}

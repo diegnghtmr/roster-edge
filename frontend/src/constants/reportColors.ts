@@ -4,38 +4,38 @@
 export const REPORT_COLORS = {
   // Primary Brand Colors (RED - RosterEdge Brand)
   primary: {
-    main: '#dc2626',        // Red 600 - Main brand color
-    light: '#ef4444',       // Red 500 - Lighter accent
-    dark: '#b91c1c',        // Red 700 - Darker accent
+    main: '#dc2626', // Red 600 - Main brand color
+    light: '#ef4444', // Red 500 - Lighter accent
+    dark: '#b91c1c', // Red 700 - Darker accent
     extraLight: '#f87171', // Red 400 - Active states
     gradient: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
   },
 
   // Secondary Colors
   secondary: {
-    main: '#059669',        // Green
-    light: '#10b981',       // Light Green
-    dark: '#047857',        // Dark Green
+    main: '#059669', // Green
+    light: '#10b981', // Light Green
+    dark: '#047857', // Dark Green
   },
 
   // Accent Colors for Charts (Red-based palette with complementary colors)
   chart: {
-    red: '#dc2626',         // Red 600 - Primary chart color
-    rose: '#f43f5e',        // Rose 500 - Complementary
-    orange: '#f97316',      // Orange 500
-    amber: '#f59e0b',       // Amber 500
-    yellow: '#eab308',      // Yellow 500
-    lime: '#84cc16',        // Lime 500
-    green: '#10b981',       // Green 500
-    emerald: '#059669',     // Emerald 600
-    teal: '#14b8a6',        // Teal 500
-    cyan: '#06b6d4',        // Cyan 500
-    blue: '#3b82f6',        // Blue 500
-    indigo: '#6366f1',      // Indigo 500
-    purple: '#a855f7',      // Purple 500
-    pink: '#ec4899',        // Pink 500
-    slate: '#64748b',       // Slate 500
-    crimson: '#b91c1c',     // Red 700 - Dark accent
+    red: '#dc2626', // Red 600 - Primary chart color
+    rose: '#f43f5e', // Rose 500 - Complementary
+    orange: '#f97316', // Orange 500
+    amber: '#f59e0b', // Amber 500
+    yellow: '#eab308', // Yellow 500
+    lime: '#84cc16', // Lime 500
+    green: '#10b981', // Green 500
+    emerald: '#059669', // Emerald 600
+    teal: '#14b8a6', // Teal 500
+    cyan: '#06b6d4', // Cyan 500
+    blue: '#3b82f6', // Blue 500
+    indigo: '#6366f1', // Indigo 500
+    purple: '#a855f7', // Purple 500
+    pink: '#ec4899', // Pink 500
+    slate: '#64748b', // Slate 500
+    crimson: '#b91c1c', // Red 700 - Dark accent
   },
 
   // Gradient combinations for charts (Red-focused)
@@ -75,16 +75,16 @@ export const REPORT_COLORS = {
   // PDF Specific Colors (Red theme)
   pdf: {
     background: '#ffffff',
-    headerBg: '#dc2626',       // Red 600
+    headerBg: '#dc2626', // Red 600
     headerText: '#ffffff',
-    sectionBg: '#fef2f2',      // Red 50 - Very light red background
+    sectionBg: '#fef2f2', // Red 50 - Very light red background
     cardBg: '#ffffff',
-    cardBorder: '#fecaca',     // Red 200
-    tableBorder: '#fca5a5',    // Red 300
-    tableHeaderBg: '#dc2626',  // Red 600
+    cardBorder: '#fecaca', // Red 200
+    tableBorder: '#fca5a5', // Red 300
+    tableHeaderBg: '#dc2626', // Red 600
     tableHeaderText: '#ffffff',
     footerText: '#9ca3af',
-    accentLine: '#ef4444',     // Red 500
+    accentLine: '#ef4444', // Red 500
   },
 };
 

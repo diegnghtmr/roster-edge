@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchGet } from "@/api/endPoints/fetchGet";
+import { useQuery } from '@tanstack/react-query';
+import { fetchGet } from '@/api/endPoints/fetchGet';
 import type {
   TeamRosterProfileResponse,
   RosterProfileReportFilter,
@@ -25,14 +25,14 @@ import type {
   PaymentMethodReportFilter,
   SubscriptionPlanPerformanceResponse,
   SubscriptionPlanReportFilter,
-} from "@/interface/IReports";
+} from '@/interface/IReports';
 
 // Helper function to build query params
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buildQueryParams = (filters: any): string => {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
+    if (value !== undefined && value !== null && value !== '') {
       params.append(key, String(value));
     }
   });
@@ -47,11 +47,11 @@ export const useRosterProfileReport = (
   enabled: boolean = true
 ) => {
   return useQuery<TeamRosterProfileResponse[]>({
-    queryKey: ["reports", "roster-profile", filters],
+    queryKey: ['reports', 'roster-profile', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "roster-profile"],
+        resource: ['analytics', 'reports', 'roster-profile'],
         params,
       });
       return response.data || [];
@@ -70,11 +70,11 @@ export const useSeasonAgendaReport = (
   enabled: boolean = true
 ) => {
   return useQuery<SeasonAgendaResponse[]>({
-    queryKey: ["reports", "season-agenda", filters],
+    queryKey: ['reports', 'season-agenda', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "season-agenda"],
+        resource: ['analytics', 'reports', 'season-agenda'],
         params,
       });
       return response.data || [];
@@ -93,11 +93,11 @@ export const useMatchLoadReport = (
   enabled: boolean = true
 ) => {
   return useQuery<TeamMatchLoadResponse[]>({
-    queryKey: ["reports", "match-load", filters],
+    queryKey: ['reports', 'match-load', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "match-load"],
+        resource: ['analytics', 'reports', 'match-load'],
         params,
       });
       return response.data || [];
@@ -116,11 +116,11 @@ export const useScoringRankingReport = (
   enabled: boolean = true
 ) => {
   return useQuery<ScoringRankingResponse[]>({
-    queryKey: ["reports", "scoring-ranking", filters],
+    queryKey: ['reports', 'scoring-ranking', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "scoring-ranking"],
+        resource: ['analytics', 'reports', 'scoring-ranking'],
         params,
       });
       return response.data || [];
@@ -139,11 +139,11 @@ export const useStaffRatioReport = (
   enabled: boolean = true
 ) => {
   return useQuery<TeamStaffRatioResponse[]>({
-    queryKey: ["reports", "staff-ratio", filters],
+    queryKey: ['reports', 'staff-ratio', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "staff-ratio"],
+        resource: ['analytics', 'reports', 'staff-ratio'],
         params,
       });
       return response.data || [];
@@ -162,11 +162,11 @@ export const usePointsProgressReport = (
   enabled: boolean = true
 ) => {
   return useQuery<TeamPointsProgressResponse[]>({
-    queryKey: ["reports", "points-progress", filters],
+    queryKey: ['reports', 'points-progress', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "points-progress"],
+        resource: ['analytics', 'reports', 'points-progress'],
         params,
       });
       return response.data || [];
@@ -185,11 +185,11 @@ export const useCategoryParticipationReport = (
   enabled: boolean = true
 ) => {
   return useQuery<CategoryParticipationResponse[]>({
-    queryKey: ["reports", "category-participation", filters],
+    queryKey: ['reports', 'category-participation', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "category-participation"],
+        resource: ['analytics', 'reports', 'category-participation'],
         params,
       });
       return response.data || [];
@@ -208,11 +208,11 @@ export const useSeasonStandingsReport = (
   enabled: boolean = true
 ) => {
   return useQuery<SeasonStandingResponse[]>({
-    queryKey: ["reports", "season-standings", filters],
+    queryKey: ['reports', 'season-standings', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "season-standings"],
+        resource: ['analytics', 'reports', 'season-standings'],
         params,
       });
       return response.data || [];
@@ -231,11 +231,11 @@ export const useScheduleDensityReport = (
   enabled: boolean = true
 ) => {
   return useQuery<ScheduleDensityResponse[]>({
-    queryKey: ["reports", "schedule-density", filters],
+    queryKey: ['reports', 'schedule-density', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "schedule-density"],
+        resource: ['analytics', 'reports', 'schedule-density'],
         params,
       });
       return response.data || [];
@@ -254,11 +254,11 @@ export const useStaffImpactReport = (
   enabled: boolean = true
 ) => {
   return useQuery<StaffImpactResponse>({
-    queryKey: ["reports", "staff-impact", filters],
+    queryKey: ['reports', 'staff-impact', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "staff-impact"],
+        resource: ['analytics', 'reports', 'staff-impact'],
         params,
       });
       return response.data || {};
@@ -277,11 +277,11 @@ export const usePaymentMethodPerformanceReport = (
   enabled: boolean = true
 ) => {
   return useQuery<PaymentMethodPerformanceResponse[]>({
-    queryKey: ["reports", "payment-method-performance", filters],
+    queryKey: ['reports', 'payment-method-performance', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "payment-method-performance"],
+        resource: ['analytics', 'reports', 'payment-method-performance'],
         params,
       });
       return response.data || [];
@@ -300,11 +300,11 @@ export const useSubscriptionPlanPerformanceReport = (
   enabled: boolean = true
 ) => {
   return useQuery<SubscriptionPlanPerformanceResponse[]>({
-    queryKey: ["reports", "subscription-plan-performance", filters],
+    queryKey: ['reports', 'subscription-plan-performance', filters],
     queryFn: async () => {
       const params = buildQueryParams(filters);
       const response = await fetchGet({
-        resource: ["analytics", "reports", "subscription-plan-performance"],
+        resource: ['analytics', 'reports', 'subscription-plan-performance'],
         params,
       });
       return response.data || [];

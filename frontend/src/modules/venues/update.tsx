@@ -1,18 +1,18 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { VenueForm, type INewVenue } from "./components/Form";
+import React, { useCallback, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { VenueForm, type INewVenue } from './components/Form';
 import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import useGetList from "@/api/services/getServices/useGetList";
-import { toast } from "sonner";
-import type { IVenueResponse } from "@/interface/IVenue";
-import type { City } from "@/interface/ICity";
-import type { Club } from "@/interface/IClub";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
+} from '@/api/services/useMutation';
+import useGetList from '@/api/services/getServices/useGetList';
+import { toast } from 'sonner';
+import type { IVenueResponse } from '@/interface/IVenue';
+import type { City } from '@/interface/ICity';
+import type { Club } from '@/interface/IClub';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
 
 interface IField {
   name: string;
@@ -23,14 +23,14 @@ export const UpdateVenue = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [venue, setVenue] = useState<INewVenue>({
-    name: "",
+    name: '',
     cityId: 0,
     clubId: 0,
-    email: "",
-    phone: "",
-    foundation: "",
+    email: '',
+    phone: '',
+    foundation: '',
     active: true,
   });
 
@@ -38,29 +38,29 @@ export const UpdateVenue = () => {
   const { data: venueData, isLoading: loadingVenue } = useGetList({
     key: `venue-${id}`,
     resource: [`venues/${id}`],
-    keyResults: "data",
+    keyResults: 'data',
     enabled: !!id,
   });
 
   // Fetch cities
   const { data: cities = [], isLoading: isLoadingCities } = useGetList<City[]>({
-    key: "cities",
-    resource: ["cities"],
-    keyResults: "data",
+    key: 'cities',
+    resource: ['cities'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Fetch clubs
   const { data: clubs = [], isLoading: isLoadingClubs } = useGetList<Club[]>({
-    key: "clubs",
-    resource: ["clubs"],
-    keyResults: "data",
+    key: 'clubs',
+    resource: ['clubs'],
+    keyResults: 'data',
     enabled: true,
   });
 
   // Populate form when venue data is loaded
   useEffect(() => {
-    console.log("Fetched venue data:", venueData);
+    console.log('Fetched venue data:', venueData);
     if (venueData && venueData.id) {
       const fetchedVenue = venueData as IVenueResponse;
 
@@ -77,7 +77,7 @@ export const UpdateVenue = () => {
   }, [venueData]);
 
   const resource = [`venues/${id}`];
-  const { mutate } = useMutateService(resource, "", "PUT");
+  const { mutate } = useMutateService(resource, '', 'PUT');
 
   // Handle the form submit event
   const handleOnSubmit = useCallback(
@@ -94,7 +94,7 @@ export const UpdateVenue = () => {
         !venue.phone ||
         !venue.foundation
       ) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -114,18 +114,15 @@ export const UpdateVenue = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al actualizar el venues",
-            );
+            toast.error(errorMessage || 'Error al actualizar el venues');
           } else {
-            toast.success("Venues actualizado exitosamente");
-            navigate("/venues");
+            toast.success('Venues actualizado exitosamente');
+            navigate('/venues');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al actualizar el venues. Por favor, intenta nuevamente.",
+            error?.message || 'Error al actualizar el venues. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -148,9 +145,9 @@ export const UpdateVenue = () => {
         <div className="text-center">
           <div className="mb-2">Cargando datos...</div>
           <div className="text-sm text-gray-500">
-            {loadingVenue && "Obteniendo información de la sede"}
-            {isLoadingCities && "Cargando ciudades"}
-            {isLoadingClubs && "Cargando clubes"}
+            {loadingVenue && 'Obteniendo información de la sede'}
+            {isLoadingCities && 'Cargando ciudades'}
+            {isLoadingClubs && 'Cargando clubes'}
           </div>
         </div>
       </div>
@@ -176,8 +173,6 @@ export const UpdateVenue = () => {
           clubs={clubs}
         />
       </div>
-
-      
     </div>
   );
 };

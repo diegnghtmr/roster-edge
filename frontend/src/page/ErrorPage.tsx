@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Home, Search, ArrowLeft } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Home, Search, ArrowLeft } from 'lucide-react';
 
 export default function ErrorPage() {
   return (
@@ -31,9 +31,7 @@ export default function ErrorPage() {
           <p className="text-gray-600 text-lg mb-2">
             Oops, parece que esta página se perdió en el espacio.
           </p>
-          <p className="text-gray-500 text-sm">
-            La página que buscas no existe o ha sido movida.
-          </p>
+          <p className="text-gray-500 text-sm">La página que buscas no existe o ha sido movida.</p>
         </div>
 
         {/* Action buttons */}
@@ -53,10 +51,7 @@ export default function ErrorPage() {
             variant="outline"
             className="border-2 border-gray-300 hover:border-rose-500 hover:bg-rose-50 transition-all duration-300 px-8 py-6 text-base"
           >
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center gap-2"
-            >
+            <button onClick={() => window.history.back()} className="flex items-center gap-2">
               <ArrowLeft className="w-5 h-5" />
               Página anterior
             </button>

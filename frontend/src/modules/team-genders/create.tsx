@@ -2,13 +2,13 @@ import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
-} from "@/api/services/useMutation";
-import { InternalHeader } from "@/components/layout/InternalHeader";
-import { BookmarkCheck } from "lucide-react";
-import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { TeamGenderForm, type INewTeamGender } from "./components/Form";
+} from '@/api/services/useMutation';
+import { InternalHeader } from '@/components/layout/InternalHeader';
+import { BookmarkCheck } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { TeamGenderForm, type INewTeamGender } from './components/Form';
 
 interface IField {
   name: string;
@@ -18,12 +18,12 @@ interface IField {
 export const TeamGenderCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [gender, setGender] = useState<INewTeamGender>({
-    name: "",
+    name: '',
   });
 
-  const resource = ["team-genders"];
+  const resource = ['team-genders'];
   const { mutate } = useMutateService(resource);
 
   // Handle the form submit event
@@ -34,7 +34,7 @@ export const TeamGenderCreateModule = () => {
 
       // Validate required fields
       if (!gender.name) {
-        toast.error("Por favor complete todos los campos requeridos");
+        toast.error('Por favor complete todos los campos requeridos');
         setIsLoading(false);
         return;
       }
@@ -48,18 +48,15 @@ export const TeamGenderCreateModule = () => {
         onSuccess: (response: MutationResponse) => {
           const errorMessage = extractErrorMessage(response.error);
           if (errorMessage) {
-            toast.error(
-              errorMessage || "Error al crear el team-genders",
-            );
+            toast.error(errorMessage || 'Error al crear el team-genders');
           } else {
-            toast.success("Team-genders creado exitosamente");
-            navigate("/team-genders");
+            toast.success('Team-genders creado exitosamente');
+            navigate('/team-genders');
           }
         },
         onError: (error: Error) => {
           toast.error(
-            error?.message ||
-              "Error al crear el team-genders. Por favor, intenta nuevamente.",
+            error?.message || 'Error al crear el team-genders. Por favor, intenta nuevamente.'
           );
         },
         onSettled: () => {
@@ -93,8 +90,6 @@ export const TeamGenderCreateModule = () => {
           onSubmit={handleOnSubmit}
         />
       </div>
-
-      
     </div>
   );
 };

@@ -1,16 +1,16 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { StaffRole } from "@/interface/IStaffRole";
-import type { Team } from "@/interface/ITeam";
-import type { City } from "@/interface/ICity";
+} from '@/components/ui/select';
+import type { StaffRole } from '@/interface/IStaffRole';
+import type { Team } from '@/interface/ITeam';
+import type { City } from '@/interface/ICity';
 
 export interface INewStaff {
   name: string;
@@ -65,9 +65,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
           name="name"
           type="text"
           value={staff.name}
-          onChange={(e) =>
-            onChangeValue({ name: "name", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'name', value: e.target.value })}
           placeholder="Ingrese el nombre"
           required
         />
@@ -82,9 +80,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
           name="lastName"
           type="text"
           value={staff.lastName}
-          onChange={(e) =>
-            onChangeValue({ name: "lastName", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'lastName', value: e.target.value })}
           placeholder="Ingrese el apellido"
           required
         />
@@ -99,9 +95,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
           name="email"
           type="email"
           value={staff.email}
-          onChange={(e) =>
-            onChangeValue({ name: "email", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'email', value: e.target.value })}
           placeholder="Ingrese el correo electrónico"
           required
         />
@@ -109,10 +103,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
 
       {!isUpdate && (
         <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">
             Contraseña
           </label>
           <Input
@@ -120,9 +111,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
             name="password"
             type="password"
             value={staff.password}
-            onChange={(e) =>
-              onChangeValue({ name: "password", value: e.target.value })
-            }
+            onChange={(e) => onChangeValue({ name: 'password', value: e.target.value })}
             placeholder="Ingrese la contraseña"
             required
           />
@@ -138,19 +127,14 @@ export const StaffForm: React.FC<StaffFormProps> = ({
           name="phone"
           type="tel"
           value={staff.phone}
-          onChange={(e) =>
-            onChangeValue({ name: "phone", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'phone', value: e.target.value })}
           placeholder="Ingrese el teléfono"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="birthDate"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="birthDate" className="text-sm font-medium text-gray-700">
           Fecha de nacimiento
         </label>
         <Input
@@ -158,9 +142,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
           name="birthDate"
           type="date"
           value={staff.birthDate}
-          onChange={(e) =>
-            onChangeValue({ name: "birthDate", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'birthDate', value: e.target.value })}
           required
         />
       </div>
@@ -174,9 +156,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
           name="hireDate"
           type="date"
           value={staff.hireDate}
-          onChange={(e) =>
-            onChangeValue({ name: "hireDate", value: e.target.value })
-          }
+          onChange={(e) => onChangeValue({ name: 'hireDate', value: e.target.value })}
           required
         />
       </div>
@@ -187,9 +167,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
         </label>
         <Select
           value={staff.cityId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "cityId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'cityId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione una ciudad" />
@@ -205,17 +183,12 @@ export const StaffForm: React.FC<StaffFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="staffRoleId"
-          className="text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="staffRoleId" className="text-sm font-medium text-gray-700">
           Rol
         </label>
         <Select
           value={staff.staffRoleId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "staffRoleId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'staffRoleId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un rol" />
@@ -236,9 +209,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
         </label>
         <Select
           value={staff.teamId?.toString()}
-          onValueChange={(value) =>
-            onChangeValue({ name: "teamId", value: parseInt(value) })
-          }
+          onValueChange={(value) => onChangeValue({ name: 'teamId', value: parseInt(value) })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccione un equipo" />
@@ -255,7 +226,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({
 
       <div className="flex justify-end col-span-1 md:col-span-2 xl:col-span-3">
         <Button type="submit" disabled={isLoading} className="max-w-[200px]">
-          {isLoading ? "Guardando..." : "Guardar"}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
     </form>
