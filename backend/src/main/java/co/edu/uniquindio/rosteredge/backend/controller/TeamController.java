@@ -42,11 +42,13 @@ public class TeamController extends BaseController {
             @RequestParam(required = false) Long clubId,
             @RequestParam(required = false) Long genderId,
             @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) Boolean active) {
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String mascot) {
         Boolean effectiveActive = resolveActive(active);
-        log.info("Request to get teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}",
-                clubId, genderId, categoryId, effectiveActive);
-        List<TeamDTO> teams = teamService.findAllTeams(clubId, genderId, categoryId, effectiveActive);
+        log.info("Request to get teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}, name: {}, mascot: {}",
+                clubId, genderId, categoryId, effectiveActive, name, mascot);
+        List<TeamDTO> teams = teamService.findAllTeams(clubId, genderId, categoryId, effectiveActive, name, mascot);
         return ResponseEntity.ok(ApiResponse.success(teams));
     }
 

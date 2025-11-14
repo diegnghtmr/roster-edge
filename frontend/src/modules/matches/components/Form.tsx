@@ -12,6 +12,7 @@ import useGetList from "@/api/services/getServices/useGetList";
 import type { IStadium } from "@/interface/IStadium";
 import type { IMatchday } from "@/interface/IMatchday";
 import type { IEvent } from "@/interface/IEvent";
+import type { Team } from "@/interface/ITeam";
 
 export interface INewMatch {
   matchdayId: number;
@@ -20,12 +21,14 @@ export interface INewMatch {
   date: number[];
   stadiumId: number;
   eventId: number;
+  homeTeamId: number | null;
+  awayTeamId: number | null;
   active: boolean;
 }
 
 interface IField {
   name: string;
-  value: string | number | boolean | number[];
+  value: string | number | boolean | number[] | null;
 }
 
 interface MatchFormProps {
@@ -65,6 +68,13 @@ export const MatchForm: React.FC<MatchFormProps> = ({
   const { data: events = [], isLoading: eventsLoading } = useGetList<IEvent[]>({
     key: "events",
     resource: ["events"],
+    keyResults: "data",
+    enabled: true,
+  });
+
+  const { data: teams = [], isLoading: teamsLoading } = useGetList<Team[]>({
+    key: "teams",
+    resource: ["teams"],
     keyResults: "data",
     enabled: true,
   });
@@ -262,6 +272,85 @@ export const MatchForm: React.FC<MatchFormProps> = ({
             )}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-2">
+        <label
+          htmlFor="homeTeamId"
+          className="text-sm font-medium text-gray-700"
+        >
+          Equipo local
+        </label>
+        <Select
+          value={match.homeTeamId ? match.homeTeamId.toString() : undefined}
+          onValueChange={(value) =>
+            onChangeValue({ name: "homeTeamId", value: parseInt(value, 10) })
+          }
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Seleccione equipo local" />
+          </SelectTrigger>
+          <SelectContent>
+            {teamsLoading ? (
+              <SelectItem value="loading" disabled>
+                Cargando...
+              </SelectItem>
+            ) : (
+              (teams as Team[]).map((team) => (
+                <SelectItem key={team.id} value={team.id.toString()}>
+                  {team.name}
+                  {team.clubName ? ` - ${team.clubName}` : ""}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <label
+          htmlFor="awayTeamId"
+          className="text-sm font-medium text-gray-700"
+        >
+          Equipo visitante
+        </label>
+        <Select
+          value={match.awayTeamId ? match.awayTeamId.toString() : undefined}
+          onValueChange={(value) =>
+            onChangeValue({ name: "awayTeamId", value: parseInt(value, 10) })
+          }
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Seleccione equipo visitante" />
+          </SelectTrigger>
+          <SelectContent>
+            {teamsLoading ? (
+              <SelectItem value="loading" disabled>
+                Cargando...
+              </SelectItem>
+            ) : (
+              (teams as Team[]).map((team) => (
+                <SelectItem
+                  key={team.id}
+                  value={team.id.toString()}
+                  disabled={
+                    match.homeTeamId != null && team.id === match.homeTeamId
+                  }
+                >
+                  {team.name}
+                  {team.clubName ? ` - ${team.clubName}` : ""}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+        {match.homeTeamId != null &&
+          match.awayTeamId != null &&
+          match.homeTeamId === match.awayTeamId && (
+            <p className="text-xs text-red-600">
+              Los equipos local y visitante deben ser diferentes.
+            </p>
+          )}
       </div>
 
       <div className="space-y-2">

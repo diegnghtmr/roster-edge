@@ -51,8 +51,9 @@ export interface SeasonAgendaResponse {
 export interface SeasonAgendaReportFilter {
   seasonId?: number;
   clubId?: number;
-  startDate?: string;
-  endDate?: string;
+  fromDate?: string;
+  toDate?: string;
+  horizonDays?: number;
 }
 
 // ============================================
@@ -225,7 +226,9 @@ export interface ScheduleDensityResponse {
 export interface ScheduleDensityReportFilter {
   seasonId?: number;
   teamId?: number;
-  restThreshold?: number;
+  fromDate?: string;
+  toDate?: string;
+  alertThresholdDays?: number;
 }
 
 // ============================================
@@ -261,13 +264,72 @@ export interface StaffImpactReportFilter {
 }
 
 // ============================================
+// Payment Method Performance Report
+// ============================================
+export interface PaymentMethodPerformanceResponse {
+  paymentMethodId?: number;
+  paymentMethodName?: string;
+  totalPayments?: number;
+  uniqueCustomers?: number;
+  plansCovered?: number;
+  grossAmount?: number;
+  totalDiscount?: number;
+  netRevenue?: number;
+  averageTicket?: number;
+  revenueSharePercentage?: number;
+  discountRatePercentage?: number;
+  firstPaymentDate?: string;
+  lastPaymentDate?: string;
+}
+
+export interface PaymentMethodReportFilter {
+  fromDate?: string;
+  toDate?: string;
+  planId?: number;
+  currencyId?: number;
+}
+
+// ============================================
+// Subscription Plan Performance Report
+// ============================================
+export interface SubscriptionPlanPerformanceResponse {
+  planId?: number;
+  planName?: string;
+  planPrice?: number;
+  totalSubscriptions?: number;
+  activeSubscriptions?: number;
+  trialSubscriptions?: number;
+  suspendedSubscriptions?: number;
+  inactiveSubscriptions?: number;
+  upcomingRenewals?: number;
+  churnedRecently?: number;
+  paymentsCount?: number;
+  grossRevenue?: number;
+  totalDiscount?: number;
+  netRevenue?: number;
+  averageRevenuePerSubscription?: number;
+  arpu?: number;
+  retentionRatePercentage?: number;
+}
+
+export interface SubscriptionPlanReportFilter {
+  fromDate?: string;
+  toDate?: string;
+  planId?: number;
+  statusId?: number;
+  renewalHorizonDays?: number;
+  churnWindowDays?: number;
+  referenceDate?: string;
+}
+
+// ============================================
 // Report Metadata
 // ============================================
 export interface ReportMetadata {
   id: string;
   name: string;
   description: string;
-  category: 'team' | 'season' | 'performance' | 'staff';
+  category: 'team' | 'season' | 'performance' | 'staff' | 'finance';
   icon: string;
   endpoint: string;
 }

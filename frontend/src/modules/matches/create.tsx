@@ -30,6 +30,8 @@ export const MatchCreateModule = () => {
     ],
     stadiumId: 0,
     eventId: 0,
+    homeTeamId: null,
+    awayTeamId: null,
     active: true,
   });
 
@@ -42,6 +44,23 @@ export const MatchCreateModule = () => {
       e.preventDefault();
       setIsLoading(true);
 
+      if (
+        match.homeTeamId === null ||
+        match.awayTeamId === null ||
+        match.homeTeamId === undefined ||
+        match.awayTeamId === undefined
+      ) {
+        toast.error("Debes seleccionar los equipos local y visitante");
+        setIsLoading(false);
+        return;
+      }
+
+      if (match.homeTeamId === match.awayTeamId) {
+        toast.error("Los equipos deben ser diferentes");
+        setIsLoading(false);
+        return;
+      }
+
       // Data already matches API expectations (no transformation needed)
       const matchData = {
         matchdayId: match.matchdayId,
@@ -50,6 +69,8 @@ export const MatchCreateModule = () => {
         date: match.date,
         stadiumId: match.stadiumId,
         eventId: match.eventId,
+        homeTeamId: match.homeTeamId,
+        awayTeamId: match.awayTeamId,
         active: match.active,
       };
 

@@ -5,7 +5,7 @@ export interface City {
   active: boolean;
   name: string;
   countryId: number;
-  countryName?: string;
+  countryName?: string | null;
 }
 
 export interface CitiesResponse {

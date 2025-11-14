@@ -3,7 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import useGetList from "@/api/services/getServices/useGetList";
 import { useMutateDeleteService } from "@/api/services/useDelete";
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
-import type { IMatch } from "@/interface/IMatch";
+import type { FilterConfig } from "@/components/table/SearchComponent";
+import type { IMatchSummary } from "@/interface/IMatchSummary";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,8 +22,22 @@ const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
   { title: "Fecha", key: "date" },
   { title: "Horario", key: "time" },
-
+  { title: "Local", key: "homeTeam" },
+  { title: "Visitante", key: "awayTeam" },
   { title: "Acciones", key: "actions", className: "w-32" },
+];
+
+const filters: FilterConfig[] = [
+  {
+    key: "dateFrom",
+    label: "Fecha desde",
+    type: "date",
+  },
+  {
+    key: "dateTo",
+    label: "Fecha hasta",
+    type: "date",
+  },
 ];
 
 export const MatchesList: React.FC = () => {
@@ -30,9 +45,9 @@ export const MatchesList: React.FC = () => {
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [matchToDelete, setMatchToDelete] = useState<number | null>(null);
 
-  const { data, isLoading, refetch, isFetching } = useGetList<IMatch[]>({
+  const { data, isLoading, refetch, isFetching } = useGetList<IMatchSummary[]>({
     key: "matchesList",
-    resource: ["matches"],
+    resource: ["matches", "schedule"],
     keyResults: "data",
     enabled: true,
     params: searchParams,
@@ -80,7 +95,7 @@ export const MatchesList: React.FC = () => {
   };
 
   // Ensure data is properly typed as IMatch array
-  const matches: IMatch[] = React.useMemo(() => {
+  const matches: IMatchSummary[] = React.useMemo(() => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
     console.warn("Unexpected data structure:", data);
@@ -88,7 +103,7 @@ export const MatchesList: React.FC = () => {
   }, [data]);
 
   // Render function for each row
-  const renderRow = (match: IMatch) => (
+  const renderRow = (match: IMatchSummary) => (
     <MatchItem key={match.id} match={match} onDelete={handleDelete} />
   );
 
@@ -98,6 +113,7 @@ export const MatchesList: React.FC = () => {
         <DataTable
           data={matches}
           headers={headers}
+          filters={filters}
           renderRow={renderRow}
           loading={isLoading}
           emptyMessage="No se encontraron partidos"

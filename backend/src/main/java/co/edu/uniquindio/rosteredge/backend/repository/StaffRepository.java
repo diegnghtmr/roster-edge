@@ -12,9 +12,15 @@ public interface StaffRepository extends BaseRepository<Staff, Long> {
 
     @Query("SELECT * FROM \"Staff\" WHERE (:teamId IS NULL OR team_id = :teamId) " +
            "AND (:staffRoleId IS NULL OR staff_role_id = :staffRoleId) " +
-           "AND (:active IS NULL OR active = :active)")
+           "AND (:active IS NULL OR active = :active) " +
+           "AND (:name IS NULL OR name ILIKE CONCAT('%', :name, '%')) " +
+           "AND (:lastName IS NULL OR last_name ILIKE CONCAT('%', :lastName, '%')) " +
+           "AND (:email IS NULL OR email ILIKE CONCAT('%', :email, '%'))")
     List<Staff> findByFilters(@Param("teamId") Long teamId,
                               @Param("staffRoleId") Long staffRoleId,
-                              @Param("active") Boolean active);
+                              @Param("active") Boolean active,
+                              @Param("name") String name,
+                              @Param("lastName") String lastName,
+                              @Param("email") String email);
 }
 

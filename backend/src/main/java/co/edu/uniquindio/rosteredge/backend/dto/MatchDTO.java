@@ -1,14 +1,13 @@
 package co.edu.uniquindio.rosteredge.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 /**
  * DTO for Match entity
@@ -42,6 +41,5 @@ public class MatchDTO extends BaseDTO {
     private String matchdayName;
     private String stadiumName;
     private String eventName;
-    private Long seasonId;
     private String seasonName;
 }

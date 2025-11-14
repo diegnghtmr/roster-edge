@@ -47,13 +47,13 @@ export const SeasonAgendaReport = () => {
       placeholder: seasonsLoading ? "Cargando..." : "Seleccionar temporada (opcional)",
     },
     {
-      key: "startDate",
+      key: "fromDate",
       label: "Fecha Inicio",
       type: "date",
       placeholder: "Fecha de inicio (opcional)",
     },
     {
-      key: "endDate",
+      key: "toDate",
       label: "Fecha Fin",
       type: "date",
       placeholder: "Fecha de fin (opcional)",

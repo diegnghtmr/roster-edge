@@ -5,6 +5,7 @@ import { useMutateDeleteService } from "@/api/services/useDelete";
 import { DataTable, type TableColumn } from "@/components/table/DataTable";
 import type { FilterConfig } from "@/components/table/SearchComponent";
 import type { City } from "@/interface/ICity";
+import type { Country } from "@/interface/ICountry";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,7 +22,7 @@ import { CityItemList } from "./ItemList";
 const headers: TableColumn[] = [
   { title: "ID", key: "id", className: "w-16" },
   { title: "Nombre", key: "name" },
-  { title: "País", key: "countryId" },
+  { title: "País", key: "countryName" },
   { title: "Fecha de creación", key: "createdAt" },
   { title: "Acciones", key: "actions", className: "w-32" },
 ];
@@ -40,12 +41,19 @@ export const CitiesList: React.FC = () => {
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [cityToDelete, setCityToDelete] = useState<number | null>(null);
 
-  const { data, isLoading, refetch, isFetching } = useGetList({
+  const { data, isLoading, refetch, isFetching } = useGetList<City[]>({
     key: "citiesList",
     resource: ["cities"],
     keyResults: "data",
     enabled: true,
     params: searchParams,
+  });
+
+  const { data: countriesData } = useGetList<Country[]>({
+    key: "citiesCountriesList",
+    resource: ["countries"],
+    keyResults: "data",
+    enabled: true,
   });
 
   const deleteService = useMutateDeleteService(["cities"]);
@@ -90,12 +98,27 @@ export const CitiesList: React.FC = () => {
   };
 
   // Ensure data is properly typed as City array
+  const countryMap = React.useMemo(() => {
+    if (!countriesData || !Array.isArray(countriesData)) {
+      return new Map<number, string>();
+    }
+    return new Map<number, string>(
+      countriesData.map((country) => [country.id, country.name]),
+    );
+  }, [countriesData]);
+
   const cities: City[] = React.useMemo(() => {
     if (!data) return [];
-    if (Array.isArray(data)) return data;
-    console.warn("Unexpected data structure:", data);
-    return [];
-  }, [data]);
+    if (!Array.isArray(data)) {
+      console.warn("Unexpected data structure:", data);
+      return [];
+    }
+    return data.map((city) => ({
+      ...city,
+      countryName:
+        countryMap.get(city.countryId) ?? city.countryName ?? null,
+    }));
+  }, [data, countryMap]);
 
   // Render function for each row
   const renderRow = (city: City) => (

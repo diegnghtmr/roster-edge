@@ -40,10 +40,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeamDTO> findAllTeams(Long clubId, Long genderId, Long categoryId, Boolean active) {
+    public List<TeamDTO> findAllTeams(Long clubId, Long genderId, Long categoryId, Boolean active, String name, String mascot) {
         Boolean effectiveActive = FilterUtils.resolveActive(active);
-        log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}", clubId, genderId, categoryId, effectiveActive);
-        return teamRepository.findByFilters(clubId, genderId, categoryId, effectiveActive)
+        log.info("Finding teams with filters - clubId: {}, genderId: {}, categoryId: {}, active: {}, name: {}, mascot: {}",
+                clubId, genderId, categoryId, effectiveActive, name, mascot);
+        return teamRepository.findByFilters(clubId, genderId, categoryId, effectiveActive, name, mascot)
                 .stream()
                 .map(entityMapper::toTeamDTO)
                 .collect(Collectors.toList());

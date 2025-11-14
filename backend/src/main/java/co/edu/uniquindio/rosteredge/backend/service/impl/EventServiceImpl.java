@@ -38,11 +38,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventDTO> findAllEvents(Long seasonId, Long venueId, Boolean active, LocalDate dateFrom, LocalDate dateTo) {
+    public List<EventDTO> findAllEvents(Long seasonId, String name, String description, Long venueId, Boolean active, LocalDate dateFrom, LocalDate dateTo) {
         Boolean effectiveActive = FilterUtils.resolveActive(active);
-        log.info("Finding events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                seasonId, venueId, effectiveActive, dateFrom, dateTo);
-        return eventRepository.findByFilters(seasonId, venueId, effectiveActive, dateFrom, dateTo)
+        log.info("Finding events with filters - seasonId: {}, name: {}, description: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                seasonId, name, description, venueId, effectiveActive, dateFrom, dateTo);
+        return eventRepository.findByFilters(seasonId, name, description, venueId, effectiveActive, dateFrom, dateTo)
                 .stream()
                 .map(entityMapper::toEventDTO)
                 .collect(Collectors.toList());

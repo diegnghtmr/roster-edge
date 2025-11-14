@@ -27,10 +27,14 @@ public class StaffServiceImpl extends SimpleCrudService<Staff> implements StaffS
 
     @Override
     @Transactional(readOnly = true)
-    public List<Staff> findByFilters(Long teamId, Long staffRoleId, Boolean active) {
+    public List<Staff> findByFilters(Long teamId,
+                                     Long staffRoleId,
+                                     Boolean active,
+                                     String name,
+                                     String lastName,
+                                     String email) {
         Boolean effectiveActive = FilterUtils.resolveActive(active);
-        return staffRepository.findByFilters(teamId, staffRoleId, effectiveActive);
+        return staffRepository.findByFilters(teamId, staffRoleId, effectiveActive, name, lastName, email);
     }
 }
-
 

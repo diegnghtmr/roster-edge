@@ -6,5 +6,10 @@ import java.util.List;
 
 public interface StaffService extends CrudService<Staff> {
 
-    List<Staff> findByFilters(Long teamId, Long staffRoleId, Boolean active);
+    List<Staff> findByFilters(Long teamId,
+                              Long staffRoleId,
+                              Boolean active,
+                              String name,
+                              String lastName,
+                              String email);
 }

@@ -35,10 +35,28 @@ const filters: FilterConfig[] = [
     placeholder: "Buscar por superficie...",
   },
   {
-    key: "totalCapacity",
-    label: "Capacidad",
-    type: "text",
-    placeholder: "Buscar por capacidad...",
+    key: "capacityFrom",
+    label: "Capacidad mínima",
+    type: "number",
+    placeholder: "Ej. 1000",
+  },
+  {
+    key: "capacityTo",
+    label: "Capacidad máxima",
+    type: "number",
+    placeholder: "Ej. 50000",
+  },
+  {
+    key: "areaFrom",
+    label: "Área mínima (m²)",
+    type: "number",
+    placeholder: "Ej. 5000",
+  },
+  {
+    key: "areaTo",
+    label: "Área máxima (m²)",
+    type: "number",
+    placeholder: "Ej. 20000",
   },
 ];
 

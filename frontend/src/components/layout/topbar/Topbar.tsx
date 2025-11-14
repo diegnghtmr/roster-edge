@@ -73,7 +73,7 @@ export const Topbar = ({ toggleDrawer }: TopbarProps) => {
               <img src="roster-logo.webp" className="h-[46px]" alt="roster" />
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4">
+          {/* <div className="hidden md:flex items-center gap-4">
             <Button
               variant="ghost"
               className="text-gray-600 hover:text-red-600 flex items-center gap-2"
@@ -98,7 +98,7 @@ export const Topbar = ({ toggleDrawer }: TopbarProps) => {
               <SupportOutlinedIcon className="h-4 w-4" />
               Soporte Técnico
             </Button>
-          </div>
+          </div> */}
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <div className="cursor-pointer">

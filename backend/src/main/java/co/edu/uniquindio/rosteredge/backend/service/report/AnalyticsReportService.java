@@ -2,6 +2,7 @@ package co.edu.uniquindio.rosteredge.backend.service.report;
 
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.CategoryParticipationReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.MatchLoadReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PaymentMethodReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.PointsProgressReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.RosterProfileReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.ScheduleDensityReportFilter;
@@ -10,7 +11,9 @@ import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonAgendaReport
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SeasonStandingsReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffImpactReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.report.StaffRatioReportFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.filter.report.SubscriptionPlanReportFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.CategoryParticipationResponse;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.PaymentMethodPerformanceResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScheduleDensityResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.ScoringRankingResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.SeasonAgendaResponse;
@@ -20,6 +23,7 @@ import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamMatchLoadRes
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamPointsProgressResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamRosterProfileResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamStaffRatioResponse;
+import co.edu.uniquindio.rosteredge.backend.dto.response.report.SubscriptionPlanPerformanceResponse;
 import java.util.List;
 
 /**
@@ -46,4 +50,8 @@ public interface AnalyticsReportService {
     List<ScheduleDensityResponse> getScheduleDensity(ScheduleDensityReportFilter filter);
 
     StaffImpactResponse getStaffImpact(StaffImpactReportFilter filter);
+
+    List<PaymentMethodPerformanceResponse> getPaymentMethodPerformance(PaymentMethodReportFilter filter);
+
+    List<SubscriptionPlanPerformanceResponse> getSubscriptionPlanPerformance(SubscriptionPlanReportFilter filter);
 }

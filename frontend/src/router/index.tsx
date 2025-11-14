@@ -1,4 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
+import NotificationsModule from "@/modules/notifications";
+import UsersModule from "@/modules/users";
 
 import Dashboard from "@/modules/dashboard/Dashboard";
 import TeamCategoriesModule from "@/modules/team-categories";
@@ -56,6 +58,8 @@ import { StaffImpactReport } from "@/modules/reports/staff-impact";
 import { SeasonAgendaReport } from "@/modules/reports/season-agenda";
 import { CategoryParticipationReport } from "@/modules/reports/category-participation";
 import { ScheduleDensityReport } from "@/modules/reports/schedule-density";
+import { PaymentMethodPerformanceReport } from "@/modules/reports/payment-method-performance";
+import { SubscriptionPlanPerformanceReport } from "@/modules/reports/subscription-plan-performance";
 import ErrorPage from "@/page/ErrorPage";
 import Login from "@/page/login/Login";
 import { createBrowserRouter, Navigate } from "react-router-dom";
@@ -263,6 +267,16 @@ export default function useRouterApp() {
               element: <UpdateVenue />,
             },
             {
+              path: "/notifications",
+              element: <NotificationsModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/users",
+              element: <UsersModule />,
+              errorElement: <ErrorPage />,
+            },
+            {
               path: "/contact",
               element: <Contact />,
             },
@@ -323,6 +337,16 @@ export default function useRouterApp() {
             {
               path: "/reports/schedule-density",
               element: <ScheduleDensityReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/payment-method-performance",
+              element: <PaymentMethodPerformanceReport />,
+              errorElement: <ErrorPage />,
+            },
+            {
+              path: "/reports/subscription-plan-performance",
+              element: <SubscriptionPlanPerformanceReport />,
               errorElement: <ErrorPage />,
             },
           ]

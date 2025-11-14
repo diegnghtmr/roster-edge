@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import useUserStore from "../../storage/storeUser";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -7,7 +6,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const { setUser } = useUserStore();
-  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [credentials, setCredentials] = useState({
@@ -59,7 +58,7 @@ const Login = () => {
         // Fetch full roster data using /roster/me/ endpoint
         try {
           const rosterResponse = await fetch(
-            "http://localhost:8081/api/roster/me/",
+            `${import.meta.env.VITE_BACKEND_URL}/roster/me/`,
             {
               headers: {
                 Authorization: `Bearer ${loginData.data.token}`,
@@ -77,9 +76,11 @@ const Login = () => {
               clubId: rosterData.data.clubId,
               subscriptionId: rosterData.data.subscriptionId,
             });
-            navigate("/dashboard");
+            // Use window.location to ensure full page reload and router re-initialization
+            window.location.href = "/dashboard";
           } else {
             setError("Failed to fetch user profile");
+            return; // Don't navigate if profile fetch fails
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);
@@ -91,6 +92,7 @@ const Login = () => {
           } else {
             setError("Failed to fetch user profile");
           }
+          return; // Don't navigate if profile fetch fails
         }
       } else {
         toast.error(

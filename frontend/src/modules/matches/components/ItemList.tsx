@@ -2,44 +2,60 @@ import { Link } from "react-router-dom";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
-import type { IMatch } from "@/interface/IMatch";
+import type { IMatchSummary } from "@/interface/IMatchSummary";
 
 interface MatchItemProps {
-  match: IMatch;
+  match: IMatchSummary;
   onDelete: (id: number) => void;
 }
 
-export const MatchItem = ({ match, onDelete }: MatchItemProps) => {
-  // Format date array to string
-  const formatDateArray = (dateArray: number[]): string => {
-    if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 3) {
-      return "N/A";
-    }
-    const [year, month, day] = dateArray;
+const formatDateValue = (value?: number[] | string): string => {
+  if (!value) return "N/A";
+  if (Array.isArray(value) && value.length >= 3) {
+    const [year, month, day] = value;
     return `${day.toString().padStart(2, "0")}/${month
       .toString()
       .padStart(2, "0")}/${year}`;
-  };
+  }
+  if (typeof value === "string") {
+    return value.slice(0, 10);
+  }
+  return "N/A";
+};
 
-  // Format time array to string
-  const formatTimeArray = (timeArray: number[]): string => {
-    if (!timeArray || !Array.isArray(timeArray) || timeArray.length < 2) {
-      return "N/A";
-    }
-    const [hour, minute] = timeArray;
+const formatTimeValue = (value?: number[] | string): string => {
+  if (!value) return "N/A";
+  if (Array.isArray(value) && value.length >= 2) {
+    const [hour, minute] = value;
     return `${hour.toString().padStart(2, "0")}:${minute
       .toString()
       .padStart(2, "0")}`;
-  };
+  }
+  if (typeof value === "string") {
+    return value.slice(0, 5);
+  }
+  return "N/A";
+};
+
+const teamLabel = (name?: string | null, club?: string | null) => {
+  if (!name) return "-";
+  return club ? `${name} (${club})` : name;
+};
+
+export const MatchItem = ({ match, onDelete }: MatchItemProps) => {
 
   return (
     <TableRow key={match.id}>
       <TableCell className="text-start font-medium">{match.id}</TableCell>
+      <TableCell className="text-start">{formatDateValue(match.date)}</TableCell>
       <TableCell className="text-start">
-        {formatDateArray(match.date)}
+        {formatTimeValue(match.startTime)} - {formatTimeValue(match.endTime)}
       </TableCell>
       <TableCell className="text-start">
-        {formatTimeArray(match.startTime)} - {formatTimeArray(match.endTime)}
+        {teamLabel(match.homeTeamName, match.homeClubName)}
+      </TableCell>
+      <TableCell className="text-start">
+        {teamLabel(match.awayTeamName, match.awayClubName)}
       </TableCell>
 
       <TableCell>

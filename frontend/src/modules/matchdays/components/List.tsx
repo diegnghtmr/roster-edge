@@ -32,12 +32,6 @@ const filters: FilterConfig[] = [
     type: "text",
     placeholder: "Buscar por nombre...",
   },
-  {
-    key: "description",
-    label: "Descripción",
-    type: "text",
-    placeholder: "Buscar por descripción...",
-  },
 ];
 
 export const MatchdaysList: React.FC = () => {

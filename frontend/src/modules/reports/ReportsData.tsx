@@ -7,6 +7,8 @@ import {
   Activity,
   Zap,
   Target,
+  CreditCard,
+  Layers,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ReportMetadata } from "@/interface/IReports";
@@ -92,6 +94,22 @@ export const reportsData: ReportMetadata[] = [
     icon: "Calendar",
     endpoint: "/reports/schedule-density",
   },
+  {
+    id: "payment-method-performance",
+    name: "Rendimiento por Metodo de Pago",
+    description: "Analiza ingresos y descuentos por tipo de pago",
+    category: "finance",
+    icon: "CreditCard",
+    endpoint: "/reports/payment-method-performance",
+  },
+  {
+    id: "subscription-plan-performance",
+    name: "Salud de Planes",
+    description: "Evalua suscripciones activas, churn y revenue por plan",
+    category: "finance",
+    icon: "Layers",
+    endpoint: "/reports/subscription-plan-performance",
+  },
 ];
 
 export const getIconComponent = (iconName: string) => {
@@ -104,6 +122,8 @@ export const getIconComponent = (iconName: string) => {
     Zap,
     Calendar,
     BarChart3,
+    CreditCard,
+    Layers,
   };
   return icons[iconName] || BarChart3;
 };

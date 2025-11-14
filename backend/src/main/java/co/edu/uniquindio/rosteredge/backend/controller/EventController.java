@@ -32,14 +32,16 @@ public class EventController extends BaseController {
     @GetMapping("/")
     public ResponseEntity<ApiResponse<List<EventDTO>>> getAllEvents(
             @RequestParam(required = false) Long seasonId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
             @RequestParam(required = false) Long venueId,
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
         Boolean effectiveActive = resolveActive(active);
-        log.info("Request to get events with filters - seasonId: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
-                seasonId, venueId, effectiveActive, dateFrom, dateTo);
-        List<EventDTO> events = eventService.findAllEvents(seasonId, venueId, effectiveActive, dateFrom, dateTo);
+        log.info("Request to get events with filters - seasonId: {}, name: {}, description: {}, venueId: {}, active: {}, dateFrom: {}, dateTo: {}",
+                seasonId, name, description, venueId, effectiveActive, dateFrom, dateTo);
+        List<EventDTO> events = eventService.findAllEvents(seasonId, name, description, venueId, effectiveActive, dateFrom, dateTo);
         return ResponseEntity.ok(ApiResponse.success(events));
     }
 

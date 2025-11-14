@@ -10,4 +10,6 @@ public class CategoryParticipationReportFilter {
 
     private Long clubId;
     private Long seasonId;
+    private Long categoryId;
+    private Long genderId;
 }

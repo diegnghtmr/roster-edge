@@ -31,11 +31,14 @@ public class StaffController extends SimpleCrudController<Staff> {
         Long teamId = parseLong(request.getParameter("teamId"));
         Long staffRoleId = parseLong(request.getParameter("staffRoleId"));
         Boolean active = resolveActive(parseBoolean(request.getParameter("active")));
+        String name = trimToNull(request.getParameter("name"));
+        String lastName = trimToNull(request.getParameter("lastName"));
+        String email = trimToNull(request.getParameter("email"));
 
-        log.info("Request to get staff with filters - teamId: {}, staffRoleId: {}, active: {}",
-                teamId, staffRoleId, active);
+        log.info("Request to get staff with filters - teamId: {}, staffRoleId: {}, active: {}, name: {}, lastName: {}, email: {}",
+                teamId, staffRoleId, active, name, lastName, email);
 
-        List<Staff> staff = staffService.findByFilters(teamId, staffRoleId, active);
+        List<Staff> staff = staffService.findByFilters(teamId, staffRoleId, active, name, lastName, email);
         return ResponseEntity.ok(ApiResponse.success(staff));
     }
 

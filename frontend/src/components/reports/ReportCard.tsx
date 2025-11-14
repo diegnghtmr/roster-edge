@@ -16,6 +16,7 @@ const categoryColors: Record<string, string> = {
   season: "bg-green-100 text-green-800 border-green-200",
   performance: "bg-purple-100 text-purple-800 border-purple-200",
   staff: "bg-orange-100 text-orange-800 border-orange-200",
+  finance: "bg-emerald-100 text-emerald-800 border-emerald-200",
 };
 
 export const ReportCard = ({ title, description, icon, path, category }: ReportCardProps) => {
