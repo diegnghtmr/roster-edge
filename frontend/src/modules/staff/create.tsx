@@ -82,7 +82,7 @@ export const StaffCreateModule = () => {
         name: staff.name,
         lastName: staff.lastName,
         email: staff.email,
-        password: staff.password,
+        passwordHash: staff.password,
         phone: staff.phone,
         birthDate: staff.birthDate,
         hireDate: staff.hireDate,

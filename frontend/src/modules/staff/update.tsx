@@ -134,7 +134,7 @@ export const StaffUpdateModule = () => {
 
       // Only include password if it's provided
       if (staff.password.trim()) {
-        staffData.password = staff.password;
+        staffData.passwordHash = staff.password;
       }
 
       mutate(staffData, {
