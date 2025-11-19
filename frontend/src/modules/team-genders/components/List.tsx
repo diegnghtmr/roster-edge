@@ -43,7 +43,7 @@ export const TeamGendersList: React.FC = () => {
 
   // Render function for each row
   const renderRow = (teamGender: TeamGender) => (
-    <TeamGenderItemList key={teamGender.id} teamGender={teamGender} onDelete={handleDelete} />
+    <TeamGenderItemList key={teamGender.id} gender={teamGender} onDelete={handleDelete} />
   );
 
   return (

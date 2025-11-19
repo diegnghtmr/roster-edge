@@ -32,7 +32,7 @@ export const TeamGenderItemList = ({ gender, onDelete }: TeamGenderItemListProps
 
   return (
     <TableRow key={gender.id}>
-      <TableCell className="text-start font-medium">{gender.id}</TableCell>
+      <TableCell className="text-start font-medium">{gender.id ?? ''}</TableCell>
       <TableCell className="text-start font-semibold">{gender.name}</TableCell>
       <TableCell className="text-start">
         <Badge variant={gender.active ? 'default' : 'secondary'}>

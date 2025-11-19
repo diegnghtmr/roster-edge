@@ -24,7 +24,7 @@ export const TeamCategoryItemList = ({ category, onDelete }: TeamCategoryItemLis
 
   return (
     <TableRow key={category.id}>
-      <TableCell className="text-start font-medium">{category.id}</TableCell>
+      <TableCell className="text-start font-medium">{category.id ?? ''}</TableCell>
       <TableCell className="text-start font-semibold">{category.name}</TableCell>
       <TableCell className="text-start">
         <Badge variant={category.active ? 'default' : 'secondary'}>
@@ -43,7 +43,9 @@ export const TeamCategoryItemList = ({ category, onDelete }: TeamCategoryItemLis
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onDelete(category.id)}
+            onClick={() => {
+              if (category.id !== undefined) onDelete(category.id);
+            }}
             className="flex items-center gap-1 text-red-700 hover:text-red-800"
           >
             <Trash2 className="h-4 w-4" />

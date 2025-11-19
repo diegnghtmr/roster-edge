@@ -1,5 +1,5 @@
 export interface TeamCategory {
-  id: number;
+  id?: number;
   createdAt: [number, number, number, number, number, number, number];
   updatedAt: [number, number, number, number, number, number, number];
   active: boolean;

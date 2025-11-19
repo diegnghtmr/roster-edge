@@ -45,7 +45,7 @@ export const TeamCategoriesList: React.FC = () => {
   const renderRow = (teamCategory: TeamCategory) => (
     <TeamCategoryItemList
       key={teamCategory.id}
-      teamCategory={teamCategory}
+      category={teamCategory}
       onDelete={handleDelete}
     />
   );

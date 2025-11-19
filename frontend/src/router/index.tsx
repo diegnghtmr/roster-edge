@@ -126,7 +126,7 @@ export default function useRouterApp() {
             {
               path: '/team-categories',
               element: <TeamCategoriesModule />,
-              errorElement: <ErrorPage />,
+              
             },
             {
               path: '/team-categories-create',
