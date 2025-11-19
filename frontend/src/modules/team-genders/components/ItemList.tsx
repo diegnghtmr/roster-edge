@@ -12,22 +12,14 @@ interface TeamGenderItemListProps {
 
 export const TeamGenderItemList = ({ gender, onDelete }: TeamGenderItemListProps) => {
   // Format created date
-  const formatCreatedDate = (dateString: string | undefined): string => {
-    if (!dateString) {
+  const formatCreatedDate = (
+    dateArray: [number, number, number, number, number, number, number] | undefined
+  ): string => {
+    if (!dateArray || !Array.isArray(dateArray) || dateArray.length !== 7) {
       return 'N/A';
     }
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return 'N/A';
-    }
+    const [year, month, day, hour, minute] = dateArray;
+    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
   };
 
   return (
