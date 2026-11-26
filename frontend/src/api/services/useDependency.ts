@@ -35,13 +35,12 @@ export const useDependencyService = (
     onError: (error: Error) => {
       handleError(error.message);
     },
+    onSuccess: (data) => {
+      if (data && typeof data === 'object' && 'error' in data && typeof data.error === 'string') {
+        handleError(data.error);
+      }
+    },
   });
-
-  if (response.data) {
-    if (response.data?.error && typeof response.data?.error === 'string') {
-      handleError(response.data.error);
-    }
-  }
 
   return response;
 };

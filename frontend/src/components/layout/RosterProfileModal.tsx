@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,156 +18,69 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
-import useGetList from '@/api/services/getServices/useGetList';
-import useUserStore from '@/storage/storeUser';
-import type { IRoster, IRosterUpdateRequest } from '@/interface/IRoster';
-import type { ILoginUser } from '@/interface/ILogin';
+import useUserStore, { getSessionToken, rosterApiUrl } from '@/storage/storeUser';
+import type { IRosterSessionResponse } from '@/interface/IRoster';
 
 interface RosterProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onLogout: () => void;
+  profile: IRosterSessionResponse;
 }
 
-export const RosterProfileModal = ({ open, onOpenChange, onLogout }: RosterProfileModalProps) => {
-  const { updateUser } = useUserStore();
-  const queryClient = useQueryClient();
+export const RosterProfileModal = ({ open, onOpenChange, onLogout, profile }: RosterProfileModalProps) => {
+  const updateUserName = useUserStore((state) => state.updateUserName);
+  const [name, setName] = useState(profile.name);
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Fetch roster data from /roster/me/ to get all fields
-  const { data: rosterData, isLoading: isLoadingRoster } = useGetList<IRoster>({
-    key: 'roster-me',
-    resource: ['roster/me'],
-    keyResults: 'data',
-    enabled: open,
-  });
-
-  // Initialize form data
-  const [formData, setFormData] = useState<IRosterUpdateRequest>({
-    name: '',
-    email: '',
-  });
-
-  const lastLoadedIdRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const hasValidData =
-      rosterData && typeof rosterData === 'object' && !Array.isArray(rosterData) && rosterData.name;
-
-    if (hasValidData && open && lastLoadedIdRef.current !== rosterData.id) {
-      setFormData({
-        name: rosterData.name || '',
-        email: rosterData.email || '',
-      });
-      lastLoadedIdRef.current = rosterData.id;
-    }
-
-    if (!open && lastLoadedIdRef.current !== null) {
-      lastLoadedIdRef.current = null;
-      setFormData({ name: '', email: '' });
-    }
-  }, [rosterData, open]);
-
-  const validateForm = (): boolean => {
-    const trimmedName = formData.name.trim();
-
-    if (!trimmedName || trimmedName.length < 2 || trimmedName.length > 100) {
-      return false;
-    }
-
-    return true;
-  };
+  const trimmedName = name.trim();
+  const isFormValid = trimmedName.length >= 2 && trimmedName.length <= 100;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
+    if (!isFormValid) {
       toast.error('Por favor completa todos los campos correctamente');
       return;
     }
 
-    setIsUpdating(true);
-
-    if (!rosterData || !rosterData.id) {
-      toast.error('No se pudieron cargar los datos del roster');
-      setIsUpdating(false);
+    const token = getSessionToken();
+    if (!token) {
+      onLogout();
       return;
     }
 
+    setIsUpdating(true);
     try {
-      const token = localStorage.getItem('token');
-
-      const fullRosterResponse = await fetch(
-        `http://localhost:8081/api/rosters/${rosterData.id}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!fullRosterResponse.ok) {
-        toast.error('No se pudieron cargar los datos completos del roster');
-        setIsUpdating(false);
-        return;
-      }
-
-      const fullRosterData = await fullRosterResponse.json();
-      const fullRoster = fullRosterData.data;
-
-      const updateData = {
-        name: formData.name.trim(),
-        email: fullRoster.email,
-        passwordHash: fullRoster.passwordHash,
-        clubId: fullRoster.clubId,
-        subscriptionId: fullRoster.subscriptionId,
-        creationDate: fullRoster.creationDate,
-        lastAccess: fullRoster.lastAccess,
-      };
-
-      const updateResponse = await fetch(`http://localhost:8081/api/rosters/${rosterData.id}/`, {
+      const updateResponse = await fetch(rosterApiUrl(`/rosters/${profile.id}/`), {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({
+          name: trimmedName,
+          email: profile.email,
+          clubId: profile.clubId,
+          subscriptionId: profile.subscriptionId,
+        }),
       });
 
+      if (getSessionToken() !== token) return;
+      if (updateResponse.status === 401) {
+        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        onLogout();
+        return;
+      }
       if (!updateResponse.ok) {
-        const errorData = await updateResponse.json().catch(() => ({}));
-        const errorMsg = errorData.message || 'Error al actualizar el perfil';
-
-        if (errorMsg.toLowerCase().includes('duplicat')) {
-          setErrorMessage('El email ya est\u00e1 en uso por otro usuario');
-        } else if (errorMsg.toLowerCase().includes('unauthorized')) {
-          setErrorMessage('Sesi\u00f3n expirada. Por favor, inicia sesi\u00f3n nuevamente.');
-          setTimeout(() => {
-            onOpenChange(false);
-            onLogout();
-          }, 2000);
-        } else {
-          setErrorMessage(errorMsg);
-        }
-        setIsUpdating(false);
+        setErrorMessage('Error al actualizar el perfil');
         return;
       }
 
+      updateUserName(trimmedName, token);
       toast.success('Perfil actualizado exitosamente');
-
-      updateUser({
-        name: updateData.name,
-      } as Partial<ILoginUser>);
-
-      queryClient.invalidateQueries({ queryKey: ['roster-me'] });
-
       onOpenChange(false);
-    } catch (error) {
-      console.error('Error updating roster:', error);
+    } catch {
       toast.error('Error al actualizar el perfil. Por favor, intenta nuevamente.');
     } finally {
       setIsUpdating(false);
@@ -179,24 +91,6 @@ export const RosterProfileModal = ({ open, onOpenChange, onLogout }: RosterProfi
     onOpenChange(false);
     onLogout();
   };
-
-  const isFormValid = formData.name.trim().length >= 2 && formData.name.trim().length <= 100;
-
-  if (isLoadingRoster) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">Mi Perfil</DialogTitle>
-            <DialogDescription>Cargando tu información...</DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center justify-center py-8">
-            <Spinner />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <>
@@ -219,8 +113,8 @@ export const RosterProfileModal = ({ open, onOpenChange, onLogout }: RosterProfi
                   id="name"
                   name="name"
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Ingrese su nombre"
                   required
                   minLength={2}
@@ -236,7 +130,7 @@ export const RosterProfileModal = ({ open, onOpenChange, onLogout }: RosterProfi
                   id="email"
                   name="email"
                   type="email"
-                  value={formData.email}
+                  value={profile.email}
                   placeholder="email@ejemplo.com"
                   disabled
                   className="bg-gray-100 cursor-not-allowed"

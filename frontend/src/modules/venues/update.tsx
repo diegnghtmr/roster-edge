@@ -35,7 +35,7 @@ export const UpdateVenue = () => {
   });
 
   // Fetch the venue data
-  const { data: venueData, isLoading: loadingVenue } = useGetList({
+  const { data: fetchedVenue, isLoading: loadingVenue } = useGetList<IVenueResponse>({
     key: `venue-${id}`,
     resource: [`venues/${id}`],
     keyResults: 'data',
@@ -60,10 +60,7 @@ export const UpdateVenue = () => {
 
   // Populate form when venue data is loaded
   useEffect(() => {
-    console.log('Fetched venue data:', venueData);
-    if (venueData && venueData.id) {
-      const fetchedVenue = venueData as IVenueResponse;
-
+    if (fetchedVenue?.id) {
       setVenue({
         name: fetchedVenue.name,
         email: fetchedVenue.email,
@@ -74,7 +71,7 @@ export const UpdateVenue = () => {
         active: fetchedVenue.active,
       });
     }
-  }, [venueData]);
+  }, [fetchedVenue]);
 
   const resource = [`venues/${id}`];
   const { mutate } = useMutateService(resource, '', 'PUT');

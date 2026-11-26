@@ -13,6 +13,7 @@ import type { IStadium } from '@/interface/IStadium';
 import type { IMatchday } from '@/interface/IMatchday';
 import type { IEvent } from '@/interface/IEvent';
 import type { Team } from '@/interface/ITeam';
+import { formatDateOnly, parseDateOnly } from '@/shared/utils/dateOnly';
 
 export interface INewMatch {
   matchdayId: number;
@@ -26,15 +27,14 @@ export interface INewMatch {
   active: boolean;
 }
 
-interface IField {
-  name: string;
-  value: string | number | boolean | number[] | null;
-}
+export type MatchField = {
+  [Name in keyof INewMatch]: { name: Name; value: INewMatch[Name] };
+}[keyof INewMatch];
 
 interface MatchFormProps {
   match: INewMatch;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  onChangeValue: (field: IField) => void;
+  onChangeValue: (field: MatchField) => void;
   isLoading: boolean;
 }
 
@@ -75,23 +75,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
     enabled: true,
   });
 
-  // Parse a date string (YYYY-MM-DD) to the array format expected by the API
-  const parseDateToArray = (dateString: string): number[] => {
-    const date = new Date(dateString);
-    return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
-  };
-
-  // Format the date array to a string for the date input
-  const formatDateArray = (dateArray: number[]): string => {
-    if (!dateArray || dateArray.length !== 3) {
-      return '';
-    }
-    const [year, month, day] = dateArray;
-    // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, '0');
-    const paddedDay = day.toString().padStart(2, '0');
-    return `${year}-${paddedMonth}-${paddedDay}`;
-  };
+  const date = formatDateOnly(match.date);
 
   // Parse time string (HH:MM) to array format [hour, minute]
   const parseTimeToArray = (timeString: string): number[] => {
@@ -109,7 +93,13 @@ export const MatchForm: React.FC<MatchFormProps> = ({
   };
 
   return (
-    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form
+      onSubmit={(event) => {
+        if (date) onSubmit(event);
+        else event.preventDefault();
+      }}
+      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
+    >
       <div className="space-y-2">
         <label htmlFor="date" className="text-sm font-medium text-gray-700">
           Fecha del Partido
@@ -118,11 +108,11 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           id="date"
           name="date"
           type="date"
-          value={formatDateArray(match.date)}
+          value={date}
           onChange={(e) =>
             onChangeValue({
               name: 'date',
-              value: parseDateToArray(e.target.value),
+              value: parseDateOnly(e.target.value),
             })
           }
           required
@@ -172,10 +162,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           Estadio
         </label>
         <Select
-          value={match.stadiumId?.toString()}
-          onValueChange={(value) => onChangeValue({ name: 'stadiumId', value: parseInt(value) })}
+          value={match.stadiumId ? String(match.stadiumId) : ''}
+          onValueChange={(value) => {
+            if (value) onChangeValue({ name: 'stadiumId', value: Number(value) });
+          }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="stadiumId" className="w-full">
             <SelectValue placeholder="Seleccione un estadio" />
           </SelectTrigger>
           <SelectContent>
@@ -184,7 +176,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (stadiums as IStadium[]).map((stadium: IStadium) => (
+              stadiums.map((stadium) => (
                 <SelectItem key={stadium.id} value={stadium.id.toString()}>
                   Estadio {stadium.id} - {stadium.surface}
                 </SelectItem>
@@ -199,10 +191,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           Jornada
         </label>
         <Select
-          value={match.matchdayId?.toString()}
-          onValueChange={(value) => onChangeValue({ name: 'matchdayId', value: parseInt(value) })}
+          value={match.matchdayId ? String(match.matchdayId) : ''}
+          onValueChange={(value) => {
+            if (value) onChangeValue({ name: 'matchdayId', value: Number(value) });
+          }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="matchdayId" className="w-full">
             <SelectValue placeholder="Seleccione una jornada" />
           </SelectTrigger>
           <SelectContent>
@@ -211,7 +205,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (matchdays as IMatchday[]).map((matchday: IMatchday) => (
+              matchdays.map((matchday) => (
                 <SelectItem key={matchday.id} value={matchday.id.toString()}>
                   {matchday.name}
                 </SelectItem>
@@ -226,10 +220,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           Evento
         </label>
         <Select
-          value={match.eventId?.toString()}
-          onValueChange={(value) => onChangeValue({ name: 'eventId', value: parseInt(value) })}
+          value={match.eventId ? String(match.eventId) : ''}
+          onValueChange={(value) => {
+            if (value) onChangeValue({ name: 'eventId', value: Number(value) });
+          }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="eventId" className="w-full">
             <SelectValue placeholder="Seleccione un evento" />
           </SelectTrigger>
           <SelectContent>
@@ -238,7 +234,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (events as IEvent[]).map((event: IEvent) => (
+              events.map((event) => (
                 <SelectItem key={event.id} value={event.id.toString()}>
                   {event.name}
                 </SelectItem>
@@ -253,12 +249,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           Equipo local
         </label>
         <Select
-          value={match.homeTeamId ? match.homeTeamId.toString() : undefined}
-          onValueChange={(value) =>
-            onChangeValue({ name: 'homeTeamId', value: parseInt(value, 10) })
-          }
+          value={match.homeTeamId == null ? '' : String(match.homeTeamId)}
+          onValueChange={(value) => {
+            if (value) onChangeValue({ name: 'homeTeamId', value: Number(value) });
+          }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="homeTeamId" className="w-full">
             <SelectValue placeholder="Seleccione equipo local" />
           </SelectTrigger>
           <SelectContent>
@@ -267,7 +263,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (teams as Team[]).map((team) => (
+              teams.map((team) => (
                 <SelectItem key={team.id} value={team.id.toString()}>
                   {team.name}
                   {team.clubName ? ` - ${team.clubName}` : ''}
@@ -283,12 +279,12 @@ export const MatchForm: React.FC<MatchFormProps> = ({
           Equipo visitante
         </label>
         <Select
-          value={match.awayTeamId ? match.awayTeamId.toString() : undefined}
-          onValueChange={(value) =>
-            onChangeValue({ name: 'awayTeamId', value: parseInt(value, 10) })
-          }
+          value={match.awayTeamId == null ? '' : String(match.awayTeamId)}
+          onValueChange={(value) => {
+            if (value) onChangeValue({ name: 'awayTeamId', value: Number(value) });
+          }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="awayTeamId" className="w-full">
             <SelectValue placeholder="Seleccione equipo visitante" />
           </SelectTrigger>
           <SelectContent>
@@ -297,7 +293,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (teams as Team[]).map((team) => (
+              teams.map((team) => (
                 <SelectItem
                   key={team.id}
                   value={team.id.toString()}

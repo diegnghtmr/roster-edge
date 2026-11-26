@@ -231,7 +231,7 @@ export const ScoringRankingReport = () => {
           <DataTable
             data={rankings}
             headers={tableHeaders}
-            renderRow={(item, index) => renderRow(item, index)}
+            renderRow={renderRow}
             loading={isLoading}
             emptyMessage="No se encontraron datos para los filtros seleccionados"
           />

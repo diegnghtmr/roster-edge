@@ -39,7 +39,7 @@ export const StaffUpdateModule = () => {
   });
 
   // Fetch the staff data
-  const { data: staffData, isLoading: loadingStaff } = useGetList({
+  const { data: fetchedStaff, isLoading: loadingStaff } = useGetList<Staff>({
     key: `staff-${id}`,
     resource: [`staff/${id}`],
     keyResults: 'data',
@@ -72,10 +72,7 @@ export const StaffUpdateModule = () => {
 
   // Populate form when staff data is loaded
   useEffect(() => {
-    console.log('Fetched staff data:', staffData);
-    if (staffData && staffData.id) {
-      const fetchedStaff = staffData as Staff;
-
+    if (fetchedStaff?.id) {
       // Convert birthDate array [year, month, day] to string "YYYY-MM-DD"
       const [birthYear, birthMonth, birthDay] = fetchedStaff.birthDate;
       const birthDateString = `${birthYear}-${birthMonth
@@ -101,7 +98,7 @@ export const StaffUpdateModule = () => {
         teamId: fetchedStaff.teamId,
       });
     }
-  }, [staffData]);
+  }, [fetchedStaff]);
 
   const resource = [`staff/${id}`];
   const { mutate } = useMutateService(resource, '', 'PUT');

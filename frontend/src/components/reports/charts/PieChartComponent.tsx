@@ -3,8 +3,8 @@ import { CHART_PALETTES, REPORT_COLORS } from '@/constants/reportColors';
 
 interface PieChartComponentProps {
   data: Record<string, string | number>[];
-  nameKey: string;
-  valueKey: string;
+  nameKey?: string;
+  valueKey?: string;
   colors?: string[];
   height?: number;
   showLabel?: boolean;
@@ -15,51 +15,48 @@ interface PieChartComponentProps {
 const DEFAULT_COLORS = CHART_PALETTES.default;
 const RADIAN = Math.PI / 180;
 
-interface CustomPieLabelProps {
-  cx?: number;
-  cy?: number;
+// Recharts injects the resolved sector coordinates into custom label elements.
+interface PieLabelLineProps {
+  cx?: string | number;
+  cy?: string | number;
   midAngle?: number;
+  outerRadius?: number;
+  percent?: number;
+  minLabelPercentage: number;
+}
+
+interface ChartLabelProps extends PieLabelLineProps {
   innerRadius?: number;
-  outerRadius?: number;
-  percent?: number;
-  name?: string;
+  name?: string | number;
 }
 
-interface CustomPieLineProps {
-  cx?: number;
-  cy?: number;
-  midAngle?: number;
-  outerRadius?: number;
-  percent?: number;
-}
-
-const createLabelRenderer = (minLabelPercentage: number) => (props: CustomPieLabelProps) => {
-  const {
-    cx = 0,
-    cy = 0,
-    midAngle = 0,
-    innerRadius = 0,
-    outerRadius = 0,
-    percent = 0,
-    name = '',
-  } = props;
-
+const PieSliceLabel = ({
+  cx = 0,
+  cy = 0,
+  midAngle = 0,
+  innerRadius = 0,
+  outerRadius = 0,
+  percent = 0,
+  name,
+  minLabelPercentage,
+}: ChartLabelProps) => {
   const percentage = percent * 100;
-
-  if (!name || Number.isNaN(percentage) || percentage < minLabelPercentage) {
+  const centerX = Number(cx);
+  const centerY = Number(cy);
+  if (name == null || name === '' || !Number.isFinite(percentage) || percentage < minLabelPercentage) {
     return null;
   }
 
   const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const x = centerX + radius * Math.cos(-midAngle * RADIAN);
+  const y = centerY + radius * Math.sin(-midAngle * RADIAN);
 
   return (
     <text
       x={x}
       y={y}
       fill={REPORT_COLORS.neutral.gray800}
-      textAnchor={x > cx ? 'start' : 'end'}
+      textAnchor={x > centerX ? 'start' : 'end'}
       dominantBaseline="middle"
       fontSize={12}
       fontWeight={600}
@@ -69,22 +66,28 @@ const createLabelRenderer = (minLabelPercentage: number) => (props: CustomPieLab
   );
 };
 
-const createLabelLineRenderer = (minLabelPercentage: number) => (props: CustomPieLineProps) => {
-  const { cx = 0, cy = 0, midAngle = 0, outerRadius = 0, percent = 0 } = props;
-
+const PieSliceLabelLine = ({
+  cx = 0,
+  cy = 0,
+  midAngle = 0,
+  outerRadius = 0,
+  percent = 0,
+  minLabelPercentage,
+}: PieLabelLineProps) => {
   const percentage = percent * 100;
-
-  if (Number.isNaN(percentage) || percentage < minLabelPercentage) {
+  const centerX = Number(cx);
+  const centerY = Number(cy);
+  if (!Number.isFinite(percentage) || percentage < minLabelPercentage) {
     return null;
   }
 
   const startRadius = outerRadius;
   const endRadius = outerRadius * 1.15;
 
-  const startX = cx + startRadius * Math.cos(-midAngle * RADIAN);
-  const startY = cy + startRadius * Math.sin(-midAngle * RADIAN);
-  const endX = cx + endRadius * Math.cos(-midAngle * RADIAN);
-  const endY = cy + endRadius * Math.sin(-midAngle * RADIAN);
+  const startX = centerX + startRadius * Math.cos(-midAngle * RADIAN);
+  const startY = centerY + startRadius * Math.sin(-midAngle * RADIAN);
+  const endX = centerX + endRadius * Math.cos(-midAngle * RADIAN);
+  const endY = centerY + endRadius * Math.sin(-midAngle * RADIAN);
 
   return (
     <path
@@ -98,17 +101,14 @@ const createLabelLineRenderer = (minLabelPercentage: number) => (props: CustomPi
 
 export const PieChartComponent = ({
   data,
-  nameKey,
-  valueKey,
+  nameKey = 'name',
+  valueKey = 'value',
   colors = DEFAULT_COLORS,
   height = 400,
   showLabel = true,
   innerRadius = 0,
   minLabelPercentage = 5,
 }: PieChartComponentProps) => {
-  const renderCustomLabel = createLabelRenderer(minLabelPercentage);
-  const renderCustomLabelLine = createLabelLineRenderer(minLabelPercentage);
-
   // Custom tooltip in Spanish
   interface TooltipProps {
     active?: boolean;
@@ -150,8 +150,8 @@ export const PieChartComponent = ({
           data={data}
           cx="50%"
           cy="50%"
-          labelLine={showLabel ? renderCustomLabelLine : false}
-          label={showLabel ? renderCustomLabel : false}
+          labelLine={showLabel && <PieSliceLabelLine minLabelPercentage={minLabelPercentage} />}
+          label={showLabel && <PieSliceLabel minLabelPercentage={minLabelPercentage} />}
           outerRadius={120}
           innerRadius={innerRadius}
           fill="#8884d8"

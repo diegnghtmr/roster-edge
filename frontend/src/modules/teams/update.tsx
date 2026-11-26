@@ -13,6 +13,7 @@ import { InternalHeader } from '@/components/layout/InternalHeader';
 import { BookmarkCheck } from 'lucide-react';
 import type { TeamCategory } from '@/interface/ITeamCategory';
 import type { Club } from '@/interface/IClub';
+import { formatDateOnly } from '@/shared/utils/dateOnly';
 
 interface IField {
   name: string;
@@ -34,7 +35,7 @@ export const TeamUpdateModule = () => {
   });
 
   // Fetch the team data
-  const { data: teamData, isLoading: loadingTeam } = useGetList({
+  const { data: fetchedTeam, isLoading: loadingTeam } = useGetList<Team>({
     key: `team-${id}`,
     resource: [`teams/${id}`],
     keyResults: 'data',
@@ -59,26 +60,17 @@ export const TeamUpdateModule = () => {
 
   // Populate form when team data is loaded
   useEffect(() => {
-    console.log('Fetched team data:', teamData);
-    if (teamData && teamData.id) {
-      const fetchedTeam = teamData as Team;
-
-      // Convert foundation array [year, month, day] to string "YYYY-MM-DD"
-      const [year, month, day] = fetchedTeam.foundation;
-      const foundationString = `${year}-${month
-        .toString()
-        .padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
+    if (fetchedTeam?.id) {
       setTeam({
         name: fetchedTeam.name,
         mascot: fetchedTeam.mascot,
-        foundation: foundationString,
+        foundation: formatDateOnly(fetchedTeam.foundation),
         genderId: fetchedTeam.genderId,
         categoryId: fetchedTeam.categoryId,
         clubId: fetchedTeam.clubId,
       });
     }
-  }, [teamData]);
+  }, [fetchedTeam]);
 
   const resource = [`teams/${id}`];
   const { mutate } = useMutateService(resource, '', 'PUT');

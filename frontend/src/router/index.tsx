@@ -62,21 +62,17 @@ import { PaymentMethodPerformanceReport } from '@/modules/reports/payment-method
 import { SubscriptionPlanPerformanceReport } from '@/modules/reports/subscription-plan-performance';
 import ErrorPage from '@/page/ErrorPage';
 import Login from '@/page/login/Login';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, matchRoutes, Navigate } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
 
-export default function useRouterApp() {
-  const isUserLoggedIn = Boolean(localStorage.getItem('token'));
-
-  return createBrowserRouter([
-    {
+const protectedRoute: RouteObject = {
       path: '/',
-      element: isUserLoggedIn ? <Layout /> : <Navigate to="/login" />,
+      element: <Layout />,
       errorElement: <ErrorPage />,
-      children: isUserLoggedIn
-        ? [
+      children: [
             {
-              path: '',
-              element: <Navigate to="/dashboard" />,
+              index: true,
+              element: <Navigate to="/dashboard" replace />,
             },
             {
               path: '/dashboard',
@@ -126,7 +122,6 @@ export default function useRouterApp() {
             {
               path: '/team-categories',
               element: <TeamCategoriesModule />,
-              
             },
             {
               path: '/team-categories-create',
@@ -349,13 +344,35 @@ export default function useRouterApp() {
               element: <SubscriptionPlanPerformanceReport />,
               errorElement: <ErrorPage />,
             },
-          ]
-        : [],
-    },
+      ],
+};
+
+function getReturnDestination(state: unknown) {
+  const fallback = '/dashboard';
+  if (!state || typeof state !== 'object' || !('returnTo' in state)) return fallback;
+  const target = state.returnTo;
+  if (typeof target !== 'string' || !target.startsWith('/') || target.startsWith('//') || target.includes('\\')) {
+    return fallback;
+  }
+
+  const url = new URL(target, window.location.origin);
+  if (url.origin !== window.location.origin || !matchRoutes([protectedRoute], url.pathname)) {
+    return fallback;
+  }
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
+let router: ReturnType<typeof createBrowserRouter> | undefined;
+
+export default function useRouterApp() {
+  router ??= createBrowserRouter([
+    protectedRoute,
     {
       path: '/login',
-      element: <Login />,
+      element: <Login getReturnDestination={getReturnDestination} />,
       errorElement: <ErrorPage />,
     },
-  ]);
+    { path: '*', element: <ErrorPage /> },
+  ], { basename: import.meta.env.BASE_URL });
+  return router;
 }

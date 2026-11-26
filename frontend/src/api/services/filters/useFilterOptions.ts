@@ -1,8 +1,3 @@
-/**
- * Custom hooks for fetching filter options (clubs, teams, seasons, etc.)
- * Used in report filters and other dropdowns
- */
-
 import useGetList from '../getServices/useGetList';
 
 export interface SelectOption {
@@ -10,193 +5,97 @@ export interface SelectOption {
   label: string;
 }
 
-/**
- * Fetch all clubs for filter dropdowns
- */
-export const useClubsForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['clubs-filter'],
-    resource: ['clubs'],
+interface CatalogEntry {
+  id: number;
+  name: string;
+  clubName?: string;
+  symbol?: string;
+}
+
+function readCatalog(data: unknown): CatalogEntry[] {
+  if (!Array.isArray(data)) return [];
+
+  const entries: CatalogEntry[] = [];
+  const ids = new Set<number>();
+  for (const row of data as unknown[]) {
+    if (!row || typeof row !== 'object' || !('id' in row) || !('name' in row)) continue;
+    const { id, name } = row;
+    if (typeof id !== 'number' || !Number.isSafeInteger(id) || id <= 0 || ids.has(id)) continue;
+    if (typeof name !== 'string' || !name.trim()) continue;
+
+    ids.add(id);
+    entries.push({
+      id,
+      name,
+      clubName: 'clubName' in row && typeof row.clubName === 'string' ? row.clubName : undefined,
+      symbol: 'symbol' in row && typeof row.symbol === 'string' ? row.symbol : undefined,
+    });
+  }
+  return entries;
+}
+
+function useCatalog(resource: string, key: string, enabled: boolean, clubId?: number) {
+  const { data, isLoading, error } = useGetList({
+    key: clubId ? [key, clubId] : [key],
+    resource: [resource],
+    params: clubId ? { clubId: String(clubId) } : undefined,
     keyResults: 'data',
     enabled,
   });
 
-  const options: SelectOption[] = (data || []).map((club: { id: number; name: string }) => ({
-    value: club.id,
-    label: `${club.name} (ID: ${club.id})`,
-  }));
+  return { entries: readCatalog(data), isLoading, error };
+}
 
-  return { options, isLoading };
-};
+const namedOption = ({ id, name }: CatalogEntry): SelectOption => ({
+  value: id,
+  label: `${name} (ID: ${id})`,
+});
 
-/**
- * Fetch all teams for filter dropdowns
- * @param clubId - Optional filter by club ID
- */
-export const useTeamsForFilter = (clubId?: number, enabled = true) => {
-  const params = clubId ? { clubId } : undefined;
+const clubOption = ({ id, name, clubName }: CatalogEntry): SelectOption =>
+  namedOption({ id, name: clubName ? `${name} - ${clubName}` : name });
 
-  const { data, isLoading } = useGetList({
-    key: clubId ? ['teams-filter', clubId] : ['teams-filter'],
-    resource: ['teams'],
-    params,
-    keyResults: 'data',
-    enabled,
-  });
+const currencyOption = (entry: CatalogEntry): SelectOption =>
+  entry.symbol ? { value: entry.id, label: `${entry.name} (${entry.symbol})` } : namedOption(entry);
 
-  const options: SelectOption[] = (data || []).map(
-    (team: { id: number; name: string; clubName?: string }) => ({
-      value: team.id,
-      label: team.clubName
-        ? `${team.name} - ${team.clubName} (ID: ${team.id})`
-        : `${team.name} (ID: ${team.id})`,
-    })
-  );
+function useFilterOptions(
+  resource: string,
+  key: string,
+  enabled: boolean,
+  toOption = namedOption,
+  clubId?: number
+) {
+  const { entries, isLoading } = useCatalog(resource, key, enabled, clubId);
+  return { options: entries.map(toOption), isLoading };
+}
 
-  return { options, isLoading };
-};
+export const useClubsForFilter = (enabled = true) =>
+  useFilterOptions('clubs', 'clubs-filter', enabled);
 
-/**
- * Fetch all seasons for filter dropdowns
- * @param clubId - Optional filter by club ID
- */
-export const useSeasonsForFilter = (clubId?: number, enabled = true) => {
-  const params = clubId ? { clubId } : undefined;
+export const useTeamsForFilter = (clubId?: number, enabled = true) =>
+  useFilterOptions('teams', 'teams-filter', enabled, clubOption, clubId);
 
-  const { data, isLoading } = useGetList({
-    key: clubId ? ['seasons-filter', clubId] : ['seasons-filter'],
-    resource: ['seasons'],
-    params,
-    keyResults: 'data',
-    enabled,
-  });
+export const useSeasonsForFilter = (clubId?: number, enabled = true) =>
+  useFilterOptions('seasons', 'seasons-filter', enabled, clubOption, clubId);
 
-  const options: SelectOption[] = (data || []).map(
-    (season: { id: number; name: string; clubName?: string }) => ({
-      value: season.id,
-      label: season.clubName
-        ? `${season.name} - ${season.clubName} (ID: ${season.id})`
-        : `${season.name} (ID: ${season.id})`,
-    })
-  );
+export const useCategoriesForFilter = (enabled = true) =>
+  useFilterOptions('team-categories', 'categories-filter', enabled);
 
-  return { options, isLoading };
-};
+export const useTeamGenderCatalog = (enabled = true) =>
+  useCatalog('team-genders', 'genders-filter', enabled);
 
-/**
- * Fetch all categories for filter dropdowns
- */
-export const useCategoriesForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['categories-filter'],
-    resource: ['team-categories'],
-    keyResults: 'data',
-    enabled,
-  });
-
-  const options: SelectOption[] = (data || []).map((category: { id: number; name: string }) => ({
-    value: category.id,
-    label: `${category.name} (ID: ${category.id})`,
-  }));
-
-  return { options, isLoading };
-};
-
-/**
- * Fetch all genders for filter dropdowns
- */
 export const useGendersForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['genders-filter'],
-    resource: ['team-genders'],
-    keyResults: 'data',
-    enabled,
-  });
-
-  const options: SelectOption[] = (data || []).map((gender: { id: number; name: string }) => ({
-    value: gender.id,
-    label: `${gender.name} (ID: ${gender.id})`,
-  }));
-
-  return { options, isLoading };
+  const { entries, isLoading } = useTeamGenderCatalog(enabled);
+  return { options: entries.map(namedOption), isLoading };
 };
 
-/**
- * Fetch all subscription plans for filter dropdowns
- */
-export const usePlansForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['plans-filter'],
-    resource: ['plans'],
-    keyResults: 'data',
-    enabled,
-  });
+export const usePlansForFilter = (enabled = true) =>
+  useFilterOptions('plans', 'plans-filter', enabled);
 
-  const options: SelectOption[] = (data || []).map((plan: { id: number; name: string }) => ({
-    value: plan.id,
-    label: `${plan.name} (ID: ${plan.id})`,
-  }));
+export const usePaymentMethodsForFilter = (enabled = true) =>
+  useFilterOptions('payment-methods', 'payment-methods-filter', enabled);
 
-  return { options, isLoading };
-};
+export const useCurrenciesForFilter = (enabled = true) =>
+  useFilterOptions('currencies', 'currencies-filter', enabled, currencyOption);
 
-/**
- * Fetch payment methods for filter dropdowns
- */
-export const usePaymentMethodsForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['payment-methods-filter'],
-    resource: ['payment-methods'],
-    keyResults: 'data',
-    enabled,
-  });
-
-  const options: SelectOption[] = (data || []).map((method: { id: number; name: string }) => ({
-    value: method.id,
-    label: `${method.name} (ID: ${method.id})`,
-  }));
-
-  return { options, isLoading };
-};
-
-/**
- * Fetch currencies for filter dropdowns
- */
-export const useCurrenciesForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['currencies-filter'],
-    resource: ['currencies'],
-    keyResults: 'data',
-    enabled,
-  });
-
-  const options: SelectOption[] = (data || []).map(
-    (currency: { id: number; name: string; symbol?: string }) => ({
-      value: currency.id,
-      label: currency.symbol
-        ? `${currency.name} (${currency.symbol})`
-        : `${currency.name} (ID: ${currency.id})`,
-    })
-  );
-
-  return { options, isLoading };
-};
-
-/**
- * Fetch subscription status catalog for filter dropdowns
- */
-export const useSubscriptionStatusesForFilter = (enabled = true) => {
-  const { data, isLoading } = useGetList({
-    key: ['subscription-statuses-filter'],
-    resource: ['subscription-statuses'],
-    keyResults: 'data',
-    enabled,
-  });
-
-  const options: SelectOption[] = (data || []).map((status: { id: number; name: string }) => ({
-    value: status.id,
-    label: `${status.name} (ID: ${status.id})`,
-  }));
-
-  return { options, isLoading };
-};
+export const useSubscriptionStatusesForFilter = (enabled = true) =>
+  useFilterOptions('subscription-statuses', 'subscription-statuses-filter', enabled);
