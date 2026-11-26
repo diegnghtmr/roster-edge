@@ -14,4 +14,8 @@ export interface IMatchSummary {
   awayTeamId?: number | null;
   awayTeamName?: string | null;
   awayClubName?: string | null;
+  active?: boolean;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  resultLabel?: string | null;
 }

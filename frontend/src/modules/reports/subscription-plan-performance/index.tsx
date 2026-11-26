@@ -14,7 +14,6 @@ import {
   useSubscriptionStatusesForFilter,
 } from '@/api/services/filters/useFilterOptions';
 import type { SubscriptionPlanPerformanceResponse } from '@/interface/IReports';
-import { SubscriptionPlanPerformancePDF } from '@/components/reports/pdf/SubscriptionPlanPerformancePDF';
 
 const currencyFormatter = new Intl.NumberFormat('es-CO', {
   style: 'currency',
@@ -217,7 +216,8 @@ export const SubscriptionPlanPerformanceReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<SubscriptionPlanPerformancePDF data={plans} />}
+            loadDocument={() => import('@/components/reports/pdf/SubscriptionPlanPerformancePDF')
+              .then(({ SubscriptionPlanPerformancePDF }) => <SubscriptionPlanPerformancePDF data={plans} />)}
             fileName="reporte-planes-suscripcion"
             disabled={plans.length === 0}
           />

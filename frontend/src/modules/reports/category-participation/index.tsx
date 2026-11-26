@@ -6,7 +6,6 @@ import { StatCard } from '@/components/reports/StatCard';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
 import { PieChartComponent } from '@/components/reports/charts/PieChartComponent';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { CategoryParticipationPDF } from '@/components/reports/pdf/CategoryParticipationPDF';
 import { useCategoryParticipationReport } from '@/api/services/reports/useReportsData';
 import {
   useClubsForFilter,
@@ -221,7 +220,8 @@ export const CategoryParticipationReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<CategoryParticipationPDF data={participation} />}
+            loadDocument={() => import('@/components/reports/pdf/CategoryParticipationPDF')
+              .then(({ CategoryParticipationPDF }) => <CategoryParticipationPDF data={participation} />)}
             fileName={`participacion-categoria-${new Date().toISOString().split('T')[0]}`}
             disabled={participation.length === 0}
           />

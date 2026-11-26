@@ -254,11 +254,20 @@ async function flows(browser) {
     return created;
   });
 
-  await step('standings exclude unplayed fixtures and include a newly recorded result', async () => {
+  await step('records a result from the match list and refreshes fixtures and standings', async () => {
     assert.deepEqual(await standings(token), before);
-    // Result entry is an API operation; use the same session obtained from the browser login.
-    const result = await data(await request(`matches/${match.id}/result/`, token, 'PUT', { homeScore: 2, awayScore: 1 }));
-    assert.deepEqual(result, { homeScore: 2, awayScore: 1 });
+    const row = page.getByRole('row').filter({ hasText: 'Bambú City FC' });
+    assert.ok(await row.getByRole('cell', { name: 'Sin resultado' }).isVisible());
+    await row.getByRole('button', { name: 'Registrar resultado' }).click();
+    const form = page.getByRole('dialog', { name: 'Registrar resultado' });
+    await form.getByRole('spinbutton', { name: 'Goles local' }).fill('2');
+    await form.getByRole('spinbutton', { name: 'Goles visitante' }).fill('1');
+    await shot(page, 'match-result-desktop');
+    const saved = browserResponse(page, `matches/${match.id}/result`, 'PUT');
+    await form.getByRole('button', { name: 'Guardar resultado' }).click();
+    assert.deepEqual(await data(await saved), { homeScore: 2, awayScore: 1 });
+    await form.waitFor({ state: 'hidden' });
+    await row.getByRole('cell', { name: '2-1', exact: true }).waitFor();
     const after = await report(page, 'season-standings', 'Tabla de Posiciones');
     assert.equal(after.length, before.length + 1);
     const added = after.find(row => row.teamId === team.id);
@@ -267,6 +276,19 @@ async function flows(browser) {
     await page.getByRole('row').filter({ hasText: 'Bambú City FC' }).waitFor();
     await page.locator('svg.recharts-surface .recharts-rectangle').first().waitFor();
     await shot(page, 'standings', true);
+  });
+
+  await step('exports standings as a PDF from the lazy-loaded report', async () => {
+    const download = page.waitForEvent('download');
+    download.catch(() => {});
+    await page.getByRole('button', { name: 'Exportar PDF' }).click();
+    const pdf = await download;
+    assert.match(pdf.suggestedFilename(), /\.pdf$/);
+    assert.equal(await pdf.failure(), null);
+    const stream = await pdf.createReadStream();
+    const { value: firstChunk } = await stream[Symbol.asyncIterator]().next();
+    stream.destroy();
+    assert.equal(firstChunk?.subarray(0, 5).toString(), '%PDF-');
   });
 
   const foreign = await data(await request('roster/login/', null, 'POST', { email: 'sierra@example.invalid', password: demoPassword }));
@@ -336,14 +358,22 @@ async function flows(browser) {
     assert.equal((await request('roster/me/', token)).status, 401);
   });
 
-  await step('mobile match schedule and report catalog render at 390 × 844', async () => {
+  await step('mobile match schedule, result form and report catalog render at 390 × 844', async () => {
     const mobile = await newPage(browser, 390, 844);
     try {
       await go(mobile, '/matches');
       await mobile.waitForURL(`${web}/login`);
       const session = await signIn(mobile, '/matches');
-      await mobile.getByRole('row').filter({ hasText: 'Bambú City FC' }).waitFor();
+      const row = mobile.getByRole('row').filter({ hasText: 'Bambú City FC' });
+      await row.waitFor();
       await shot(mobile, 'matches-mobile');
+      await row.getByRole('button', { name: 'Editar resultado' }).click();
+      const form = mobile.getByRole('dialog', { name: 'Editar resultado' });
+      assert.equal(await form.getByRole('spinbutton', { name: 'Goles local' }).inputValue(), '2');
+      assert.equal(await form.getByRole('spinbutton', { name: 'Goles visitante' }).inputValue(), '1');
+      assert.ok(await form.evaluate(dialog => dialog.scrollWidth <= dialog.clientWidth));
+      await shot(mobile, 'match-result-mobile');
+      await form.getByRole('button', { name: 'Cancelar' }).click();
       await go(mobile, '/reports');
       await heading(mobile, 'Reportes y Análiticas');
       await shot(mobile, 'reports-mobile');

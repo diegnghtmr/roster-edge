@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { LineChartComponent } from '@/components/reports/charts/LineChartComponent';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { PointsProgressPDF } from '@/components/reports/pdf/PointsProgressPDF';
 import { usePointsProgressReport } from '@/api/services/reports/useReportsData';
 import { useSeasonsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
 import { ArrowLeft, TrendingUp, Trophy, Target } from 'lucide-react';
@@ -167,7 +166,8 @@ export const PointsProgressReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<PointsProgressPDF data={progress} teamName={progress[0]?.teamName} />}
+            loadDocument={() => import('@/components/reports/pdf/PointsProgressPDF')
+              .then(({ PointsProgressPDF }) => <PointsProgressPDF data={progress} teamName={progress[0]?.teamName} />)}
             fileName={`progreso-puntos-${progress[0]?.teamName || 'reporte'}`}
             disabled={progress.length === 0}
           />

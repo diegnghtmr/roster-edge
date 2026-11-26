@@ -4,6 +4,7 @@ import { DeleteConfirmDialog } from '@shared/components';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
 import type { FilterConfig } from '@/components/table/SearchComponent';
 import type { IMatchSummary } from '@/interface/IMatchSummary';
+import useUserStore from '@/storage/storeUser';
 import { MatchItem } from './ItemList';
 
 const headers: TableColumn[] = [
@@ -12,6 +13,7 @@ const headers: TableColumn[] = [
   { title: 'Horario', key: 'time' },
   { title: 'Local', key: 'homeTeam' },
   { title: 'Visitante', key: 'awayTeam' },
+  { title: 'Resultado', key: 'result' },
   { title: 'Acciones', key: 'actions', className: 'w-32' },
 ];
 
@@ -29,6 +31,8 @@ const filters: FilterConfig[] = [
 ];
 
 export const MatchesList: React.FC = () => {
+  // Only a signed-in Roster account can act on the API's club-scoped fixture list.
+  const canRecordResults = useUserStore((state) => state.status === 'signed-in' && state.user !== null);
   // All duplicate logic extracted to reusable hook
   const {
     items: matches,
@@ -38,6 +42,7 @@ export const MatchesList: React.FC = () => {
     handleDelete,
     confirmDelete,
     cancelDelete,
+    refetch,
   } = useResourceList<IMatchSummary>({
     resource: ['matches', 'schedule'],
     deleteResource: ['matches'],
@@ -50,7 +55,7 @@ export const MatchesList: React.FC = () => {
 
   // Render function for each row
   const renderRow = (match: IMatchSummary) => (
-    <MatchItem key={match.id} match={match} onDelete={handleDelete} />
+    <MatchItem key={match.id} match={match} onDelete={handleDelete} onResultSaved={canRecordResults ? refetch : undefined} />
   );
 
   return (

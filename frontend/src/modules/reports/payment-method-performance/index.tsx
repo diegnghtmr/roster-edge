@@ -11,7 +11,6 @@ import { ArrowLeft, DollarSign, PieChart, Receipt } from 'lucide-react';
 import { usePaymentMethodPerformanceReport } from '@/api/services/reports/useReportsData';
 import { usePlansForFilter, useCurrenciesForFilter } from '@/api/services/filters/useFilterOptions';
 import type { PaymentMethodPerformanceResponse } from '@/interface/IReports';
-import { PaymentMethodPerformancePDF } from '@/components/reports/pdf/PaymentMethodPerformancePDF';
 
 const currencyFormatter = new Intl.NumberFormat('es-CO', {
   style: 'currency',
@@ -199,7 +198,8 @@ export const PaymentMethodPerformanceReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<PaymentMethodPerformancePDF data={performance} />}
+            loadDocument={() => import('@/components/reports/pdf/PaymentMethodPerformancePDF')
+              .then(({ PaymentMethodPerformancePDF }) => <PaymentMethodPerformancePDF data={performance} />)}
             fileName="reporte-metodos-pago"
             disabled={performance.length === 0}
           />

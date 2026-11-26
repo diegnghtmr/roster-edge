@@ -3,10 +3,12 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2 } from 'lucide-react';
 import type { IMatchSummary } from '@/interface/IMatchSummary';
+import { ResultDialog } from './ResultDialog';
 
 interface MatchItemProps {
   match: IMatchSummary;
   onDelete: (id: number) => void;
+  onResultSaved?: () => void;
 }
 
 const formatDateValue = (value?: number[] | string): string => {
@@ -38,7 +40,8 @@ const teamLabel = (name?: string | null, club?: string | null) => {
   return club ? `${name} (${club})` : name;
 };
 
-export const MatchItem = ({ match, onDelete }: MatchItemProps) => {
+export const MatchItem = ({ match, onDelete, onResultSaved }: MatchItemProps) => {
+  const hasTeams = match.homeTeamId != null && match.awayTeamId != null && match.homeTeamId !== match.awayTeamId;
   return (
     <TableRow key={match.id}>
       <TableCell className="text-start font-medium">{match.id}</TableCell>
@@ -52,9 +55,11 @@ export const MatchItem = ({ match, onDelete }: MatchItemProps) => {
       <TableCell className="text-start">
         {teamLabel(match.awayTeamName, match.awayClubName)}
       </TableCell>
+      <TableCell className="text-start">{match.resultLabel ?? 'Sin resultado'}</TableCell>
 
       <TableCell>
         <div className="flex gap-2">
+          {onResultSaved && match.active && hasTeams && <ResultDialog match={match} onSaved={onResultSaved} />}
           <Link to={`/matches/${match.id}/edit`}>
             <Button variant="outline" size="sm" className="flex items-center gap-1">
               <Edit className="h-4 w-4" />

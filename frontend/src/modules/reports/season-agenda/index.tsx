@@ -4,7 +4,6 @@ import { ExportButton } from '@/components/reports/ExportButton';
 import { ReportFilters, type FilterField } from '@/components/reports/ReportFilters';
 import { StatCard } from '@/components/reports/StatCard';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { SeasonAgendaPDF } from '@/components/reports/pdf/SeasonAgendaPDF';
 import { useSeasonAgendaReport } from '@/api/services/reports/useReportsData';
 import { useSeasonsForFilter, useClubsForFilter } from '@/api/services/filters/useFilterOptions';
 import { ArrowLeft, Calendar, MapPin, Clock } from 'lucide-react';
@@ -179,7 +178,8 @@ export const SeasonAgendaReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<SeasonAgendaPDF data={agenda} seasonName={agenda[0]?.seasonName} />}
+            loadDocument={() => import('@/components/reports/pdf/SeasonAgendaPDF')
+              .then(({ SeasonAgendaPDF }) => <SeasonAgendaPDF data={agenda} seasonName={agenda[0]?.seasonName} />)}
             fileName={`agenda-temporada-${agenda[0]?.seasonName || 'reporte'}`}
             disabled={agenda.length === 0}
           />

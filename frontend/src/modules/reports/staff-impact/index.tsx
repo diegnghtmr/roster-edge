@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { StaffImpactPDF } from '@/components/reports/pdf/StaffImpactPDF';
 import { useStaffImpactReport } from '@/api/services/reports/useReportsData';
 import { useClubsForFilter, useSeasonsForFilter } from '@/api/services/filters/useFilterOptions';
 import { ArrowLeft, TrendingUp, Zap, Users } from 'lucide-react';
@@ -175,7 +174,8 @@ export const StaffImpactReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<StaffImpactPDF data={impact} />}
+            loadDocument={() => import('@/components/reports/pdf/StaffImpactPDF')
+              .then(({ StaffImpactPDF }) => <StaffImpactPDF data={impact} />)}
             fileName={`impacto-personal-${new Date().toISOString().split('T')[0]}`}
             disabled={teams.length === 0}
           />

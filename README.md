@@ -50,7 +50,7 @@ PGPASSWORD="$POSTGRES_PASSWORD" psql -X -h 127.0.0.1 -p "$POSTGRES_PORT" \
 
 Sign in as `roster@example.invalid` with `RosterDemo-only!21`. The fixture includes two fictional clubs, generated IDs, teams, staff roles, completed and unplayed matches, and sample payments. It refuses to import into a schema containing clubs or roster accounts. **Never import this public fixture in production**; the application does not seed it at startup.
 
-The match form schedules fixtures. To finalize a result, send an authenticated `PUT /api/matches/{id}/result/` with `{"homeScore":2,"awayScore":1}` for a match in your club. There is no result-entry form yet. The staff-role catalog is read-only; roles can still be selected when managing club staff.
+In **Partidos**, choose **Registrar resultado** next to an active fixture with both teams assigned. Enter whole, non-negative numbers for **Goles local** and **Goles visitante**, including an explicit `0` for a team that did not score. **Guardar resultado** finalizes the score and refreshes the fixtures and standings. Use **Editar resultado** to correct a saved score. The form uses `PUT /api/matches/{id}/result/`; only a signed-in roster account for the owning club can use it. The read-only staff-role catalog remains separate; those roles can still be selected when managing club staff.
 
 ## Verification
 
@@ -59,6 +59,7 @@ With the database variables set as above, point `POSTGRES_DB` to a separate disp
 ```bash
 (cd backend && SPRING_PROFILES_ACTIVE=test ./mvnw -B verify)
 (cd frontend && npm ci && NODE_OPTIONS=--no-experimental-webstorage npm run test -- --run)
+(cd frontend && npm run lint)
 (cd frontend && VITE_BACKEND_URL=http://127.0.0.1:8081/api npm run build)
 ```
 
@@ -66,7 +67,7 @@ The backend suite uses PostgreSQL, including empty-schema and restart checks, au
 
 ## Architecture
 
-- **Frontend (`frontend/`)**: React and TypeScript, Vite, React Router for guarded routes, TanStack Query for API data, Recharts for charts, and React PDF for exports. Match form dates are kept as calendar dates rather than converted through UTC.
+- **Frontend (`frontend/`)**: React and TypeScript, Vite, React Router for guarded, lazy-loaded routes, TanStack Query for API data, Recharts for charts, and React PDF for exports. Report charts load with their routes; PDF code loads only when you choose **Exportar PDF**. Match form dates are kept as calendar dates rather than converted through UTC.
 - **Backend (`backend/`)**: Spring Boot REST and Spring Data JDBC. The API derives club scope from the roster session rather than trusting client filters. Passwords are hashed with PBKDF2, and active bearer sessions are tracked in memory; logging out revokes the current token and restarting invalidates active sessions.
 - **PostgreSQL**: Flyway owns the schema. Match and assignment writes, including notification records, are transactional. A result is stored explicitly, so an unplayed fixture never counts as a 0–0 draw in standings.
 

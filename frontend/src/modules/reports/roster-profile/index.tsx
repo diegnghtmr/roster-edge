@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { PieChartComponent } from '@/components/reports/charts/PieChartComponent';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
-import { RosterProfilePDF } from '@/components/reports/pdf/RosterProfilePDF';
 import { useRosterProfileReport } from '@/api/services/reports/useReportsData';
 import { useClubsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
 import { translatePhysicalState } from '@/utils/translations';
@@ -174,7 +173,8 @@ export const RosterProfileReport = () => {
         {/* Export Button */}
         <div className="flex justify-end">
           <ExportButton
-            document={<RosterProfilePDF data={profiles} />}
+            loadDocument={() => import('@/components/reports/pdf/RosterProfilePDF')
+              .then(({ RosterProfilePDF }) => <RosterProfilePDF data={profiles} />)}
             fileName={`perfil-plantilla-${new Date().toISOString().split('T')[0]}`}
             disabled={profiles.length === 0}
           />

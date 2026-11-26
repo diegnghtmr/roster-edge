@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
-import { SeasonStandingsPDF } from '@/components/reports/pdf/SeasonStandingsPDF';
 import { useSeasonStandingsReport } from '@/api/services/reports/useReportsData';
 import { useSeasonsForFilter, useClubsForFilter } from '@/api/services/filters/useFilterOptions';
 import { ArrowLeft, Trophy, Target, TrendingUp } from 'lucide-react';
@@ -185,7 +184,8 @@ export const SeasonStandingsReport = () => {
         {/* Export Button */}
         <div className="flex justify-end">
           <ExportButton
-            document={<SeasonStandingsPDF data={standings} seasonName={standings[0]?.seasonName} />}
+            loadDocument={() => import('@/components/reports/pdf/SeasonStandingsPDF')
+              .then(({ SeasonStandingsPDF }) => <SeasonStandingsPDF data={standings} seasonName={standings[0]?.seasonName} />)}
             fileName={`tabla-posiciones-${standings[0]?.seasonName || 'reporte'}`}
             disabled={standings.length === 0}
           />
