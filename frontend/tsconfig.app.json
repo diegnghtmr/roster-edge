@@ -14,8 +14,7 @@
       "@components/*": ["./src/components/*"],
       "@api/*": ["./src/api/*"],
       "@hooks/*": ["./src/hooks/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@i18n/*": ["./src/i18n/*"]
+      "@utils/*": ["./src/utils/*"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
