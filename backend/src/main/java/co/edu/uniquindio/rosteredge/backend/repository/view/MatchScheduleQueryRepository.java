@@ -36,28 +36,28 @@ public class MatchScheduleQueryRepository {
             .append("       event.season_id AS season_id, season.name AS season_name, \n")
             .append("       event.id AS event_id, event.name AS event_name, \n")
             .append(
-                "       home.team_id AS home_team_id, homeTeam.name AS home_team_name, home.score AS home_score, \n"
+                "       home.team_id AS home_team_id, homeTeam.name AS home_team_name, result.home_score, \n"
             )
             .append(
                 "       homeClub.id AS home_club_id, homeClub.name AS home_club_name, \n"
             )
             .append(
-                "       away.team_id AS away_team_id, awayTeam.name AS away_team_name, away.score AS away_score, \n"
+                "       away.team_id AS away_team_id, awayTeam.name AS away_team_name, result.away_score, \n"
             )
             .append(
                 "       awayClub.id AS away_club_id, awayClub.name AS away_club_name, \n"
             )
             .append(
-                "       (CAST(COALESCE(home.score, 0) AS TEXT) || '-' || CAST(COALESCE(away.score, 0) AS TEXT)) AS result_label, \n"
+                "       (result.home_score::text || '-' || result.away_score::text) AS result_label, \n"
             )
             .append(
                 "       (CAST(m.date AS TIMESTAMP) + m.start_time) AS kickoff, \n"
             )
             .append(
-                "       (CASE WHEN (m.date > CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time > CURRENT_TIME) THEN true ELSE false END) AS upcoming, \n"
+                "       (result.match_id IS NULL AND (m.date, m.end_time) > (CURRENT_DATE, LOCALTIME)) AS upcoming, \n"
             )
             .append(
-                "       (CASE WHEN (m.date < CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time <= CURRENT_TIME) THEN true ELSE false END) AS played, \n"
+                "       (result.match_id IS NOT NULL) AS played, \n"
             )
             .append("       m.active, m.created_at, m.updated_at \n")
             .append("FROM \"Match\" m \n")
@@ -75,7 +75,7 @@ public class MatchScheduleQueryRepository {
                 "LEFT JOIN \"Country\" country ON city.country_id = country.id \n"
             )
             .append(
-                "LEFT JOIN \"MatchHomeTeam\" home ON m.id = home.match_id \n"
+                "LEFT JOIN \"MatchHomeTeam\" home ON m.id = home.match_id AND home.active IS TRUE \n"
             )
             .append(
                 "LEFT JOIN \"Team\" homeTeam ON home.team_id = homeTeam.id \n"
@@ -84,7 +84,7 @@ public class MatchScheduleQueryRepository {
                 "LEFT JOIN \"Club\" homeClub ON homeTeam.club_id = homeClub.id \n"
             )
             .append(
-                "LEFT JOIN \"MatchAwayTeam\" away ON m.id = away.match_id \n"
+                "LEFT JOIN \"MatchAwayTeam\" away ON m.id = away.match_id AND away.active IS TRUE \n"
             )
             .append(
                 "LEFT JOIN \"Team\" awayTeam ON away.team_id = awayTeam.id \n"
@@ -92,6 +92,8 @@ public class MatchScheduleQueryRepository {
             .append(
                 "LEFT JOIN \"Club\" awayClub ON awayTeam.club_id = awayClub.id \n"
             )
+            .append("LEFT JOIN \"FinalMatchResult\" result ON result.match_id = m.id "
+                + "AND result.home_team_id = home.team_id AND result.away_team_id = away.team_id \n")
             .append("WHERE 1 = 1");
 
         if (filter.getEventId() != null) {
@@ -138,12 +140,12 @@ public class MatchScheduleQueryRepository {
         }
         if (Boolean.TRUE.equals(filter.getUpcomingOnly())) {
             sql.append(
-                " AND ((m.date > CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time > CURRENT_TIME))"
+                " AND result.match_id IS NULL AND (m.date, m.end_time) > (CURRENT_DATE, LOCALTIME)"
             );
         }
         if (Boolean.TRUE.equals(filter.getPlayedOnly())) {
             sql.append(
-                " AND ((m.date < CURRENT_DATE) OR (m.date = CURRENT_DATE AND m.end_time <= CURRENT_TIME))"
+                " AND result.match_id IS NOT NULL"
             );
         }
 
