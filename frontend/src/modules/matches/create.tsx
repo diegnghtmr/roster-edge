@@ -8,28 +8,24 @@ import {
 import { toast } from 'sonner';
 import { BookmarkCheck } from 'lucide-react';
 import { InternalHeader } from '@/components/layout/InternalHeader';
-import { MatchForm, type INewMatch } from './components/Form';
-
-interface IField {
-  name: string;
-  value: string | number | boolean | number[];
-}
+import { todayDateOnly } from '@/shared/utils/dateOnly';
+import { MatchForm, type INewMatch, type MatchField } from './components/Form';
 
 export const MatchCreateModule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [match, setMatch] = useState<INewMatch>({
+  const [match, setMatch] = useState<INewMatch>(() => ({
     matchdayId: 0,
     startTime: [0, 0],
     endTime: [0, 0],
-    date: [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()],
+    date: todayDateOnly(),
     stadiumId: 0,
     eventId: 0,
     homeTeamId: null,
     awayTeamId: null,
     active: true,
-  });
+  }));
 
   const resource = ['matches'];
   const { mutate } = useMutateService(resource);
@@ -94,8 +90,8 @@ export const MatchCreateModule = () => {
   );
 
   // Set the values after field changes
-  const handleChangeValue = (field: IField) => {
-    setMatch({ ...match, [field.name]: field.value });
+  const handleChangeValue = ({ name, value }: MatchField) => {
+    setMatch((prev) => ({ ...prev, [name]: value }));
   };
 
   return (

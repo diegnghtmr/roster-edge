@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import useGetList from '@/api/services/getServices/useGetList';
 import type { IVenueResponse } from '@/interface/IVenue';
+import { formatDateOnly, parseDateOnly } from '@/shared/utils/dateOnly';
 
 export interface INewStadium {
   area: number;
@@ -39,33 +40,23 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
   isLoading,
 }) => {
   // Fetch venues for the dropdown
-  const { data: venues = [], isLoading: venuesLoading } = useGetList({
+  const { data: venues = [], isLoading: venuesLoading } = useGetList<IVenueResponse[]>({
     key: 'venues',
     resource: ['venues'],
     keyResults: 'data',
     enabled: true,
   });
 
-  // Parse a date string (YYYY-MM-DD) to the array format expected by the API
-  const parseDateToArray = (dateString: string): number[] => {
-    const date = new Date(dateString);
-    return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
-  };
-
-  // Format the foundation date array to a string for the date input
-  const formatFoundationDate = (): string => {
-    if (!stadium.foundation || stadium.foundation.length !== 3) {
-      return '';
-    }
-    const [year, month, day] = stadium.foundation;
-    // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, '0');
-    const paddedDay = day.toString().padStart(2, '0');
-    return `${year}-${paddedMonth}-${paddedDay}`;
-  };
+  const foundation = formatDateOnly(stadium.foundation);
 
   return (
-    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form
+      onSubmit={(event) => {
+        if (foundation) onSubmit(event);
+        else event.preventDefault();
+      }}
+      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
+    >
       <div className="space-y-2">
         <label htmlFor="area" className="text-sm font-medium text-gray-700">
           Área (m²)
@@ -125,11 +116,11 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
           id="foundation"
           name="foundation"
           type="date"
-          value={formatFoundationDate()}
+          value={foundation}
           onChange={(e) =>
             onChangeValue({
               name: 'foundation',
-              value: parseDateToArray(e.target.value),
+              value: parseDateOnly(e.target.value),
             })
           }
           required
@@ -153,7 +144,7 @@ export const StadiumForm: React.FC<StadiumFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              venues.map((venue: IVenueResponse) => (
+              venues.map((venue) => (
                 <SelectItem key={venue.id} value={venue.id.toString()}>
                   {venue.name}
                 </SelectItem>

@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import useGetList from '@/api/services/getServices/useGetList';
 import type { Club } from '@/interface/IClub';
+import { formatDateOnly, parseDateOnly } from '@/shared/utils/dateOnly';
 
 export interface INewSeason {
   clubId: number;
@@ -45,26 +46,17 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
     enabled: true,
   });
 
-  // Parse a date string (YYYY-MM-DD) to the array format expected by the API
-  const parseDateToArray = (dateString: string): number[] => {
-    const date = new Date(dateString);
-    return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
-  };
-
-  // Format the date array to a string for the date input
-  const formatDateArray = (dateArray: number[]): string => {
-    if (!dateArray || dateArray.length !== 3) {
-      return '';
-    }
-    const [year, month, day] = dateArray;
-    // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, '0');
-    const paddedDay = day.toString().padStart(2, '0');
-    return `${year}-${paddedMonth}-${paddedDay}`;
-  };
+  const startDate = formatDateOnly(season.startDate);
+  const endDate = formatDateOnly(season.endDate);
 
   return (
-    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form
+      onSubmit={(event) => {
+        if (startDate && endDate) onSubmit(event);
+        else event.preventDefault();
+      }}
+      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
+    >
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre de la Temporada
@@ -97,7 +89,7 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (clubs as Club[]).map((club: Club) => (
+              clubs.map((club) => (
                 <SelectItem key={club.id} value={club.id.toString()}>
                   {club.name}
                 </SelectItem>
@@ -115,11 +107,11 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
           id="startDate"
           name="startDate"
           type="date"
-          value={formatDateArray(season.startDate)}
+          value={startDate}
           onChange={(e) =>
             onChangeValue({
               name: 'startDate',
-              value: parseDateToArray(e.target.value),
+              value: parseDateOnly(e.target.value),
             })
           }
           required
@@ -134,11 +126,11 @@ export const SeasonForm: React.FC<SeasonFormProps> = ({
           id="endDate"
           name="endDate"
           type="date"
-          value={formatDateArray(season.endDate)}
+          value={endDate}
           onChange={(e) =>
             onChangeValue({
               name: 'endDate',
-              value: parseDateToArray(e.target.value),
+              value: parseDateOnly(e.target.value),
             })
           }
           required
