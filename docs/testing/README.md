@@ -2,7 +2,7 @@
 
 The smoke runs the Spring Boot JAR and Vite preview on loopback, applies Flyway to a new PostgreSQL schema, explicitly imports [`demo.sql`](demo.sql), then drives Chromium in `America/Bogota`. It leaves the parent PostgreSQL server running and stops the API, preview server, and browser on completion or failure. Every run prints its own `roster_smoke_*` schema name; keep these fixtures only in a disposable database. CI discards the whole PostgreSQL service after the job.
 
-From the repository root, with Java 21, Node 22, `psql` and a local PostgreSQL 17 server, configure `POSTGRES_PORT`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` as in the [local setup](../../README.md#local-setup). Create a disposable `rosteredge_smoke` database owned by the test role and run:
+From the repository root, with Java 21, Node 22, `psql` and a local PostgreSQL 17 server, configure `POSTGRES_PORT`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` as in the [quick start](../../README.md#quick-start). Create a disposable `rosteredge_smoke` database owned by the test role and run:
 
 ```bash
 export POSTGRES_DB=rosteredge_smoke

@@ -1,14 +1,73 @@
-# RosterEdge
+<!-- markdownlint-disable-next-line MD041 -->
+<div align="center">
 
-RosterEdge is a web app for sports clubs to manage teams and staff, schedule matches, and view standings, calendar density, and financial reports. The app includes Spanish and English translations and can export reports to PDF.
+<h1>RosterEdge</h1>
 
-## Local setup
+<p><strong>Teams, fixtures, and standings for sports club staff.</strong></p>
 
-Requirements: **Node.js 22** with npm, **JDK 21**, and **PostgreSQL 17** with `psql`. The backend includes a Maven wrapper. Start PostgreSQL and create a database and role with permission to create tables, sequences, and schemas. Use a disposable database for demos and tests.
+<p>
+<a href="https://github.com/diegnghtmr/roster-edge/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/diegnghtmr/roster-edge/ci.yml?branch=main&amp;style=for-the-badge&amp;labelColor=1F1F28&amp;label=CI" alt="CI"></a>
+<img src="https://img.shields.io/badge/React-19-E0C15A?style=for-the-badge&amp;labelColor=1F1F28" alt="React 19">
+<img src="https://img.shields.io/badge/Spring%20Boot-3.5-E0C15A?style=for-the-badge&amp;labelColor=1F1F28" alt="Spring Boot 3.5">
+<img src="https://img.shields.io/badge/PostgreSQL-17-E0C15A?style=for-the-badge&amp;labelColor=1F1F28" alt="PostgreSQL 17">
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-7FB4CA?style=for-the-badge&amp;labelColor=1F1F28" alt="License: MIT"></a>
+</p>
 
-From the repository root, start the API in one terminal. This example assumes a local PostgreSQL server on port `5432`:
+<p>
+<a href="https://diegnghtmr.me/en/work/roster-edge/"><strong>Case study</strong></a> &bull;
+<a href="#quick-start"><strong>Quick start</strong></a> &bull;
+<a href="#architecture"><strong>Architecture</strong></a>
+</p>
+
+</div>
+
+<p align="center"><img width="100%" alt="RosterEdge team directory with name and mascot filters and five fictional teams" src="docs/assets/teams.png"></p>
+
+A scheduled fixture belongs on the calendar, but it should not count in the standings until someone records the score. RosterEdge keeps team and staff records, fixture scheduling, and club reports in one workspace. Staff can record results from the fixture list and export standings and financial reports to PDF.
+
+## Features
+
+- **Team and staff directories.** Organize teams by category and assign catalog roles to club staff.
+- **Match scheduling.** Choose the event, venue, start and end times, and home and away teams in one form.
+- **Result entry.** Record or correct a final score without reopening the scheduling form.
+- **Season reporting.** Review standings, scoring, and schedule density without counting unplayed fixtures as 0–0 draws.
+- **Payment reports.** Compare payments by method or subscription plan and export reports as PDFs.
+- **Club-scoped access.** Sign in with a roster account tied to your club; the API checks access independently of browser navigation.
+- **Spanish and English.** The app includes translations for both languages.
+
+## Preview
+
+These screenshots show the running app with fictional club data.
+
+![Result-entry dialog with separate home and away score fields](docs/assets/match-result.png)
+
+*Record a final score from the match list.*
+
+![Season standings with points and wins charts and an Export PDF button](docs/assets/standings.png)
+
+*Standings count finalized results and can be exported to PDF.*
+
+![Payment-method report with net revenue, payment counts, and a chart in Colombian pesos](docs/assets/payment-report.png)
+
+*Compare net revenue and payment counts by payment method.*
+
+## Quick start
+
+Use **Node.js 22** with npm, **JDK 21**, and **PostgreSQL 17** with `psql`. The backend includes a Maven wrapper. Start PostgreSQL and create a disposable database and a role with permission to create tables, sequences, and schemas.
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `POSTGRES_DB` | Database name | `roster_db` |
+| `POSTGRES_PORT` | Local PostgreSQL port | `5431` |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD` | Database credentials | Required |
+| `SPRING_PROFILES_ACTIVE` | Use `dev` for local development | No active profile |
+| `VITE_BACKEND_URL` | Frontend API base URL including `/api`, without a trailing slash | Required |
+
+The example uses PostgreSQL on port `5432`. Substitute your local database and role names if they differ, then start the API:
 
 ```bash
+git clone https://github.com/diegnghtmr/roster-edge.git
+cd roster-edge
 export POSTGRES_DB=rosteredge_demo POSTGRES_PORT=5432 POSTGRES_USER=roster_local
 read -rs -p 'Local PostgreSQL password: ' POSTGRES_PASSWORD; printf '\n'
 export POSTGRES_PASSWORD
@@ -17,9 +76,9 @@ cd backend
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.address=127.0.0.1
 ```
 
-The API is available at `http://127.0.0.1:8081/api`; `GET /api/health/` is public. Flyway applies the migrations automatically. A new database has no accounts or catalog entries until you provision them or import the demo.
+The API base is `http://127.0.0.1:8081/api`, with a public `GET /api/health/` endpoint. Flyway migrates the database on startup; it does not create demo accounts or populate catalogs.
 
-In a second terminal:
+In a second terminal, from the checkout:
 
 ```bash
 cd frontend
@@ -27,34 +86,31 @@ npm ci
 VITE_BACKEND_URL=http://127.0.0.1:8081/api npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-Open `http://127.0.0.1:5173`. For a built frontend, set `VITE_BACKEND_URL` when running `npm run build` (not at preview time), then run `npm run preview -- --host 127.0.0.1 --port 5173 --strictPort`. The API CORS allowlist includes the loopback URL shown above; for a deployment, use a same-origin reverse proxy or configure the allowed frontend origin in `CorsConfig`.
+Open `http://127.0.0.1:5173`. To try the app without provisioning an account, [import the synthetic demo](docs/database.md#optional-synthetic-demo) into the empty local database.
 
-| Variable | Purpose |
-| --- | --- |
-| `POSTGRES_DB`, `POSTGRES_PORT` | Database and local port (`roster_db` and `5431` by default). |
-| `POSTGRES_USER`, `POSTGRES_PASSWORD` | Database credentials. |
-| `SPRING_DATASOURCE_URL` | Optional override for the JDBC URL; the default targets `localhost`. |
-| `SPRING_PROFILES_ACTIVE` | Set to `dev` or `test` only for local development or tests. |
-| `SECURITY_TOKEN_SECRET` | Outside `dev`/`test`, required: use a cryptographically random value at least 32 bytes long in UTF-8. For example, generate 32 random bytes with `openssl rand -hex 32` and inject the result as a secret. A missing secret in the local profiles generates an ephemeral key. |
-| `SECURITY_TOKEN_EXPIRATION` | Bearer token lifetime in seconds, default `3600`. |
-| `VITE_BACKEND_URL` | Required frontend API base URL, including `/api` and without a trailing slash. This value is public; do not put secrets in Vite variables. |
+## Architecture
 
-### Optional synthetic demo
+The browser calls the Spring Boot API over HTTP/JSON; only the API connects to PostgreSQL. React Router guards and lazy-loads routes, so charts load with their reports and the PDF renderer loads on export. The API derives club scope from the roster session and commits match scheduling, team assignments, and the in-app notification in one transaction.
 
-After the API has migrated an empty local demo database, run this from the repository root with the same database environment:
-
-```bash
-PGPASSWORD="$POSTGRES_PASSWORD" psql -X -h 127.0.0.1 -p "$POSTGRES_PORT" \
-  -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f docs/testing/demo.sql
+```mermaid
+flowchart LR
+    SPA["Club workspace (React SPA)"] -->|"HTTP / JSON"| API["Club-scoped REST API (Spring Boot)"]
+    API -->|"JDBC / SQL"| DB["PostgreSQL (Flyway migrations)"]
 ```
 
-Sign in as `roster@example.invalid` with `RosterDemo-only!21`. The fixture includes two fictional clubs, generated IDs, teams, staff roles, completed and unplayed matches, and sample payments. It refuses to import into a schema containing clubs or roster accounts. **Never import this public fixture in production**; the application does not seed it at startup.
+## Tech stack
 
-In **Partidos**, choose **Registrar resultado** next to an active fixture with both teams assigned. Enter whole, non-negative numbers for **Goles local** and **Goles visitante**, including an explicit `0` for a team that did not score. **Guardar resultado** finalizes the score and refreshes the fixtures and standings. Use **Editar resultado** to correct a saved score. The form uses `PUT /api/matches/{id}/result/`; only a signed-in roster account for the owning club can use it. The read-only staff-role catalog remains separate; those roles can still be selected when managing club staff.
+| Layer | Technology |
+| --- | --- |
+| Web app | React 19, TypeScript, Vite, React Router, TanStack Query |
+| Reports and exports | Recharts, React PDF |
+| API | Java 21, Spring Boot 3.5, Spring Data JDBC |
+| Database | PostgreSQL 17, Flyway |
+| Testing | JUnit with PostgreSQL, Vitest and Testing Library, Playwright and Chromium |
 
-## Verification
+## Testing
 
-With the database variables set as above, point `POSTGRES_DB` to a separate disposable test database, then run:
+Keep the database credentials exported as above, but point `POSTGRES_DB` at a separate disposable database. From the repository root:
 
 ```bash
 (cd backend && SPRING_PROFILES_ACTIVE=test ./mvnw -B verify)
@@ -63,13 +119,23 @@ With the database variables set as above, point `POSTGRES_DB` to a separate disp
 (cd frontend && VITE_BACKEND_URL=http://127.0.0.1:8081/api npm run build)
 ```
 
-The backend suite uses PostgreSQL, including empty-schema and restart checks, authorization, transaction rollback, and report correctness. The frontend suite uses Vitest and Testing Library. CI on pushes and pull requests targeting `main` runs both suites, builds the frontend, and runs a [Chromium smoke against the packaged API and built frontend](docs/testing/README.md).
+Backend tests cover empty schemas, restarts, authorization, rollback, and report correctness. CI runs the backend and frontend suites, builds the frontend, and runs a [Chromium smoke test](docs/testing/README.md) against the packaged API and built frontend on pushes and pull requests targeting `main`.
 
-## Architecture
+## Documentation
 
-- **Frontend (`frontend/`)**: React and TypeScript, Vite, React Router for guarded, lazy-loaded routes, TanStack Query for API data, Recharts for charts, and React PDF for exports. Report charts load with their routes; PDF code loads only when you choose **Exportar PDF**. Match form dates are kept as calendar dates rather than converted through UTC.
-- **Backend (`backend/`)**: Spring Boot REST and Spring Data JDBC. The API derives club scope from the roster session rather than trusting client filters. Passwords are hashed with PBKDF2, and active bearer sessions are tracked in memory; logging out revokes the current token and restarting invalidates active sessions.
-- **PostgreSQL**: Flyway owns the schema. Match and assignment writes, including notification records, are transactional. A result is stored explicitly, so an unplayed fixture never counts as a 0–0 draw in standings.
+- [API, staff roles, and club scoping](docs/api.md) — session lifecycle, key routes, and match result rules.
+- [Configuration](docs/configuration.md) — environment variables, built frontend preview, and CORS.
+- [Database and demo data](docs/database.md) — Flyway, disposable fixtures, and a result-entry walkthrough.
+- [Packaged browser smoke](docs/testing/README.md) — how to run the Chromium checks and capture screenshots.
+
+## Team
+
+RosterEdge is a team project. Contributors credited in the repository history:
+
+- [Diego Alejandro Flores Quintero (`diegnghtmr`)](https://github.com/diegnghtmr)
+- [Edwin Viña R (`ecodant`)](https://github.com/ecodant)
+- [`Spalax-dev`](https://github.com/spalax-dev)
+- [`Jorge-ivan-aa`](https://github.com/diegnghtmr/roster-edge/commit/3cc0523) (Git author name)
 
 ## License
 
