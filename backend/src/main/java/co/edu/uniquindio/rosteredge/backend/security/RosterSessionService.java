@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * In-memory registry of active roster tokens to enable optional session-aware endpoints.
+ * In-memory registry of issued roster sessions; restart revokes all sessions.
  */
 @Component
 public class RosterSessionService {
@@ -16,6 +16,8 @@ public class RosterSessionService {
     private final ConcurrentMap<String, SessionInfo> sessions = new ConcurrentHashMap<>();
 
     public void register(String token, String email, long expiresAt) {
+        long now = Instant.now().getEpochSecond();
+        sessions.values().removeIf(session -> session.expiresAt() <= now);
         sessions.put(token, new SessionInfo(email, expiresAt));
     }
 
@@ -28,8 +30,8 @@ public class RosterSessionService {
             return Optional.empty();
         }
         long now = Instant.now().getEpochSecond();
-        if (info.expiresAt() < now) {
-            sessions.remove(token);
+        if (info.expiresAt() <= now) {
+            sessions.remove(token, info);
             return Optional.empty();
         }
         return Optional.of(info.email());

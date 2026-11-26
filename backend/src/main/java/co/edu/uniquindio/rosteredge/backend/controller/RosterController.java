@@ -4,26 +4,21 @@ import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.request.RosterLoginRequest;
 import co.edu.uniquindio.rosteredge.backend.dto.response.RosterLoginResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.RosterSessionResponse;
-import co.edu.uniquindio.rosteredge.backend.exception.UnauthorizedException;
-import co.edu.uniquindio.rosteredge.backend.model.Roster;
+import co.edu.uniquindio.rosteredge.backend.security.RosterAuthenticationFilter;
+import co.edu.uniquindio.rosteredge.backend.security.RosterPrincipal;
 import co.edu.uniquindio.rosteredge.backend.service.RosterService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Authentication controller for roster administrators.
- */
 @RestController
 @RequestMapping("/roster")
 public class RosterController {
-
-    private static final String BEARER_PREFIX = "Bearer ";
 
     private final RosterService rosterService;
 
@@ -38,39 +33,14 @@ public class RosterController {
     }
 
     @GetMapping("/me/")
-    public ResponseEntity<ApiResponse<RosterSessionResponse>> currentRoster(
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
-        String token = resolveToken(authorization);
-        Roster roster = rosterService.resolveRoster(token)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or expired token"));
-
-        RosterSessionResponse response = new RosterSessionResponse(
-                roster.getId(),
-                roster.getName(),
-                roster.getEmail(),
-                roster.getClubId(),
-                roster.getSubscriptionId());
-
-        return ResponseEntity.ok(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<RosterSessionResponse>> currentRoster(RosterPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.success(new RosterSessionResponse(principal.rosterId(),
+                principal.name(), principal.email(), principal.clubId(), principal.subscriptionId())));
     }
 
     @PostMapping("/logout/")
-    public ResponseEntity<ApiResponse<Void>> logout(
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
-        String token = resolveToken(authorization);
-        rosterService.logout(token);
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        rosterService.logout(RosterAuthenticationFilter.sessionToken(request));
         return ResponseEntity.ok(ApiResponse.<Void>success(null, "Logout successful"));
     }
-
-    private String resolveToken(String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
-            throw new UnauthorizedException("Authorization header missing or invalid");
-        }
-        String token = authorizationHeader.substring(BEARER_PREFIX.length()).trim();
-        if (token.isEmpty()) {
-            throw new UnauthorizedException("Authorization header missing or invalid");
-        }
-        return token;
-    }
 }
-

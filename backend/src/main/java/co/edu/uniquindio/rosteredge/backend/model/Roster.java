@@ -1,5 +1,6 @@
 package co.edu.uniquindio.rosteredge.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -43,6 +44,8 @@ public class Roster extends BaseEntity {
      */
     @NotBlank(message = "Password hash is required")
     @Size(max = 255, message = "Password hash cannot exceed 255 characters")
+    @JsonIgnore
+    @lombok.ToString.Exclude
     private String passwordHash;
 
     /**
