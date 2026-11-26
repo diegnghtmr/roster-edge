@@ -1,5 +1,5 @@
 import { InternalHeader } from '@/components/layout/InternalHeader';
-import { Plus, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { StaffRolesList } from './components/List';
 export const StaffRolesModule = () => {
   return (
@@ -7,19 +7,13 @@ export const StaffRolesModule = () => {
       <div className="mb-4"></div>
       <InternalHeader
         title="Roles de Personal"
-        description="Gestiona los roles del personal de tu organización"
+        description="Consulta el catálogo de roles del personal"
         buttons={[
           {
             text: 'Personal',
             icon: <Users className="h-4 w-4" />,
             link: '/staff',
             variant: 'outline',
-          },
-          {
-            text: 'Nuevo Rol',
-            icon: <Plus className="h-4 w-4" />,
-            link: '/staff-roles-create',
-            variant: 'default',
           },
         ]}
       />

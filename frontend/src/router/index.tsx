@@ -16,8 +16,6 @@ import { StaffModule } from '@/modules/staff';
 import StaffCreateModule from '@/modules/staff/create';
 import StaffUpdateModule from '@/modules/staff/update';
 import { StaffRolesModule } from '@/modules/staff-roles';
-import StaffRoleCreateModule from '@/modules/staff-roles/create';
-import StaffRoleUpdateModule from '@/modules/staff-roles/update';
 import CitiesModule from '@/modules/cities';
 import CityCreateModule from '@/modules/cities/create';
 import CityUpdateModule from '@/modules/cities/update';
@@ -113,11 +111,11 @@ const protectedRoute: RouteObject = {
             },
             {
               path: '/staff-roles-create',
-              element: <StaffRoleCreateModule />,
+              element: <Navigate to="/staff-roles" replace />,
             },
             {
               path: '/staff-roles/:id/edit',
-              element: <StaffRoleUpdateModule />,
+              element: <Navigate to="/staff-roles" replace />,
             },
             {
               path: '/team-categories',
