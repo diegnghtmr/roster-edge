@@ -1,87 +1,132 @@
-import type { ILoginUser } from '@/interface/ILogin';
+import type { IRosterSessionResponse } from '@/interface/IRoster';
 import { create } from 'zustand';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import StringCrypto from 'string-crypto';
 
-// Define the state and actions for the store
+const TOKEN_KEY = 'token';
+const PROFILE_KEY = 'roster-profile';
+const CACHE_VERSION = 1;
+
 interface UserStore {
-  user: ILoginUser | null;
-  setUser: (user: ILoginUser) => void;
-  updateUser: (updates: Partial<ILoginUser>) => void;
+  user: IRosterSessionResponse | null;
+  status: 'signed-out' | 'restoring' | 'signed-in';
+  setUser: (user: IRosterSessionResponse, token: string) => void;
+  updateUserName: (name: string, token: string) => void;
+  restoreSession: (signal: AbortSignal) => Promise<void>;
   clearUser: () => void;
 }
 
-// Setup crypto outside of the store
-const options = {
-  salt: import.meta.env.VITE_SECURE_LOCAL_STORAGE_SALT,
-};
-const sc = new StringCrypto(options);
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
 
-const getSecureLocalStorage = (key: string) => {
-  const value = localStorage.getItem(key);
-  if (value) return sc.decryptString(value, import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD);
-  return '';
-};
+function parseProfile(value: unknown): IRosterSessionResponse | null {
+  const profile = asRecord(value);
+  if (!profile) return null;
+  const { id, name, email, clubId, subscriptionId } = profile;
+  if (
+    typeof id !== 'number' || !Number.isSafeInteger(id) || id < 1 ||
+    typeof name !== 'string' || !name.trim() ||
+    typeof email !== 'string' || !email.trim() ||
+    typeof clubId !== 'number' || !Number.isSafeInteger(clubId) || clubId < 1 ||
+    typeof subscriptionId !== 'number' || !Number.isSafeInteger(subscriptionId) || subscriptionId < 1
+  ) {
+    return null;
+  }
+  // Persist only the fields used by the profile UI; never copy arbitrary response fields.
+  return { id, name, email, clubId, subscriptionId };
+}
 
-const setObjectSecureLocalStorage = (key: string, value: object) => {
-  const encryptedValue = sc.encryptString(
-    JSON.stringify(value),
-    import.meta.env.VITE_SECURE_LOCAL_STORAGE_PASSWORD
-  );
-  localStorage.setItem(key, encryptedValue);
-};
+export function getSessionToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
 
-// Create the store
-const useUserStore = create<UserStore>((set) => {
-  // Initialize state from localStorage if available
-  const storedUser = getSecureLocalStorage('user');
-  const initialUser = storedUser ? JSON.parse(storedUser) : null;
+export function rosterApiUrl(path: string) {
+  const baseUrl = import.meta.env.VITE_BACKEND_URL?.trim();
+  if (!baseUrl) throw new Error('VITE_BACKEND_URL is required');
+  return `${baseUrl.replace(/\/+$/, '')}${path}`;
+}
 
-  // Set a new user into the store and persists it in the local storage
-  const setUser = (user: ILoginUser) => {
-    setObjectSecureLocalStorage('user', user);
-    set({ user });
+export function getApiData(response: unknown) {
+  return asRecord(asRecord(response)?.data);
+}
+
+export async function fetchSessionProfile(token: string, signal?: AbortSignal) {
+  const response = await fetch(rosterApiUrl('/roster/me/'), {
+    headers: { Authorization: `Bearer ${token}` },
+    signal,
+  });
+  if (!response.ok) throw new Error('Failed to fetch user profile');
+  const profile = parseProfile(getApiData(await response.json()));
+  if (!profile) throw new Error('Failed to fetch user profile');
+  return profile;
+}
+
+function clearSessionStorage() {
+  localStorage.removeItem(PROFILE_KEY);
+  localStorage.removeItem(TOKEN_KEY);
+}
+
+function initialSession(): Pick<UserStore, 'user' | 'status'> {
+  // Old caches were not reliably readable; rehydrate from the server instead.
+  localStorage.removeItem('user');
+  if (getSessionToken()) {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (raw === null) return { user: null, status: 'restoring' };
+
+    try {
+      const cache = asRecord(JSON.parse(raw));
+      const user = cache?.version === CACHE_VERSION ? parseProfile(cache.profile) : null;
+      if (user) return { user, status: 'restoring' };
+    } catch {
+      // Malformed or unsupported profile data must not reach the protected UI.
+    }
+  }
+
+  clearSessionStorage();
+  return { user: null, status: 'signed-out' };
+}
+
+const useUserStore = create<UserStore>((set, get) => {
+  const saveProfile = (profile: IRosterSessionResponse) => {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify({ version: CACHE_VERSION, profile }));
+    set({ user: profile, status: 'signed-in' });
   };
 
-  // Update the current user information
-  const updateUser = (updates: Partial<ILoginUser>) =>
-    set((state) => {
-      const updatedUser = state.user ? { ...state.user, ...updates } : null;
-      if (updatedUser) {
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-      } else {
-        localStorage.removeItem('user');
-      }
-      return { user: updatedUser };
-    });
+  const setUser = (user: IRosterSessionResponse, token: string) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    saveProfile(user);
+  };
 
-  // Remove the current user from store and local storage
   const clearUser = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    // Also clear any secure storage
-    try {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      // Clear any encrypted data
-      const keys = Object.keys(localStorage);
-      keys.forEach((key) => {
-        if (key.includes('user') || key.includes('token')) {
-          localStorage.removeItem(key);
-        }
-      });
-    } catch (error) {
-      console.warn('Error clearing secure storage:', error);
-    }
-    set({ user: null });
+    clearSessionStorage();
+    set({ user: null, status: 'signed-out' });
   };
 
   return {
-    user: initialUser,
+    ...initialSession(),
     setUser,
-    updateUser,
     clearUser,
+    updateUserName: (name, token) => {
+      const { user, status } = get();
+      if (user && status === 'signed-in' && getSessionToken() === token) {
+        saveProfile({ ...user, name });
+      }
+    },
+    restoreSession: async (signal) => {
+      const token = getSessionToken();
+      if (!token) {
+        clearUser();
+        return;
+      }
+
+      try {
+        const profile = await fetchSessionProfile(token, signal);
+        if (!signal.aborted && getSessionToken() === token) saveProfile(profile);
+      } catch {
+        if (!signal.aborted && getSessionToken() === token) clearUser();
+      }
+    },
   };
 });
 
