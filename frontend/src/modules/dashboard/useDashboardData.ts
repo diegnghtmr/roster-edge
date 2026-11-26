@@ -24,7 +24,7 @@ interface DashboardStats {
 
 export const useDashboardData = () => {
   // Obtener datos de clubs
-  const { data: clubsData, isLoading: isLoadingClubs } = useGetList<Club>({
+  const { data: clubsData, isLoading: isLoadingClubs } = useGetList<Club[]>({
     key: 'dashboard-clubs',
     resource: ['clubs'],
     keyResults: 'data',
@@ -32,7 +32,7 @@ export const useDashboardData = () => {
   });
 
   // Obtener datos de equipos
-  const { data: teamsData, isLoading: isLoadingTeams } = useGetList<Team>({
+  const { data: teamsData, isLoading: isLoadingTeams } = useGetList<Team[]>({
     key: 'dashboard-teams',
     resource: ['teams'],
     keyResults: 'data',

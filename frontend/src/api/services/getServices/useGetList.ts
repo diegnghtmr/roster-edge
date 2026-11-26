@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { QueryKey } from '@tanstack/react-query';
 import dataTransform from '../../transforms/transformDataGet/index';
@@ -6,21 +7,15 @@ import { useNavigate } from 'react-router-dom';
 import useUserStore from '@/storage/storeUser';
 
 type QueryKeyInput = QueryKey | string;
-type RequestParams = Record<string, string> | URLSearchParams | string | undefined;
+type RequestParams = Parameters<typeof fetchGet>[0]['params'];
 
-interface IParamsService<TParams = RequestParams> {
+interface IParamsService {
   key: QueryKeyInput;
   resource: string[] | undefined | null;
-  params?: TParams;
+  params?: RequestParams;
   keyResults: string | null;
   enabled?: boolean;
   retry?: number;
-}
-
-interface ApiResponse<TData> {
-  metaData?: Record<string, unknown>;
-  results?: TData;
-  error?: string;
 }
 
 const useGetList = <TData = unknown>({
@@ -30,22 +25,19 @@ const useGetList = <TData = unknown>({
   keyResults,
   enabled = true,
   retry = 3,
-}: IParamsService<RequestParams>) => {
+}: IParamsService) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { clearUser } = useUserStore();
+  const clearUser = useUserStore((state) => state.clearUser);
+  const hasResource = Boolean(resource?.length);
 
-  const hasResource = Array.isArray(resource) ? resource.length > 0 : Boolean(resource);
-  const queryKeyValue = (Array.isArray(key) ? key : [key]) as QueryKey;
-  const paramsFetch = hasResource ? { resource: resource as string[], params } : null;
-
-  const { error, data, isLoading, refetch, isFetching } = useQuery<ApiResponse<TData>>({
-    queryKey: queryKeyValue,
+  const { error, data, isLoading, refetch, isFetching } = useQuery<unknown>({
+    queryKey: typeof key === 'string' ? [key] : key,
     queryFn: () => {
-      if (!paramsFetch) {
+      if (!resource?.length) {
         throw new Error('Resource is required to perform the request.');
       }
-      return fetchGet(paramsFetch);
+      return fetchGet({ resource, params });
     },
     enabled: enabled && hasResource,
     refetchOnMount: false,
@@ -54,49 +46,33 @@ const useGetList = <TData = unknown>({
     retry,
   });
 
-  // Manejo de errores relacionados con el token
-  const handleError = (error: string) => {
-    const lowerError = error?.toLowerCase();
-    const isTokenError =
-      lowerError.includes('token') ||
-      lowerError.includes('signature') ||
-      lowerError.includes('expired');
+  const apiError =
+    data && typeof data === 'object' && 'error' in data && typeof data.error === 'string'
+      ? data.error
+      : undefined;
 
-    if (isTokenError) {
+  useEffect(() => {
+    const message = apiError?.toLowerCase();
+    if (message && /token|signature|expired/.test(message)) {
       clearUser();
       queryClient.removeQueries();
       navigate('/login?error=session');
     }
+  }, [apiError, clearUser, navigate, queryClient]);
+
+  const transformed =
+    data != null && !apiError && (!keyResults || typeof data === 'object')
+      ? dataTransform(data, keyResults ?? '')
+      : undefined;
+
+  return {
+    error: hasResource ? error : null,
+    data: (transformed?.results ?? undefined) as TData | undefined,
+    metaData: transformed?.metaData,
+    isLoading: hasResource && isLoading,
+    refetch,
+    isFetching,
   };
-
-  if (data?.error) {
-    handleError(data.error);
-    return { error, data: [], isLoading, refetch, isFetching };
-  }
-
-  if (data) {
-    const { metaData, results } = dataTransform(data, keyResults || '');
-    return {
-      error,
-      data: results as TData,
-      metaData,
-      isLoading,
-      refetch,
-      isFetching,
-    };
-  }
-
-  if (!hasResource) {
-    return {
-      error: null,
-      data: [],
-      isLoading: false,
-      refetch,
-      isFetching,
-    };
-  }
-
-  return { error, data: [], isLoading, refetch, isFetching };
 };
 
 export default useGetList;

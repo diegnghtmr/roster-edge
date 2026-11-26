@@ -27,7 +27,7 @@ export const StaffRoleUpdateModule = () => {
   });
 
   // Fetch the staff role data
-  const { data: staffRoleData, isLoading: loadingStaffRole } = useGetList({
+  const { data: fetchedStaffRole, isLoading: loadingStaffRole } = useGetList<StaffRole>({
     key: `staff-role-${id}`,
     resource: [`staff-roles/${id}`],
     keyResults: 'data',
@@ -36,15 +36,12 @@ export const StaffRoleUpdateModule = () => {
 
   // Populate form when staff role data is loaded
   useEffect(() => {
-    console.log('Fetched staff role data:', staffRoleData);
-    if (staffRoleData && staffRoleData.id) {
-      const fetchedStaffRole = staffRoleData as StaffRole;
-
+    if (fetchedStaffRole?.id) {
       setStaffRole({
         name: fetchedStaffRole.name,
       });
     }
-  }, [staffRoleData]);
+  }, [fetchedStaffRole]);
 
   const resource = [`staff-roles/${id}`];
   const { mutate } = useMutateService(resource, '', 'PUT');

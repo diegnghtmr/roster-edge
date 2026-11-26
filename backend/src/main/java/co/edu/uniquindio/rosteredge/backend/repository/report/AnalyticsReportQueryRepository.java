@@ -27,6 +27,7 @@ import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamRosterProfil
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamRosterProfileResponse.PhysicalStateBreakdown;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamStaffRatioResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.response.report.TeamStaffRatioResponse.StaffRoleBreakdown;
+import co.edu.uniquindio.rosteredge.backend.exception.BusinessException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +57,25 @@ public class AnalyticsReportQueryRepository {
         new TypeReference<>() {};
     private static final TypeReference<List<StaffRoleBreakdown>> STAFF_ROLE_TYPE =
         new TypeReference<>() {};
+
+    private static final String FINAL_TEAM_RESULTS = """
+            WITH team_results AS (
+                SELECT e.season_id, m.id AS match_id, m.date AS match_date, m.matchday_id,
+                       team.team_id, team.goals_for, team.goals_against,
+                       CASE
+                           WHEN team.goals_for > team.goals_against THEN 3
+                           WHEN team.goals_for = team.goals_against THEN 1
+                           ELSE 0
+                       END AS points
+                FROM "FinalMatchResult" r
+                JOIN "Match" m ON m.id = r.match_id
+                JOIN "Event" e ON e.id = m.event_id
+                CROSS JOIN LATERAL (VALUES
+                    (r.home_team_id, r.home_score, r.away_score),
+                    (r.away_team_id, r.away_score, r.home_score)
+                ) AS team(team_id, goals_for, goals_against)
+            )
+            """;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
@@ -263,36 +283,7 @@ public class AnalyticsReportQueryRepository {
             .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
             .addValue("minMatches", filter.getMinMatches(), Types.INTEGER);
 
-        String sql = """
-            WITH team_matches AS (
-                SELECT e.season_id,
-                       home.team_id AS team_id,
-                       t.club_id,
-                       m.id AS match_id,
-                       m.date,
-                       home.score AS goals_for,
-                       away.score AS goals_against
-                FROM "Match" m
-                JOIN "Event" e ON e.id = m.event_id
-                JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                JOIN "Team" t ON t.id = home.team_id
-                WHERE m.active = true
-                UNION ALL
-                SELECT e.season_id,
-                       away.team_id AS team_id,
-                       t.club_id,
-                       m.id,
-                       m.date,
-                       away.score,
-                       home.score
-                FROM "Match" m
-                JOIN "Event" e ON e.id = m.event_id
-                JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                JOIN "Team" t ON t.id = away.team_id
-                WHERE m.active = true
-            )
+        String sql = FINAL_TEAM_RESULTS + """
             SELECT s.id AS season_id,
                    s.name AS season_name,
                    t.id AS team_id,
@@ -305,7 +296,7 @@ public class AnalyticsReportQueryRepository {
                    SUM(tm.goals_for) - SUM(tm.goals_against) AS goal_difference,
                    (SUM(tm.goals_for)::numeric / NULLIF(COUNT(tm.match_id), 0))::double precision AS goals_per_match,
                    (SUM(tm.goals_against)::numeric / NULLIF(COUNT(tm.match_id), 0))::double precision AS goals_against_per_match
-            FROM team_matches tm
+            FROM team_results tm
             JOIN "Season" s ON s.id = tm.season_id
             JOIN "Team" t ON t.id = tm.team_id
             JOIN "Club" c ON c.id = t.club_id
@@ -409,74 +400,25 @@ public class AnalyticsReportQueryRepository {
             .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
             .addValue("teamId", filter.getTeamId(), Types.BIGINT);
 
-        String sql = """
-            WITH team_points AS (
-                SELECT e.season_id,
-                       m.id AS match_id,
-                       m.date AS match_date,
-                       m.matchday_id,
-                       md.name AS matchday_name,
-                       home.team_id AS team_id,
-                       t.name AS team_name,
-                       s.id AS club_id,
-                       s.name AS club_name,
-                       CASE
-                           WHEN home.score > away.score THEN 3
-                           WHEN home.score = away.score THEN 1
-                           ELSE 0
-                       END AS points_earned,
-                       home.score AS goals_for,
-                       away.score AS goals_against
-                FROM "Match" m
-                JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                JOIN "Event" e ON e.id = m.event_id
-                JOIN "Season" s ON s.id = e.season_id
-                JOIN "Team" t ON t.id = home.team_id
-                LEFT JOIN "Matchday" md ON md.id = m.matchday_id
-                WHERE m.active = true
-                UNION ALL
-                SELECT e.season_id,
-                       m.id,
-                       m.date,
-                       m.matchday_id,
-                       md.name,
-                       away.team_id,
-                       t.name,
-                       s.id,
-                       s.name,
-                       CASE
-                           WHEN away.score > home.score THEN 3
-                           WHEN away.score = home.score THEN 1
-                           ELSE 0
-                       END,
-                       away.score,
-                       home.score
-                FROM "Match" m
-                JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                JOIN "Event" e ON e.id = m.event_id
-                JOIN "Season" s ON s.id = e.season_id
-                JOIN "Team" t ON t.id = away.team_id
-                LEFT JOIN "Matchday" md ON md.id = m.matchday_id
-                WHERE m.active = true
-            )
+        String sql = FINAL_TEAM_RESULTS + """
             SELECT season_id,
                    s.name AS season_name,
                    team_id,
-                   team_name,
+                   t.name AS team_name,
                    match_id,
                    match_date,
                    matchday_id,
-                   matchday_name,
+                   md.name AS matchday_name,
                    ROW_NUMBER() OVER (PARTITION BY season_id, team_id ORDER BY match_date, match_id) AS match_number,
-                   points_earned,
-                   SUM(points_earned) OVER (PARTITION BY season_id, team_id ORDER BY match_date, match_id ROWS UNBOUNDED PRECEDING) AS cumulative_points,
+                   points AS points_earned,
+                   SUM(points) OVER (PARTITION BY season_id, team_id ORDER BY match_date, match_id ROWS UNBOUNDED PRECEDING) AS cumulative_points,
                    goals_for,
                    goals_against,
                    goals_for - goals_against AS goal_difference
-            FROM team_points tp
+            FROM team_results tp
             JOIN "Season" s ON s.id = tp.season_id
+            JOIN "Team" t ON t.id = tp.team_id
+            LEFT JOIN "Matchday" md ON md.id = tp.matchday_id
             WHERE (:seasonId IS NULL OR season_id = :seasonId)
               AND (:teamId IS NULL OR team_id = :teamId)
             ORDER BY season_id, team_id, match_date, match_id
@@ -583,40 +525,7 @@ public class AnalyticsReportQueryRepository {
             .addValue("clubId", filter.getClubId(), Types.BIGINT)
             .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
 
-        String sql = """
-            WITH team_results AS (
-                SELECT e.season_id,
-                       home.team_id AS team_id,
-                       t.club_id,
-                       m.id AS match_id,
-                       CASE WHEN home.score > away.score THEN 1 ELSE 0 END AS win,
-                       CASE WHEN home.score = away.score THEN 1 ELSE 0 END AS draw,
-                       CASE WHEN home.score < away.score THEN 1 ELSE 0 END AS loss,
-                       home.score AS goals_for,
-                       away.score AS goals_against
-                FROM "Match" m
-                JOIN "Event" e ON e.id = m.event_id
-                JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                JOIN "Team" t ON t.id = home.team_id
-                WHERE m.active = true
-                UNION ALL
-                SELECT e.season_id,
-                       away.team_id,
-                       t.club_id,
-                       m.id,
-                       CASE WHEN away.score > home.score THEN 1 ELSE 0 END,
-                       CASE WHEN away.score = home.score THEN 1 ELSE 0 END,
-                       CASE WHEN away.score < home.score THEN 1 ELSE 0 END,
-                       away.score,
-                       home.score
-                FROM "Match" m
-                JOIN "Event" e ON e.id = m.event_id
-                JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                JOIN "Team" t ON t.id = away.team_id
-                WHERE m.active = true
-            )
+        String sql = FINAL_TEAM_RESULTS + """
             SELECT s.id AS season_id,
                    s.name AS season_name,
                    t.id AS team_id,
@@ -624,19 +533,19 @@ public class AnalyticsReportQueryRepository {
                    c.id AS club_id,
                    c.name AS club_name,
                    COUNT(tr.match_id) AS played,
-                   SUM(tr.win) AS wins,
-                   SUM(tr.draw) AS draws,
-                   SUM(tr.loss) AS losses,
+                   COUNT(*) FILTER (WHERE tr.points = 3) AS wins,
+                   COUNT(*) FILTER (WHERE tr.points = 1) AS draws,
+                   COUNT(*) FILTER (WHERE tr.points = 0) AS losses,
                    SUM(tr.goals_for) AS goals_for,
                    SUM(tr.goals_against) AS goals_against,
                    SUM(tr.goals_for) - SUM(tr.goals_against) AS goal_difference,
-                   SUM(tr.win) * 3 + SUM(tr.draw) AS points,
-                   (SUM(tr.win)::numeric / NULLIF(COUNT(tr.match_id), 0))::double precision AS win_rate,
-                   ((SUM(tr.win) * 3 + SUM(tr.draw))::numeric / NULLIF(COUNT(tr.match_id), 0))::double precision AS points_per_match,
+                   SUM(tr.points) AS points,
+                   ((COUNT(*) FILTER (WHERE tr.points = 3))::numeric / COUNT(*))::double precision AS win_rate,
+                   (AVG(tr.points))::double precision AS points_per_match,
                    DENSE_RANK() OVER (
                        PARTITION BY s.id
                        ORDER BY
-                           (SUM(tr.win) * 3 + SUM(tr.draw)) DESC,
+                           SUM(tr.points) DESC,
                            (SUM(tr.goals_for) - SUM(tr.goals_against)) DESC,
                            SUM(tr.goals_for) DESC
                    ) AS ranking_position
@@ -647,7 +556,7 @@ public class AnalyticsReportQueryRepository {
             WHERE (:clubId IS NULL OR c.id = :clubId)
               AND (:seasonId IS NULL OR s.id = :seasonId)
             GROUP BY s.id, s.name, t.id, t.name, c.id, c.name
-            ORDER BY s.start_date DESC, points DESC, goal_difference DESC, goals_for DESC
+            ORDER BY s.start_date DESC, points DESC, goal_difference DESC, goals_for DESC, t.id
             """;
 
         return jdbcTemplate.query(sql, params, (rs, rowNum) -> SeasonStandingResponse.builder()
@@ -673,6 +582,7 @@ public class AnalyticsReportQueryRepository {
 
     public List<ScheduleDensityResponse> findScheduleDensity(ScheduleDensityReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("clubId", requireClubId(filter.getClubId()), Types.BIGINT)
             .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
             .addValue("teamId", filter.getTeamId(), Types.BIGINT)
             .addValue("fromDate", filter.getFromDate(), Types.DATE)
@@ -697,7 +607,7 @@ public class AnalyticsReportQueryRepository {
                     SELECT away.match_id, away.team_id FROM "MatchAwayTeam" away
                 ) mt ON mt.match_id = m.id
                 JOIN "Team" t ON t.id = mt.team_id
-                WHERE m.active = true
+                WHERE m.active = true AND t.club_id = :clubId
             ),
             enriched AS (
                 SELECT tc.*,
@@ -760,8 +670,8 @@ public class AnalyticsReportQueryRepository {
             .addValue("clubId", filter.getClubId(), Types.BIGINT)
             .addValue("seasonId", filter.getSeasonId(), Types.BIGINT);
 
-        String sql = """
-            WITH player_metrics AS (
+        String sql = FINAL_TEAM_RESULTS + """
+            , player_metrics AS (
                 SELECT p.team_id,
                        AVG(EXTRACT(YEAR FROM age(CURRENT_DATE, p.birth_date))) AS average_player_age,
                        COUNT(*) AS players,
@@ -780,38 +690,11 @@ public class AnalyticsReportQueryRepository {
                 SELECT res.season_id,
                        res.team_id,
                        COUNT(res.match_id) AS matches_played,
-                       SUM(res.win) AS wins,
-                       SUM(res.draw) AS draws,
-                       SUM(res.win) * 3 + SUM(res.draw) AS points,
+                       COUNT(*) FILTER (WHERE res.points = 3) AS wins,
+                       SUM(res.points) AS points,
                        SUM(res.goals_for) AS goals_for,
                        SUM(res.goals_against) AS goals_against
-                FROM (
-                    SELECT e.season_id,
-                           home.team_id,
-                           m.id AS match_id,
-                           CASE WHEN home.score > away.score THEN 1 ELSE 0 END AS win,
-                           CASE WHEN home.score = away.score THEN 1 ELSE 0 END AS draw,
-                           home.score AS goals_for,
-                           away.score AS goals_against
-                    FROM "Match" m
-                    JOIN "Event" e ON e.id = m.event_id
-                    JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                    JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                    WHERE m.active = true
-                    UNION ALL
-                    SELECT e.season_id,
-                           away.team_id,
-                           m.id,
-                           CASE WHEN away.score > home.score THEN 1 ELSE 0 END,
-                           CASE WHEN away.score = home.score THEN 1 ELSE 0 END,
-                           away.score,
-                           home.score
-                    FROM "Match" m
-                    JOIN "Event" e ON e.id = m.event_id
-                    JOIN "MatchHomeTeam" home ON home.match_id = m.id
-                    JOIN "MatchAwayTeam" away ON away.match_id = m.id
-                    WHERE m.active = true
-                ) res
+                FROM team_results res
                 GROUP BY res.season_id, res.team_id
             )
             SELECT s.id AS season_id,
@@ -860,6 +743,7 @@ public class AnalyticsReportQueryRepository {
 
     public List<PaymentMethodPerformanceResponse> findPaymentMethodPerformance(PaymentMethodReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("clubId", requireClubId(filter.getClubId()), Types.BIGINT)
             .addValue("fromDate", filter.getFromDate(), Types.DATE)
             .addValue("toDate", filter.getToDate(), Types.DATE)
             .addValue("planId", filter.getPlanId(), Types.BIGINT)
@@ -877,6 +761,7 @@ public class AnalyticsReportQueryRepository {
                        (p.amount - COALESCE(p.discount, 0)) AS net_amount
                 FROM "Payment" p
                 JOIN "PaymentMethod" pm ON pm.id = p.payment_method_id
+                JOIN "Roster" r ON r.id = p.roster_id AND r.club_id = :clubId
                 WHERE p.active = true
                   AND (:fromDate IS NULL OR p.payment_date::date >= :fromDate)
                   AND (:toDate IS NULL OR p.payment_date::date <= :toDate)
@@ -935,6 +820,7 @@ public class AnalyticsReportQueryRepository {
 
     public List<SubscriptionPlanPerformanceResponse> findSubscriptionPlanPerformance(SubscriptionPlanReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("clubId", requireClubId(filter.getClubId()), Types.BIGINT)
             .addValue("planId", filter.getPlanId(), Types.BIGINT)
             .addValue("statusId", filter.getStatusId(), Types.BIGINT)
             .addValue("fromDate", filter.getFromDate(), Types.DATE)
@@ -968,7 +854,8 @@ public class AnalyticsReportQueryRepository {
                        END AS churn_flag
                 FROM "Subscription" s
                 LEFT JOIN "SubscriptionStatus" ss ON ss.id = s.status_id
-                WHERE (:planId IS NULL OR s.plan_id = :planId)
+                WHERE EXISTS (SELECT 1 FROM "Roster" r WHERE r.subscription_id = s.id AND r.club_id = :clubId)
+                  AND (:planId IS NULL OR s.plan_id = :planId)
                   AND (:statusId IS NULL OR s.status_id = :statusId)
             ),
             aggregated_subs AS (
@@ -992,6 +879,7 @@ public class AnalyticsReportQueryRepository {
                        COALESCE(SUM(p.discount), 0) AS total_discount,
                        COALESCE(SUM(p.amount - COALESCE(p.discount, 0)), 0) AS net_revenue
                 FROM "Payment" p
+                JOIN "Roster" r ON r.id = p.roster_id AND r.club_id = :clubId
                 WHERE p.active = true
                   AND (:planId IS NULL OR p.plan_id = :planId)
                   AND (:fromDate IS NULL OR p.payment_date::date >= :fromDate)
@@ -1051,6 +939,13 @@ public class AnalyticsReportQueryRepository {
             .arpu(rs.getBigDecimal("arpu"))
             .retentionRatePercentage(getAsDouble(rs, "retention_rate_percentage"))
             .build());
+    }
+
+    private long requireClubId(Long clubId) {
+        if (clubId == null) {
+            throw new BusinessException("Club ID is required");
+        }
+        return clubId;
     }
 
     private List<PhysicalStateBreakdown> parsePhysicalStates(String json) {

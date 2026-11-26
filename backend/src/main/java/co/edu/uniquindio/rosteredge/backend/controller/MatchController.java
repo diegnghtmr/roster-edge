@@ -4,15 +4,11 @@ import co.edu.uniquindio.rosteredge.backend.dto.ApiResponse;
 import co.edu.uniquindio.rosteredge.backend.dto.filter.MatchScheduleFilter;
 import co.edu.uniquindio.rosteredge.backend.dto.request.MatchRequest;
 import co.edu.uniquindio.rosteredge.backend.dto.response.MatchResponse;
-import co.edu.uniquindio.rosteredge.backend.exception.BusinessException;
 import co.edu.uniquindio.rosteredge.backend.model.Match;
 import co.edu.uniquindio.rosteredge.backend.service.MatchService;
-import co.edu.uniquindio.rosteredge.backend.service.notification.MatchNotificationPublisher;
-import co.edu.uniquindio.rosteredge.backend.service.notification.MatchTeamAssignmentService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,16 +32,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MatchController extends BaseController {
 
     private final MatchService matchService;
-    private final MatchTeamAssignmentService matchTeamAssignmentService;
-    private final MatchNotificationPublisher matchNotificationPublisher;
 
     @PostMapping("/")
     public ResponseEntity<ApiResponse<Match>> createMatch(@Valid @RequestBody MatchRequest request) {
         log.info("Request to create match on date: {}", request.getDate());
-        validateTeams(request.getHomeTeamId(), request.getAwayTeamId());
-        Match createdMatch = matchService.save(mapToMatch(request));
-        upsertTeams(createdMatch.getId(), request.getHomeTeamId(), request.getAwayTeamId());
-        matchNotificationPublisher.publishMatchScheduled(createdMatch);
+        Match createdMatch = matchService.schedule(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(createdMatch, "Match created successfully"));
     }
@@ -84,9 +75,7 @@ public class MatchController extends BaseController {
     public ResponseEntity<ApiResponse<Match>> updateMatch(@PathVariable Long id,
                                                           @Valid @RequestBody MatchRequest request) {
         log.info("Request to update match with id: {}", id);
-        validateTeams(request.getHomeTeamId(), request.getAwayTeamId());
-        Match updatedMatch = matchService.update(id, mapToMatch(request));
-        upsertTeams(updatedMatch.getId(), request.getHomeTeamId(), request.getAwayTeamId());
+        Match updatedMatch = matchService.updateSchedule(id, request);
         return ResponseEntity.ok(ApiResponse.success(updatedMatch, "Match updated successfully"));
     }
 
@@ -97,29 +86,4 @@ public class MatchController extends BaseController {
         return ResponseEntity.ok(ApiResponse.success(null, "Match deleted successfully"));
     }
 
-    private Match mapToMatch(MatchRequest request) {
-        return Match.builder()
-                .matchdayId(request.getMatchdayId())
-                .eventId(request.getEventId())
-                .startTime(request.getStartTime())
-                .endTime(request.getEndTime())
-                .date(request.getDate())
-                .stadiumId(request.getStadiumId())
-                .active(request.getActive())
-                .build();
-    }
-
-    private void validateTeams(Long homeTeamId, Long awayTeamId) {
-        if (homeTeamId == null || awayTeamId == null) {
-            throw new BusinessException("Home and away teams are required");
-        }
-        if (Objects.equals(homeTeamId, awayTeamId)) {
-            throw new BusinessException("Home and away teams must be different");
-        }
-    }
-
-    private void upsertTeams(Long matchId, Long homeTeamId, Long awayTeamId) {
-        matchTeamAssignmentService.assignHomeTeam(matchId, homeTeamId);
-        matchTeamAssignmentService.assignAwayTeam(matchId, awayTeamId);
-    }
 }

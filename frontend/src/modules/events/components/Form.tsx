@@ -12,6 +12,7 @@ import {
 import useGetList from '@/api/services/getServices/useGetList';
 import type { ISeason } from '@/interface/ISeason';
 import type { IVenueResponse } from '@/interface/IVenue';
+import { formatDateOnly, parseDateOnly } from '@/shared/utils/dateOnly';
 
 export interface INewEvent {
   seasonId: number;
@@ -56,26 +57,16 @@ export const EventForm: React.FC<EventFormProps> = ({
     enabled: true,
   });
 
-  // Parse a date string (YYYY-MM-DD) to the array format expected by the API
-  const parseDateToArray = (dateString: string): number[] => {
-    const date = new Date(dateString);
-    return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
-  };
-
-  // Format the date array to a string for the date input
-  const formatDateArray = (dateArray: number[]): string => {
-    if (!dateArray || dateArray.length !== 3) {
-      return '';
-    }
-    const [year, month, day] = dateArray;
-    // Ensure month and day are zero-padded
-    const paddedMonth = month.toString().padStart(2, '0');
-    const paddedDay = day.toString().padStart(2, '0');
-    return `${year}-${paddedMonth}-${paddedDay}`;
-  };
+  const date = formatDateOnly(event.date);
 
   return (
-    <form onSubmit={onSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form
+      onSubmit={(event) => {
+        if (date) onSubmit(event);
+        else event.preventDefault();
+      }}
+      className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
+    >
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
           Nombre del Evento
@@ -99,11 +90,11 @@ export const EventForm: React.FC<EventFormProps> = ({
           id="date"
           name="date"
           type="date"
-          value={formatDateArray(event.date)}
+          value={date}
           onChange={(e) =>
             onChangeValue({
               name: 'date',
-              value: parseDateToArray(e.target.value),
+              value: parseDateOnly(e.target.value),
             })
           }
           required
@@ -127,7 +118,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (seasons as ISeason[]).map((season: ISeason) => (
+              seasons.map((season) => (
                 <SelectItem key={season.id} value={season.id.toString()}>
                   {season.name}
                 </SelectItem>
@@ -154,7 +145,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                 Cargando...
               </SelectItem>
             ) : (
-              (venues as IVenueResponse[]).map((venue: IVenueResponse) => (
+              venues.map((venue) => (
                 <SelectItem key={venue.id} value={venue.id.toString()}>
                   {venue.name}
                 </SelectItem>

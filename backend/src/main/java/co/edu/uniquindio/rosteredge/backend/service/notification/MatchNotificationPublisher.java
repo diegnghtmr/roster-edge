@@ -1,5 +1,6 @@
 package co.edu.uniquindio.rosteredge.backend.service.notification;
 
+import co.edu.uniquindio.rosteredge.backend.exception.EntityNotFoundException;
 import co.edu.uniquindio.rosteredge.backend.model.Club;
 import co.edu.uniquindio.rosteredge.backend.model.ClubEvent;
 import co.edu.uniquindio.rosteredge.backend.model.Event;
@@ -33,6 +34,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Helper component that builds and stores notifications whenever a match is scheduled.
@@ -63,42 +66,30 @@ public class MatchNotificationPublisher {
      *
      * @param match persisted match entity
      */
+    @Transactional(propagation = Propagation.MANDATORY)
     public void publishMatchScheduled(Match match) {
-        if (match == null || match.getEventId() == null) {
-            log.debug("Skipping notification for match without event information");
-            return;
-        }
-        try {
-            Optional<Event> eventOpt = eventRepository.findById(match.getEventId());
-            if (eventOpt.isEmpty()) {
-                log.warn("Unable to publish notification. Event {} not found for match {}", match.getEventId(), match.getId());
-                return;
-            }
+        Event event = eventRepository.findById(match.getEventId())
+                .orElseThrow(() -> new EntityNotFoundException("Event", match.getEventId()));
+        Season season = event.getSeasonId() != null ? seasonRepository.findById(event.getSeasonId()).orElse(null) : null;
+        Matchday matchday = matchdayRepository.findById(match.getMatchdayId()).orElse(null);
+        Stadium stadium = stadiumRepository.findById(match.getStadiumId()).orElse(null);
+        Venue venue = (stadium != null && stadium.getVenueId() != null)
+                ? venueRepository.findById(stadium.getVenueId()).orElse(null)
+                : null;
 
-            Event event = eventOpt.get();
-            Season season = event.getSeasonId() != null ? seasonRepository.findById(event.getSeasonId()).orElse(null) : null;
-            Matchday matchday = matchdayRepository.findById(match.getMatchdayId()).orElse(null);
-            Stadium stadium = stadiumRepository.findById(match.getStadiumId()).orElse(null);
-            Venue venue = (stadium != null && stadium.getVenueId() != null)
-                    ? venueRepository.findById(stadium.getVenueId()).orElse(null)
-                    : null;
+        TeamContext homeTeam = resolveTeam(match.getId(), true);
+        TeamContext awayTeam = resolveTeam(match.getId(), false);
+        List<ClubEvent> clubEvents = clubEventRepository.findByFilters(null, event.getId(), Boolean.TRUE);
 
-            TeamContext homeTeam = resolveTeam(match.getId(), true);
-            TeamContext awayTeam = resolveTeam(match.getId(), false);
-            List<ClubEvent> clubEvents = clubEventRepository.findByFilters(null, event.getId(), Boolean.TRUE);
+        String message = buildMessage(event, season, matchday, venue, match, homeTeam, awayTeam, clubEvents);
+        Notification notification = Notification.builder()
+                .message(message)
+                .sendDate(resolveSendDate(match.getDate(), match.getStartTime()))
+                .active(Boolean.TRUE)
+                .build();
 
-            String message = buildMessage(event, season, matchday, venue, match, homeTeam, awayTeam, clubEvents);
-            Notification notification = Notification.builder()
-                    .message(message)
-                    .sendDate(resolveSendDate(match.getDate(), match.getStartTime()))
-                    .active(Boolean.TRUE)
-                    .build();
-
-            Notification savedNotification = notificationService.save(notification);
-            linkNotificationToClubs(savedNotification.getId(), event.getId(), homeTeam, awayTeam, clubEvents);
-        } catch (Exception ex) {
-            log.error("Unable to publish notification for match {}", match.getId(), ex);
-        }
+        Notification savedNotification = notificationService.save(notification);
+        linkNotificationToClubs(savedNotification.getId(), event.getId(), homeTeam, awayTeam, clubEvents);
     }
 
     private void linkNotificationToClubs(Long notificationId,
@@ -232,7 +223,7 @@ public class MatchNotificationPublisher {
         if (team == null) {
             return new TeamContext(teamId, null, null, null);
         }
-        Club club = clubRepository.findById(team.getClubId()).orElse(null);
+        Club club = team.getClubId() == null ? null : clubRepository.findById(team.getClubId()).orElse(null);
         return new TeamContext(teamId, team.getName(), team.getClubId(), club != null ? club.getName() : null);
     }
 

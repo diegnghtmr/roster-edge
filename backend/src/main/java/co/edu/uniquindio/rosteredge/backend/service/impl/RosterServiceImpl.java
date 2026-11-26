@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,6 +56,12 @@ public class RosterServiceImpl extends SimpleCrudService<Roster> implements Rost
             throw new UnauthorizedException("Invalid credentials");
         }
 
+        if (roster.getClubId() == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+        if (passwordHasher.needsRehash(roster.getPasswordHash())) {
+            roster.setPasswordHash(passwordHasher.hash(password));
+        }
         roster.setLastAccess(LocalDate.now());
         repository.save(roster);
 

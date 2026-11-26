@@ -1,6 +1,5 @@
-import React from 'react';
-import { useResourceList } from '@shared/hooks';
-import { DeleteConfirmDialog } from '@shared/components';
+import { useSearchParams } from 'react-router-dom';
+import useGetList from '@/api/services/getServices/useGetList';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
 import type { FilterConfig } from '@/components/table/SearchComponent';
 import type { StaffRole } from '@/interface/IStaffRole';
@@ -10,7 +9,6 @@ const headers: TableColumn[] = [
   { title: 'ID', key: 'id', className: 'w-16' },
   { title: 'Nombre', key: 'name' },
   { title: 'Fecha de creación', key: 'createdAt' },
-  { title: 'Acciones', key: 'actions', className: 'w-32' },
 ];
 
 const filters: FilterConfig[] = [
@@ -22,58 +20,31 @@ const filters: FilterConfig[] = [
   },
 ];
 
-export const StaffRolesList: React.FC = () => {
-  // All duplicate logic extracted to reusable hook
-  const {
-    items: staffRoles,
-    isLoading,
-    itemToDelete,
-    isDeleting,
-    handleDelete,
-    confirmDelete,
-    cancelDelete,
-  } = useResourceList<StaffRole>({
+export function StaffRolesList() {
+  const [searchParams] = useSearchParams();
+  const { data, isLoading } = useGetList<StaffRole[]>({
     resource: ['staff-roles'],
-    queryKey: 'staffRolesList',
+    key: ['staffRolesList', searchParams.toString()],
     keyResults: 'data',
-    resourceName: 'rol de personal',
-    deleteSuccessMessage: 'Rol de personal eliminado exitosamente',
-    deleteErrorMessage: 'Error al eliminar el rol de personal',
+    params: searchParams,
   });
 
-  // Render function for each row
-  const renderRow = (staffRole: StaffRole) => (
-    <StaffRoleItemList key={staffRole.id} staffRole={staffRole} onDelete={handleDelete} />
-  );
-
   return (
-    <>
-      <div
-        className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4"
-        role="region"
-        aria-label="Lista de roles de personal"
-      >
-        <DataTable
-          data={staffRoles}
-          headers={headers}
-          filters={filters}
-          renderRow={renderRow}
-          loading={isLoading}
-          emptyMessage="No se encontraron roles de personal"
-          className="mt-6"
-          aria-label="Tabla de roles de personal"
-        />
-      </div>
-
-      <DeleteConfirmDialog
-        isOpen={itemToDelete !== null}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        resourceName="rol de personal"
-        isDeleting={isDeleting}
-        title="¿Estás seguro?"
-        description="Esta acción no se puede deshacer. El rol de personal será eliminado permanentemente del sistema."
+    <div
+      className="relative overflow-x-auto rounded-lg xl:overflow-visible p-4"
+      role="region"
+      aria-label="Lista de roles de personal"
+    >
+      <DataTable
+        data={Array.isArray(data) ? data : []}
+        headers={headers}
+        filters={filters}
+        renderRow={(staffRole) => <StaffRoleItemList key={staffRole.id} staffRole={staffRole} />}
+        loading={isLoading}
+        emptyMessage="No se encontraron roles de personal"
+        className="mt-6"
+        aria-label="Tabla de roles de personal"
       />
-    </>
+    </div>
   );
-};
+}

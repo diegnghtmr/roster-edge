@@ -1,15 +1,12 @@
 import { Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined';
-import SupportOutlinedIcon from '@mui/icons-material/SupportOutlined';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useCookies } from 'react-cookie';
-import useUserStore from '@/storage/storeUser';
-import type { ILoginUser } from '@/interface/ILogin';
+import { toast } from 'sonner';
+import useUserStore, { getSessionToken, rosterApiUrl } from '@/storage/storeUser';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 import ContentLogout from '../ContentLogout';
 import { RosterProfileModal } from '../RosterProfileModal';
 
@@ -17,14 +14,21 @@ interface TopbarProps {
   toggleDrawer: (newOpen: boolean) => () => void;
 }
 
-const Profile = ({ image, user }: { image: React.ReactNode; user: ILoginUser | null }) => {
-  if (!user) return null;
-
-  return <div className="flex items-center gap-2">{image}</div>;
-};
+async function revokeSession(token: string) {
+  try {
+    const response = await fetch(rosterApiUrl('/roster/logout/'), {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok && response.status !== 401) throw new Error('Logout request failed');
+  } catch {
+    toast.warning('Sesión cerrada en este navegador. No se pudo confirmar el cierre en el servidor.');
+  }
+}
 
 export const Topbar = ({ toggleDrawer }: TopbarProps) => {
   const { user, clearUser } = useUserStore();
+  const queryClient = useQueryClient();
   const [, , removeCookie] = useCookies(['token']);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -37,11 +41,13 @@ export const Topbar = ({ toggleDrawer }: TopbarProps) => {
   };
 
   const handleLogout = () => {
+    const token = getSessionToken();
     setIsPopoverOpen(false);
     clearUser();
-    removeCookie('token');
-    localStorage.removeItem('token');
-    navigate('/login');
+    removeCookie('token', { path: '/' });
+    queryClient.clear();
+    void navigate('/login', { replace: true });
+    if (token) void revokeSession(token);
   };
 
   return (
@@ -60,49 +66,18 @@ export const Topbar = ({ toggleDrawer }: TopbarProps) => {
           </div>
           <div className="flex items-center gap-6">
             <div className="py-2">
-              <img src="roster-logo.webp" className="h-[46px]" alt="roster" />
+              <img src={`${import.meta.env.BASE_URL}roster-logo.webp`} className="h-[46px]" alt="roster" />
             </div>
           </div>
-          {/* <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="text-gray-600 hover:text-red-600 flex items-center gap-2"
-              onClick={() => navigate("/dashboard")}
-            >
-              <HomeOutlinedIcon className="h-4 w-4" />
-              Home
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-gray-600 hover:text-red-600 flex items-center gap-2"
-              onClick={() => navigate("/contact")}
-            >
-              <ContactMailOutlinedIcon className="h-4 w-4" />
-              Contacto
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-gray-600 hover:text-red-600 flex items-center gap-2"
-              onClick={() => navigate("/support")}
-            >
-              <SupportOutlinedIcon className="h-4 w-4" />
-              Soporte Técnico
-            </Button>
-          </div> */}
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
-              <div className="cursor-pointer">
+              <button type="button" aria-label="Menú de perfil" className="cursor-pointer flex items-center gap-2">
                 {user && (
-                  <Profile
-                    image={
-                      <div className="bg-red-400 w-[40px] h-[40px] flex justify-center items-center text-white rounded-full uppercase">
-                        {user.name.slice(0, 2)}
-                      </div>
-                    }
-                    user={user}
-                  />
+                  <span className="bg-red-400 w-[40px] h-[40px] flex justify-center items-center text-white rounded-full uppercase">
+                    {user.name.slice(0, 2)}
+                  </span>
                 )}
-              </div>
+              </button>
             </PopoverTrigger>
             <PopoverContent>
               <ContentLogout onOpenProfile={handleOpenProfile} onLogout={handleLogout} />
@@ -110,11 +85,14 @@ export const Topbar = ({ toggleDrawer }: TopbarProps) => {
           </Popover>
         </Box>
       </div>
-      <RosterProfileModal
-        open={isProfileOpen}
-        onOpenChange={setIsProfileOpen}
-        onLogout={handleLogout}
-      />
+      {isProfileOpen && user && (
+        <RosterProfileModal
+          open={isProfileOpen}
+          onOpenChange={setIsProfileOpen}
+          onLogout={handleLogout}
+          profile={user}
+        />
+      )}
     </>
   );
 };

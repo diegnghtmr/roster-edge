@@ -23,7 +23,7 @@ interface DataTableProps<T> {
   data: T[];
   headers: TableColumn[];
   filters?: FilterConfig[];
-  renderRow: (item: T) => React.ReactNode;
+  renderRow: (item: T, index: number) => React.ReactNode;
   loading?: boolean;
   emptyMessage?: string;
   className?: string;
@@ -63,7 +63,7 @@ export function DataTable<T>({
           </TableHeader>
           <TableBody>
             {hasData ? (
-              data.map((item) => renderRow(item))
+              data.map((item, index) => renderRow(item, index))
             ) : (
               <TableRow>
                 <TableCell colSpan={headers.length} className="h-24">

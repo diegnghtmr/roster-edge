@@ -1,158 +1,116 @@
 package co.edu.uniquindio.rosteredge.backend.security;
 
 import co.edu.uniquindio.rosteredge.backend.exception.UnauthorizedException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-/**
- * Minimal JWT-like token generator using HMAC-SHA256 that can also validate and decode tokens.
- */
 @Component
 public class TokenService {
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";
-
+    private static final int KEY_BYTES = 32;
+    private static final Set<String> LOCAL_PROFILES = Set.of("dev", "test");
+    private static final String HEADER = encode("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".getBytes(StandardCharsets.UTF_8));
+    private final ObjectMapper json = new ObjectMapper();
     private final byte[] secret;
     private final long expirationSeconds;
 
-    public TokenService(
-            @Value("${security.token.secret:change-me}") String secret,
-            @Value("${security.token.expiration:3600}") long expirationSeconds) {
-        this.secret = secret.getBytes(StandardCharsets.UTF_8);
+    public TokenService(@Value("${security.token.secret:}") String configuredSecret,
+                        @Value("${security.token.expiration:3600}") long expirationSeconds,
+                        Environment environment) {
+        byte[] configuredKey = configuredSecret.getBytes(StandardCharsets.UTF_8);
+        String[] profiles = environment.getActiveProfiles();
+        if (configuredSecret.isEmpty() && profiles.length > 0 && Arrays.stream(profiles).allMatch(LOCAL_PROFILES::contains)) {
+            configuredKey = new byte[KEY_BYTES];
+            new SecureRandom().nextBytes(configuredKey);
+        } else if (configuredKey.length < KEY_BYTES || configuredSecret.chars().distinct().count() < 12) {
+            throw new IllegalArgumentException("security.token.secret must be a random signing secret of at least 32 bytes");
+        }
+        if (expirationSeconds <= 0) {
+            throw new IllegalArgumentException("security.token.expiration must be positive");
+        }
+        this.secret = configuredKey;
         this.expirationSeconds = expirationSeconds;
     }
 
-    /**
-     * Generate a signed token for the given subject, returning token metadata for downstream use.
-     */
     public TokenDetails generateToken(String subject) {
         long issuedAt = Instant.now().getEpochSecond();
-        long expiresAt = issuedAt + expirationSeconds;
-
-        String headerJson = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
-        String payloadJson = String.format(
-                "{\"sub\":\"%s\",\"iat\":%d,\"exp\":%d}",
-                escape(subject), issuedAt, expiresAt);
-
-        String header = base64UrlEncode(headerJson.getBytes(StandardCharsets.UTF_8));
-        String payload = base64UrlEncode(payloadJson.getBytes(StandardCharsets.UTF_8));
-        String signature = sign(header + "." + payload);
-
-        String token = String.join(".", header, payload, signature);
-        return new TokenDetails(token, subject, issuedAt, expiresAt);
+        long expiresAt = Math.addExact(issuedAt, expirationSeconds);
+        try {
+            String payload = encode(json.writeValueAsBytes(Map.of(
+                    "sub", subject, "iat", issuedAt, "exp", expiresAt, "jti", UUID.randomUUID().toString())));
+            String signed = HEADER + "." + payload;
+            return new TokenDetails(signed + "." + encode(sign(signed)), subject, issuedAt, expiresAt);
+        } catch (JsonProcessingException ex) {
+            throw new IllegalStateException("Unable to encode token claims", ex);
+        }
     }
 
-    /**
-     * Validate token signature and expiration, returning its decoded claims.
-     */
     public TokenDetails validateToken(String token) {
         TokenDetails details = parseToken(token);
-        long now = Instant.now().getEpochSecond();
-        if (details.expiresAt() < now) {
+        if (details.expiresAt() <= Instant.now().getEpochSecond()) {
             throw new UnauthorizedException("Token expired");
         }
         return details;
     }
 
-    /**
-     * Decode token without checking expiration (useful right after issuing a token).
-     */
     public TokenDetails parseToken(String token) {
-        if (token == null || token.isBlank()) {
-            throw new UnauthorizedException("Token is required");
-        }
-
-        String[] parts = token.split("\\.");
-        if (parts.length != 3) {
+        if (token == null || token.length() > 4096) {
             throw new UnauthorizedException("Invalid token format");
         }
-
-        String unsigned = parts[0] + "." + parts[1];
-        String expectedSignature = sign(unsigned);
-        if (!constantTimeEquals(expectedSignature, parts[2])) {
-            throw new UnauthorizedException("Invalid token signature");
+        String[] parts = token.split("\\.", -1);
+        if (parts.length != 3 || !HEADER.equals(parts[0])) {
+            throw new UnauthorizedException("Invalid token format");
         }
-
-        String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-        String subject = extractStringClaim(payloadJson, "sub");
-        long issuedAt = extractLongClaim(payloadJson, "iat");
-        long expiresAt = extractLongClaim(payloadJson, "exp");
-
-        return new TokenDetails(token, subject, issuedAt, expiresAt);
+        try {
+            var decoder = Base64.getUrlDecoder();
+            if (!MessageDigest.isEqual(sign(parts[0] + "." + parts[1]), decoder.decode(parts[2]))) {
+                throw new UnauthorizedException("Invalid token signature");
+            }
+            var claims = json.readTree(decoder.decode(parts[1]));
+            var subject = claims.path("sub");
+            var issuedAt = claims.path("iat");
+            var expiresAt = claims.path("exp");
+            if (!subject.isTextual() || subject.asText().isBlank() || !issuedAt.isIntegralNumber()
+                    || !expiresAt.isIntegralNumber() || expiresAt.asLong() <= issuedAt.asLong()) {
+                throw new UnauthorizedException("Invalid token claims");
+            }
+            return new TokenDetails(token, subject.asText(), issuedAt.asLong(), expiresAt.asLong());
+        } catch (IOException | IllegalArgumentException ex) {
+            throw new UnauthorizedException("Invalid token format");
+        }
     }
 
-    private String sign(String data) {
+    private byte[] sign(String data) {
         try {
             Mac mac = Mac.getInstance(HMAC_ALGORITHM);
             mac.init(new SecretKeySpec(secret, HMAC_ALGORITHM));
-            byte[] signatureBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return base64UrlEncode(signatureBytes);
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to sign token", e);
+            return mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        } catch (GeneralSecurityException ex) {
+            throw new IllegalStateException("Unable to sign token", ex);
         }
     }
 
-    private static boolean constantTimeEquals(String expected, String actual) {
-        if (expected.length() != actual.length()) {
-            return false;
-        }
-        int result = 0;
-        for (int i = 0; i < expected.length(); i++) {
-            result |= expected.charAt(i) ^ actual.charAt(i);
-        }
-        return result == 0;
-    }
-
-    private static String base64UrlEncode(byte[] input) {
+    private static String encode(byte[] input) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(input);
     }
 
-    private static String escape(String value) {
-        return value.replace("\\", "\\\\").replace("\"", "\\\"");
-    }
-
-    private static String extractStringClaim(String json, String field) {
-        String pattern = String.format("\"%s\":\"", field);
-        int start = json.indexOf(pattern);
-        if (start < 0) {
-            throw new UnauthorizedException("Missing claim: " + field);
-        }
-        start += pattern.length();
-        int end = json.indexOf('"', start);
-        if (end < 0) {
-            throw new UnauthorizedException("Invalid claim: " + field);
-        }
-        return json.substring(start, end);
-    }
-
-    private static long extractLongClaim(String json, String field) {
-        String pattern = String.format("\"%s\":", field);
-        int start = json.indexOf(pattern);
-        if (start < 0) {
-            throw new UnauthorizedException("Missing claim: " + field);
-        }
-        start += pattern.length();
-        int end = json.indexOf(',', start);
-        if (end < 0) {
-            end = json.indexOf('}', start);
-        }
-        if (end < 0) {
-            throw new UnauthorizedException("Invalid claim: " + field);
-        }
-        String value = json.substring(start, end).trim();
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException ex) {
-            throw new UnauthorizedException("Invalid numeric claim: " + field);
-        }
-    }
-
-    public record TokenDetails(String token, String subject, long issuedAt, long expiresAt) {
-    }
+    public record TokenDetails(String token, String subject, long issuedAt, long expiresAt) { }
 }

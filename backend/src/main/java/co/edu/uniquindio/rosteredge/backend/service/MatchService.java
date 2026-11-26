@@ -1,12 +1,16 @@
 package co.edu.uniquindio.rosteredge.backend.service;
 
 import co.edu.uniquindio.rosteredge.backend.dto.filter.MatchScheduleFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.request.MatchRequest;
 import co.edu.uniquindio.rosteredge.backend.dto.response.MatchResponse;
 import co.edu.uniquindio.rosteredge.backend.model.Match;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface MatchService extends CrudService<Match> {
+    Match schedule(MatchRequest request);
+    Match updateSchedule(Long id, MatchRequest request);
+
     List<Match> findAllMatches(Long teamId, Long eventId, Long matchdayId, Long stadiumId,
                                Boolean active, LocalDate dateFrom, LocalDate dateTo);
     List<Match> findByTeamId(Long teamId);

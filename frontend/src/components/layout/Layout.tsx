@@ -1,37 +1,52 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../sidebar/Sidebar.tsx';
 import { Topbar } from './topbar/Topbar';
 import { useEffect, useState } from 'react';
 import { navigationList } from '../sidebar/constants/navigationList.tsx';
 import useUserStore from '../../storage/storeUser.ts';
 import { Drawer } from '@mui/material';
+import { Spinner } from '@/components/ui/spinner';
 
 export const Layout = () => {
-  const { user } = useUserStore();
+  const status = useUserStore((state) => state.status);
+  const restoreSession = useUserStore((state) => state.restoreSession);
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const { pathname, search, hash } = useLocation();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
+    if (status !== 'restoring') return;
+    const controller = new AbortController();
+    void restoreSession(controller.signal);
+    return () => controller.abort();
+  }, [status, restoreSession]);
+
+  if (status === 'restoring') {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (status === 'signed-out') {
+    return <Navigate to="/login" replace state={{ returnTo: `${pathname}${search}${hash}` }} />;
+  }
 
   return (
     <div className="w-full absolute inset-0">
       {/* Top bar */}
       <Topbar toggleDrawer={toggleDrawer} />
 
-      {/* Sidebar para desktop */}
+      {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar navigationList={navigationList} />
       </div>
 
-      {/* Drawer para móvil/tablet */}
+      {/* Mobile and tablet drawer */}
       <Drawer
         open={open}
         onClose={toggleDrawer(false)}

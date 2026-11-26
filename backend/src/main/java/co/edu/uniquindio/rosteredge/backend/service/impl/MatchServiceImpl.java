@@ -1,11 +1,16 @@
 package co.edu.uniquindio.rosteredge.backend.service.impl;
 
 import co.edu.uniquindio.rosteredge.backend.dto.filter.MatchScheduleFilter;
+import co.edu.uniquindio.rosteredge.backend.dto.request.MatchRequest;
 import co.edu.uniquindio.rosteredge.backend.dto.response.MatchResponse;
+import co.edu.uniquindio.rosteredge.backend.exception.BusinessException;
 import co.edu.uniquindio.rosteredge.backend.model.Match;
 import co.edu.uniquindio.rosteredge.backend.repository.MatchRepository;
+import co.edu.uniquindio.rosteredge.backend.repository.TeamRepository;
 import co.edu.uniquindio.rosteredge.backend.repository.view.MatchScheduleQueryRepository;
 import co.edu.uniquindio.rosteredge.backend.service.MatchService;
+import co.edu.uniquindio.rosteredge.backend.service.notification.MatchNotificationPublisher;
+import co.edu.uniquindio.rosteredge.backend.service.notification.MatchTeamAssignmentService;
 import co.edu.uniquindio.rosteredge.backend.util.FilterUtils;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,12 +27,74 @@ public class MatchServiceImpl extends SimpleCrudService<Match> implements MatchS
 
     private final MatchRepository matchRepository;
     private final MatchScheduleQueryRepository matchScheduleQueryRepository;
+    private final TeamRepository teamRepository;
+    private final MatchTeamAssignmentService assignments;
+    private final MatchNotificationPublisher notifications;
 
     public MatchServiceImpl(MatchRepository matchRepository,
-                            MatchScheduleQueryRepository matchScheduleQueryRepository) {
+                            MatchScheduleQueryRepository matchScheduleQueryRepository,
+                            TeamRepository teamRepository,
+                            MatchTeamAssignmentService assignments,
+                            MatchNotificationPublisher notifications) {
         super(matchRepository);
         this.matchRepository = matchRepository;
         this.matchScheduleQueryRepository = matchScheduleQueryRepository;
+        this.teamRepository = teamRepository;
+        this.assignments = assignments;
+        this.notifications = notifications;
+    }
+
+    @Override
+    @CacheEvict(value = "matches", allEntries = true)
+    public Match schedule(MatchRequest request) {
+        validateTeams(request);
+        Match match = super.save(mapToMatch(request));
+        assignTeams(match, request);
+        // The in-app notification and its links must commit with the match.
+        notifications.publishMatchScheduled(match);
+        return match;
+    }
+
+    @Override
+    @CacheEvict(value = "matches", allEntries = true)
+    public Match updateSchedule(Long id, MatchRequest request) {
+        validateTeams(request);
+        Match match = super.update(id, mapToMatch(request));
+        assignTeams(match, request);
+        return match;
+    }
+
+    private void validateTeams(MatchRequest request) {
+        Long homeTeamId = request.getHomeTeamId();
+        Long awayTeamId = request.getAwayTeamId();
+        if (homeTeamId == null || awayTeamId == null) {
+            throw new BusinessException("Home and away teams are required");
+        }
+        if (homeTeamId.equals(awayTeamId)) {
+            throw new BusinessException("Home and away teams must be different");
+        }
+        for (Long teamId : List.of(homeTeamId, awayTeamId)) {
+            if (!teamRepository.existsById(teamId)) {
+                throw new BusinessException("Team not found with id: " + teamId);
+            }
+        }
+    }
+
+    private void assignTeams(Match match, MatchRequest request) {
+        assignments.assignHomeTeam(match.getId(), request.getHomeTeamId());
+        assignments.assignAwayTeam(match.getId(), request.getAwayTeamId());
+    }
+
+    private Match mapToMatch(MatchRequest request) {
+        return Match.builder()
+                .matchdayId(request.getMatchdayId())
+                .eventId(request.getEventId())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .date(request.getDate())
+                .stadiumId(request.getStadiumId())
+                .active(request.getActive())
+                .build();
     }
 
     @Override

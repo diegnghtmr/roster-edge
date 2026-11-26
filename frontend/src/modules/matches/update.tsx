@@ -12,12 +12,7 @@ import type { IMatch } from '@/interface/IMatch';
 import type { IMatchTeam } from '@/interface/IMatchTeam';
 import { InternalHeader } from '@/components/layout/InternalHeader';
 import { BookmarkCheck } from 'lucide-react';
-import { MatchForm, type INewMatch } from './components/Form';
-
-interface IField {
-  name: string;
-  value: string | number | boolean | number[];
-}
+import { MatchForm, type INewMatch, type MatchField } from './components/Form';
 
 export const MatchUpdateModule = () => {
   const navigate = useNavigate();
@@ -28,7 +23,7 @@ export const MatchUpdateModule = () => {
     matchdayId: 0,
     startTime: [0, 0],
     endTime: [0, 0],
-    date: [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()],
+    date: [],
     stadiumId: 0,
     eventId: 0,
     homeTeamId: null,
@@ -37,7 +32,7 @@ export const MatchUpdateModule = () => {
   });
 
   // Fetch the match data
-  const { data: matchData, isLoading: loadingMatch } = useGetList<IMatch>({
+  const { data: fetchedMatch, isLoading: loadingMatch } = useGetList<IMatch>({
     key: `match-${id}`,
     resource: [`matches/${id}`],
     keyResults: 'data',
@@ -46,8 +41,7 @@ export const MatchUpdateModule = () => {
 
   // Populate form when match data is loaded
   useEffect(() => {
-    if (matchData) {
-      const fetchedMatch = matchData as IMatch;
+    if (fetchedMatch?.id) {
       setMatch((prev) => ({
         ...prev,
         matchdayId: fetchedMatch.matchdayId,
@@ -59,7 +53,7 @@ export const MatchUpdateModule = () => {
         active: fetchedMatch.active,
       }));
     }
-  }, [matchData]);
+  }, [fetchedMatch]);
 
   const { data: homeTeamsData } = useGetList<IMatchTeam[]>({
     key: `match-home-team-${id}`,
@@ -160,8 +154,8 @@ export const MatchUpdateModule = () => {
   );
 
   // Set the values after field changes
-  const handleChangeValue = (field: IField) => {
-    setMatch({ ...match, [field.name]: field.value });
+  const handleChangeValue = ({ name, value }: MatchField) => {
+    setMatch((prev) => ({ ...prev, [name]: value }));
   };
 
   // Show loading state while fetching any required data
