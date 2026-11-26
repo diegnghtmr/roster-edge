@@ -5,6 +5,7 @@ import {
   useMutateService,
   extractErrorMessage,
   type MutationResponse,
+  type MutationVariables,
 } from '@/api/services/useMutation';
 
 /**
@@ -15,7 +16,7 @@ import {
  * @param config - Configuration options
  * @returns Create state and handlers
  */
-export function useResourceCreate<T>(
+export function useResourceCreate<T extends MutationVariables>(
   resource: string[],
   config?: {
     redirectPath?: string;

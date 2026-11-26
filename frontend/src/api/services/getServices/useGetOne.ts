@@ -1,19 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from '@tanstack/react-query';
+import type { QueryKey } from '@tanstack/react-query';
 import { fetchGet } from '../../endPoints/fetchGet';
 
 interface IParamsService {
-  key: any;
+  key: QueryKey | string;
   resource: string[];
-  params?: any;
+  params?: Parameters<typeof fetchGet>[0]['params'];
 }
 
 const useGetOne = ({ key, resource, params }: IParamsService) => {
-  const paramsFetch: any = { resource, params };
-
-  const { error, data, isLoading, refetch } = useQuery({
+  const { error, data, isLoading, refetch } = useQuery<unknown>({
     queryKey: [key],
-    queryFn: () => fetchGet(paramsFetch),
+    queryFn: () => fetchGet({ resource, params }),
   });
 
   return { error, data, isLoading, refetch };
