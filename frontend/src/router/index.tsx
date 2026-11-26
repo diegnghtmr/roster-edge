@@ -1,348 +1,105 @@
-import { Layout } from '@/components/layout/Layout';
-import NotificationsModule from '@/modules/notifications';
-import UsersModule from '@/modules/users';
-
-import Dashboard from '@/modules/dashboard/Dashboard';
-import TeamCategoriesModule from '@/modules/team-categories';
-import TeamCategoryCreateModule from '@/modules/team-categories/create';
-import TeamCategoryUpdateModule from '@/modules/team-categories/update';
-import TeamGendersModule from '@/modules/team-genders';
-import TeamGenderCreateModule from '@/modules/team-genders/create';
-import TeamGenderUpdateModule from '@/modules/team-genders/update';
-import { TeamsModule } from '@/modules/teams';
-import TeamCreateModule from '@/modules/teams/create';
-import TeamUpdateModule from '@/modules/teams/update';
-import { StaffModule } from '@/modules/staff';
-import StaffCreateModule from '@/modules/staff/create';
-import StaffUpdateModule from '@/modules/staff/update';
-import { StaffRolesModule } from '@/modules/staff-roles';
-import CitiesModule from '@/modules/cities';
-import CityCreateModule from '@/modules/cities/create';
-import CityUpdateModule from '@/modules/cities/update';
-import CountriesModule from '@/modules/countries';
-import CountryCreateModule from '@/modules/countries/create';
-import CountryUpdateModule from '@/modules/countries/update';
-import CurrenciesModule from '@/modules/currencies';
-import CurrencyCreateModule from '@/modules/currencies/create';
-import CurrencyUpdateModule from '@/modules/currencies/update';
-import StadiumsModule from '@/modules/stadiums';
-import StadiumCreateModule from '@/modules/stadiums/create';
-import StadiumUpdateModule from '@/modules/stadiums/update';
-import SeasonsModule from '@/modules/seasons';
-import SeasonCreateModule from '@/modules/seasons/create';
-import SeasonUpdateModule from '@/modules/seasons/update';
-import EventsModule from '@/modules/events';
-import EventCreateModule from '@/modules/events/create';
-import EventUpdateModule from '@/modules/events/update';
-import MatchdaysModule from '@/modules/matchdays';
-import MatchdayCreateModule from '@/modules/matchdays/create';
-import MatchdayUpdateModule from '@/modules/matchdays/update';
-import MatchesModule from '@/modules/matches';
-import MatchCreateModule from '@/modules/matches/create';
-import MatchUpdateModule from '@/modules/matches/update';
-import { VenuesModule } from '@/modules/venues';
-import { CreateVenue } from '@/modules/venues/create';
-import { UpdateVenue } from '@/modules/venues/update';
-import Contact from '@/modules/contact/Contact';
-import Support from '@/modules/support/Support';
-import { ReportsModule } from '@/modules/reports';
-import { SeasonStandingsReport } from '@/modules/reports/season-standings';
-import { RosterProfileReport } from '@/modules/reports/roster-profile';
-import { ScoringRankingReport } from '@/modules/reports/scoring-ranking';
-import { PointsProgressReport } from '@/modules/reports/points-progress';
-import { MatchLoadReport } from '@/modules/reports/match-load';
-import { StaffRatioReport } from '@/modules/reports/staff-ratio';
-import { StaffImpactReport } from '@/modules/reports/staff-impact';
-import { SeasonAgendaReport } from '@/modules/reports/season-agenda';
-import { CategoryParticipationReport } from '@/modules/reports/category-participation';
-import { ScheduleDensityReport } from '@/modules/reports/schedule-density';
-import { PaymentMethodPerformanceReport } from '@/modules/reports/payment-method-performance';
-import { SubscriptionPlanPerformanceReport } from '@/modules/reports/subscription-plan-performance';
-import ErrorPage from '@/page/ErrorPage';
-import Login from '@/page/login/Login';
+import type { ComponentType } from 'react';
 import { createBrowserRouter, matchRoutes, Navigate } from 'react-router-dom';
 import type { RouteObject } from 'react-router-dom';
+import { Layout } from '@/components/layout/Layout';
+import { Spinner } from '@/components/ui/spinner';
+import ErrorPage from '@/page/ErrorPage';
+import Login from '@/page/login/Login';
+
+function page(path: string, load: () => Promise<ComponentType>, ownErrorBoundary = false): RouteObject {
+  return {
+    path,
+    lazy: async () => ({ Component: await load() }),
+    ...(ownErrorBoundary && { errorElement: <ErrorPage /> }),
+  };
+}
 
 const protectedRoute: RouteObject = {
-      path: '/',
-      element: <Layout />,
-      errorElement: <ErrorPage />,
-      children: [
-            {
-              index: true,
-              element: <Navigate to="/dashboard" replace />,
-            },
-            {
-              path: '/dashboard',
-              element: <Dashboard />,
-            },
+  path: '/',
+  element: <Layout />,
+  errorElement: <ErrorPage />,
+  hydrateFallbackElement: (
+    <div className="flex min-h-screen items-center justify-center">
+      <Spinner />
+    </div>
+  ),
+  children: [
+    { index: true, element: <Navigate to="/dashboard" replace /> },
+    page('/dashboard', () => import('@/modules/dashboard/Dashboard').then((m) => m.default)),
 
-            {
-              path: '/teams',
-              element: <TeamsModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/teams-create',
-              element: <TeamCreateModule />,
-            },
-            {
-              path: '/teams/:id/edit',
-              element: <TeamUpdateModule />,
-            },
+    page('/teams', () => import('@/modules/teams').then((m) => m.TeamsModule), true),
+    page('/teams-create', () => import('@/modules/teams/create').then((m) => m.default)),
+    page('/teams/:id/edit', () => import('@/modules/teams/update').then((m) => m.default)),
 
-            {
-              path: '/staff',
-              element: <StaffModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/staff-create',
-              element: <StaffCreateModule />,
-            },
-            {
-              path: '/staff/:id/edit',
-              element: <StaffUpdateModule />,
-            },
-            {
-              path: '/staff-roles',
-              element: <StaffRolesModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/staff-roles-create',
-              element: <Navigate to="/staff-roles" replace />,
-            },
-            {
-              path: '/staff-roles/:id/edit',
-              element: <Navigate to="/staff-roles" replace />,
-            },
-            {
-              path: '/team-categories',
-              element: <TeamCategoriesModule />,
-            },
-            {
-              path: '/team-categories-create',
-              element: <TeamCategoryCreateModule />,
-            },
-            {
-              path: '/team-categories/:id/edit',
-              element: <TeamCategoryUpdateModule />,
-            },
-            {
-              path: '/team-genders',
-              element: <TeamGendersModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/team-genders-create',
-              element: <TeamGenderCreateModule />,
-            },
-            {
-              path: '/team-genders/:id/edit',
-              element: <TeamGenderUpdateModule />,
-            },
-            {
-              path: '/cities',
-              element: <CitiesModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/cities-create',
-              element: <CityCreateModule />,
-            },
-            {
-              path: '/cities/:id/edit',
-              element: <CityUpdateModule />,
-            },
-            {
-              path: '/countries',
-              element: <CountriesModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/countries-create',
-              element: <CountryCreateModule />,
-            },
-            {
-              path: '/countries/:id/edit',
-              element: <CountryUpdateModule />,
-            },
-            {
-              path: '/currencies',
-              element: <CurrenciesModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/currencies-create',
-              element: <CurrencyCreateModule />,
-            },
-            {
-              path: '/currencies/:id/edit',
-              element: <CurrencyUpdateModule />,
-            },
-            {
-              path: '/stadiums',
-              element: <StadiumsModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/stadiums-create',
-              element: <StadiumCreateModule />,
-            },
-            {
-              path: '/stadiums/:id/edit',
-              element: <StadiumUpdateModule />,
-            },
-            {
-              path: '/seasons',
-              element: <SeasonsModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/seasons-create',
-              element: <SeasonCreateModule />,
-            },
-            {
-              path: '/seasons/:id/edit',
-              element: <SeasonUpdateModule />,
-            },
-            {
-              path: '/events',
-              element: <EventsModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/events-create',
-              element: <EventCreateModule />,
-            },
-            {
-              path: '/events/:id/edit',
-              element: <EventUpdateModule />,
-            },
-            {
-              path: '/matchdays',
-              element: <MatchdaysModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/matchdays-create',
-              element: <MatchdayCreateModule />,
-            },
-            {
-              path: '/matchdays/:id/edit',
-              element: <MatchdayUpdateModule />,
-            },
-            {
-              path: '/matches',
-              element: <MatchesModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/matches-create',
-              element: <MatchCreateModule />,
-            },
-            {
-              path: '/matches/:id/edit',
-              element: <MatchUpdateModule />,
-            },
-            {
-              path: '/venues',
-              element: <VenuesModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/venues-create',
-              element: <CreateVenue />,
-            },
-            {
-              path: '/venues/:id/edit',
-              element: <UpdateVenue />,
-            },
-            {
-              path: '/notifications',
-              element: <NotificationsModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/users',
-              element: <UsersModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/contact',
-              element: <Contact />,
-            },
-            {
-              path: '/support',
-              element: <Support />,
-            },
-            {
-              path: '/reports',
-              element: <ReportsModule />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/season-standings',
-              element: <SeasonStandingsReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/roster-profile',
-              element: <RosterProfileReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/scoring-ranking',
-              element: <ScoringRankingReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/points-progress',
-              element: <PointsProgressReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/match-load',
-              element: <MatchLoadReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/staff-ratio',
-              element: <StaffRatioReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/staff-impact',
-              element: <StaffImpactReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/season-agenda',
-              element: <SeasonAgendaReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/category-participation',
-              element: <CategoryParticipationReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/schedule-density',
-              element: <ScheduleDensityReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/payment-method-performance',
-              element: <PaymentMethodPerformanceReport />,
-              errorElement: <ErrorPage />,
-            },
-            {
-              path: '/reports/subscription-plan-performance',
-              element: <SubscriptionPlanPerformanceReport />,
-              errorElement: <ErrorPage />,
-            },
-      ],
+    page('/staff', () => import('@/modules/staff').then((m) => m.StaffModule), true),
+    page('/staff-create', () => import('@/modules/staff/create').then((m) => m.default)),
+    page('/staff/:id/edit', () => import('@/modules/staff/update').then((m) => m.default)),
+    page('/staff-roles', () => import('@/modules/staff-roles').then((m) => m.StaffRolesModule)),
+    { path: '/staff-roles-create', element: <Navigate to="/staff-roles" replace /> },
+    { path: '/staff-roles/:id/edit', element: <Navigate to="/staff-roles" replace /> },
+
+    page('/team-categories', () => import('@/modules/team-categories').then((m) => m.default)),
+    page('/team-categories-create', () => import('@/modules/team-categories/create').then((m) => m.default)),
+    page('/team-categories/:id/edit', () => import('@/modules/team-categories/update').then((m) => m.default)),
+    page('/team-genders', () => import('@/modules/team-genders').then((m) => m.default), true),
+    page('/team-genders-create', () => import('@/modules/team-genders/create').then((m) => m.default)),
+    page('/team-genders/:id/edit', () => import('@/modules/team-genders/update').then((m) => m.default)),
+
+    page('/cities', () => import('@/modules/cities').then((m) => m.default), true),
+    page('/cities-create', () => import('@/modules/cities/create').then((m) => m.default)),
+    page('/cities/:id/edit', () => import('@/modules/cities/update').then((m) => m.default)),
+
+    page('/countries', () => import('@/modules/countries').then((m) => m.default), true),
+    page('/countries-create', () => import('@/modules/countries/create').then((m) => m.default)),
+    page('/countries/:id/edit', () => import('@/modules/countries/update').then((m) => m.default)),
+
+    page('/currencies', () => import('@/modules/currencies').then((m) => m.default), true),
+    page('/currencies-create', () => import('@/modules/currencies/create').then((m) => m.default)),
+    page('/currencies/:id/edit', () => import('@/modules/currencies/update').then((m) => m.default)),
+
+    page('/stadiums', () => import('@/modules/stadiums').then((m) => m.default), true),
+    page('/stadiums-create', () => import('@/modules/stadiums/create').then((m) => m.default)),
+    page('/stadiums/:id/edit', () => import('@/modules/stadiums/update').then((m) => m.default)),
+
+    page('/seasons', () => import('@/modules/seasons').then((m) => m.default)),
+    page('/seasons-create', () => import('@/modules/seasons/create').then((m) => m.default)),
+    page('/seasons/:id/edit', () => import('@/modules/seasons/update').then((m) => m.default)),
+
+    page('/events', () => import('@/modules/events').then((m) => m.default)),
+    page('/events-create', () => import('@/modules/events/create').then((m) => m.default)),
+    page('/events/:id/edit', () => import('@/modules/events/update').then((m) => m.default)),
+
+    page('/matchdays', () => import('@/modules/matchdays').then((m) => m.default)),
+    page('/matchdays-create', () => import('@/modules/matchdays/create').then((m) => m.default)),
+    page('/matchdays/:id/edit', () => import('@/modules/matchdays/update').then((m) => m.default)),
+
+    page('/matches', () => import('@/modules/matches').then((m) => m.default)),
+    page('/matches-create', () => import('@/modules/matches/create').then((m) => m.default)),
+    page('/matches/:id/edit', () => import('@/modules/matches/update').then((m) => m.default)),
+
+    page('/venues', () => import('@/modules/venues').then((m) => m.VenuesModule)),
+    page('/venues-create', () => import('@/modules/venues/create').then((m) => m.CreateVenue)),
+    page('/venues/:id/edit', () => import('@/modules/venues/update').then((m) => m.UpdateVenue)),
+
+    page('/notifications', () => import('@/modules/notifications').then((m) => m.default), true),
+    page('/users', () => import('@/modules/users').then((m) => m.default), true),
+    page('/contact', () => import('@/modules/contact/Contact').then((m) => m.default)),
+    page('/support', () => import('@/modules/support/Support').then((m) => m.default)),
+
+    page('/reports', () => import('@/modules/reports').then((m) => m.ReportsModule), true),
+    page('/reports/season-standings', () => import('@/modules/reports/season-standings').then((m) => m.SeasonStandingsReport), true),
+    page('/reports/roster-profile', () => import('@/modules/reports/roster-profile').then((m) => m.RosterProfileReport), true),
+    page('/reports/scoring-ranking', () => import('@/modules/reports/scoring-ranking').then((m) => m.ScoringRankingReport), true),
+    page('/reports/points-progress', () => import('@/modules/reports/points-progress').then((m) => m.PointsProgressReport), true),
+    page('/reports/match-load', () => import('@/modules/reports/match-load').then((m) => m.MatchLoadReport), true),
+    page('/reports/staff-ratio', () => import('@/modules/reports/staff-ratio').then((m) => m.StaffRatioReport), true),
+    page('/reports/staff-impact', () => import('@/modules/reports/staff-impact').then((m) => m.StaffImpactReport), true),
+    page('/reports/season-agenda', () => import('@/modules/reports/season-agenda').then((m) => m.SeasonAgendaReport), true),
+    page('/reports/category-participation', () => import('@/modules/reports/category-participation').then((m) => m.CategoryParticipationReport), true),
+    page('/reports/schedule-density', () => import('@/modules/reports/schedule-density').then((m) => m.ScheduleDensityReport), true),
+    page('/reports/payment-method-performance', () => import('@/modules/reports/payment-method-performance').then((m) => m.PaymentMethodPerformanceReport), true),
+    page('/reports/subscription-plan-performance', () => import('@/modules/reports/subscription-plan-performance').then((m) => m.SubscriptionPlanPerformanceReport), true),
+  ],
 };
 
 function getReturnDestination(state: unknown) {

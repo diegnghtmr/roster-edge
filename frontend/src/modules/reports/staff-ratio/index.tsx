@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
 import { PieChartComponent } from '@/components/reports/charts/PieChartComponent';
-import { StaffRatioPDF } from '@/components/reports/pdf/StaffRatioPDF';
 import { useStaffRatioReport } from '@/api/services/reports/useReportsData';
 import { useClubsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
 import { translateStaffRole } from '@/utils/translations';
@@ -163,7 +162,8 @@ export const StaffRatioReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<StaffRatioPDF data={ratios} />}
+            loadDocument={() => import('@/components/reports/pdf/StaffRatioPDF')
+              .then(({ StaffRatioPDF }) => <StaffRatioPDF data={ratios} />)}
             fileName={`ratio-personal-${new Date().toISOString().split('T')[0]}`}
             disabled={ratios.length === 0}
           />

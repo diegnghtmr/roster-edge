@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { LineChartComponent } from '@/components/reports/charts/LineChartComponent';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { ScheduleDensityPDF } from '@/components/reports/pdf/ScheduleDensityPDF';
 import { useScheduleDensityReport } from '@/api/services/reports/useReportsData';
 import { useSeasonsForFilter, useTeamsForFilter } from '@/api/services/filters/useFilterOptions';
 import { ArrowLeft, Calendar, AlertTriangle, Clock } from 'lucide-react';
@@ -321,7 +320,8 @@ export const ScheduleDensityReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<ScheduleDensityPDF data={density} teamName={teamNameForExport} />}
+            loadDocument={() => import('@/components/reports/pdf/ScheduleDensityPDF')
+              .then(({ ScheduleDensityPDF }) => <ScheduleDensityPDF data={density} teamName={teamNameForExport} />)}
             fileName={`densidad-calendario-${teamNameForExport || 'reporte'}`}
             disabled={density.length === 0}
           />

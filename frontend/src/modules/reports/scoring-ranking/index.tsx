@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { ScoringRankingPDF } from '@/components/reports/pdf/ScoringRankingPDF';
 import { useScoringRankingReport } from '@/api/services/reports/useReportsData';
 import { useSeasonsForFilter, useClubsForFilter } from '@/api/services/filters/useFilterOptions';
 import { ArrowLeft, Target, TrendingUp, TrendingDown } from 'lucide-react';
@@ -203,7 +202,8 @@ export const ScoringRankingReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<ScoringRankingPDF data={rankings} seasonName={rankings[0]?.seasonName} />}
+            loadDocument={() => import('@/components/reports/pdf/ScoringRankingPDF')
+              .then(({ ScoringRankingPDF }) => <ScoringRankingPDF data={rankings} seasonName={rankings[0]?.seasonName} />)}
             fileName={`ranking-goleadores-${rankings[0]?.seasonName || 'reporte'}`}
             disabled={rankings.length === 0}
           />

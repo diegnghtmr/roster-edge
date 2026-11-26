@@ -5,7 +5,6 @@ import { ReportFilters, type FilterField } from '@/components/reports/ReportFilt
 import { StatCard } from '@/components/reports/StatCard';
 import { BarChartComponent } from '@/components/reports/charts/BarChartComponent';
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
-import { MatchLoadPDF } from '@/components/reports/pdf/MatchLoadPDF';
 import { useMatchLoadReport } from '@/api/services/reports/useReportsData';
 import {
   useSeasonsForFilter,
@@ -179,7 +178,8 @@ export const MatchLoadReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            document={<MatchLoadPDF data={matchLoad} seasonName={matchLoad[0]?.seasonName} />}
+            loadDocument={() => import('@/components/reports/pdf/MatchLoadPDF')
+              .then(({ MatchLoadPDF }) => <MatchLoadPDF data={matchLoad} seasonName={matchLoad[0]?.seasonName} />)}
             fileName={`carga-partidos-${matchLoad[0]?.seasonName || 'reporte'}`}
             disabled={matchLoad.length === 0}
           />

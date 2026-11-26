@@ -1,20 +1,20 @@
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { pdf } from '@react-pdf/renderer';
+import type { DocumentProps } from '@react-pdf/renderer';
 import { toast } from 'sonner';
 
 interface ExportButtonProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  document: React.ReactElement<any>;
+  loadDocument: () => Promise<React.ReactElement<DocumentProps>>;
   fileName: string;
   disabled?: boolean;
 }
 
-export const ExportButton = ({ document: pdfDocument, fileName, disabled }: ExportButtonProps) => {
+export const ExportButton = ({ loadDocument, fileName, disabled }: ExportButtonProps) => {
   const handleExport = async () => {
     try {
       toast.info('Generando PDF...');
 
+      const [{ pdf }, pdfDocument] = await Promise.all([import('@react-pdf/renderer'), loadDocument()]);
       const blob = await pdf(pdfDocument).toBlob();
       const url = URL.createObjectURL(blob);
       const link = window.document.createElement('a');
