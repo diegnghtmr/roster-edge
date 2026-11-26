@@ -1,11 +1,18 @@
 import { useState } from 'react';
-import useUserStore from '../../storage/storeUser';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useUserStore, { fetchSessionProfile, getApiData, rosterApiUrl } from '../../storage/storeUser';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { toast } from 'sonner';
 
-const Login = () => {
-  const { setUser } = useUserStore();
+interface LoginProps {
+  getReturnDestination: (state: unknown) => string;
+}
+
+const Login = ({ getReturnDestination }: LoginProps) => {
+  const setUser = useUserStore((state) => state.setUser);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,8 +27,7 @@ const Login = () => {
     setError('');
 
     try {
-      // Hacer la petición de login manualmente
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/roster/login/`, {
+      const response = await fetch(rosterApiUrl('/roster/login/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,51 +49,17 @@ const Login = () => {
         throw new Error(`Error del servidor: ${response.status}`);
       }
 
-      const loginData = await response.json();
-
-      if (loginData?.data?.token) {
-        localStorage.setItem('token', loginData.data.token);
-
-        // Fetch full roster data using /roster/me/ endpoint
-        try {
-          const rosterResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/roster/me/`, {
-            headers: {
-              Authorization: `Bearer ${loginData.data.token}`,
-            },
-          });
-
-          if (rosterResponse.ok) {
-            const rosterData = await rosterResponse.json();
-            // Set user with all data from /roster/me/ response
-            setUser({
-              id: rosterData.data.id,
-              email: rosterData.data.email,
-              name: rosterData.data.name || 'Usuario',
-              clubId: rosterData.data.clubId,
-              subscriptionId: rosterData.data.subscriptionId,
-            });
-            // Use window.location to ensure full page reload and router re-initialization
-            window.location.href = '/dashboard';
-          } else {
-            setError('Failed to fetch user profile');
-            return; // Don't navigate if profile fetch fails
-          }
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
-          if (error instanceof TypeError && error.message.includes('fetch')) {
-            toast.error('El servidor no está disponible. Por favor, inténtalo más tarde.');
-            setError('Error de conexión');
-          } else {
-            setError('Failed to fetch user profile');
-          }
-          return; // Don't navigate if profile fetch fails
-        }
-      } else {
+      const token = getApiData(await response.json())?.token;
+      if (typeof token !== 'string' || !token.trim()) {
         toast.error('Error en el inicio de sesión. Por favor, intenta nuevamente.');
         setError('Error en el inicio de sesión. Por favor, intenta nuevamente.');
+        return;
       }
+
+      const profile = await fetchSessionProfile(token);
+      setUser(profile, token);
+      void navigate(getReturnDestination(location.state), { replace: true });
     } catch (error) {
-      console.error('Login error:', error);
       if (error instanceof TypeError && error.message.includes('fetch')) {
         toast.error('El servidor no está disponible. Por favor, inténtalo más tarde.');
         setError('Error de conexión');
@@ -109,7 +81,7 @@ const Login = () => {
   return (
     <div className="flex-col min-h-screen flex items-center justify-center bg-gray-50">
       <div className="mb-8">
-        <img className="mx-auto h-full w-[200px]" src="roster-logo.webp" alt="Logo" />
+        <img className="mx-auto h-full w-[200px]" src={`${import.meta.env.BASE_URL}roster-logo.webp`} alt="Logo" />
       </div>
       <div className="w-[350px] space-y-8 p-8 bg-white rounded-lg shadow">
         <form className="space-y-6" onSubmit={handleSubmit}>

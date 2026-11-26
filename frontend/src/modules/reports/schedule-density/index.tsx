@@ -278,10 +278,7 @@ export const ScheduleDensityReport = () => {
     <div className="flex flex-col gap-6 pb-6">
       <InternalHeader
         title="Reporte de Densidad del Calendario"
-        breadcrumbs={[
-          { label: 'Reportes', href: '/reports' },
-          { label: 'Densidad del Calendario' },
-        ]}
+        description="Distribución de partidos y días de descanso por equipo"
         buttons={[
           {
             text: 'Volver',
