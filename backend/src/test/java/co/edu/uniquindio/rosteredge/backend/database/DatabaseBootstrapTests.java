@@ -7,6 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -28,9 +29,12 @@ class DatabaseBootstrapTests {
         root.execute("CREATE SCHEMA " + schema);
         try {
             int firstConstraints;
+            List<String> firstMigrations;
             try (var ctx = start(url, user, password)) {
                 var jdbc = ctx.getBean(JdbcTemplate.class);
                 firstConstraints = foreignKeys(jdbc);
+                firstMigrations = migrations(jdbc);
+                assertThat(firstMigrations).containsExactly("001:true", "003:true", "004:true");
                 assertThat(firstConstraints).isPositive();
                 assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM \"Roster\"", Long.class)).isZero();
                 assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM \"Team\"", Long.class)).isZero();
@@ -42,7 +46,7 @@ class DatabaseBootstrapTests {
                 var jdbc = ctx.getBean(JdbcTemplate.class);
                 assertAll(
                         () -> assertThat(foreignKeys(jdbc)).isEqualTo(firstConstraints),
-                        () -> assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM flyway_schema_history WHERE success", Integer.class)).isGreaterThanOrEqualTo(2),
+                        () -> assertThat(migrations(jdbc)).containsExactlyElementsOf(firstMigrations),
                         () -> assertThat(jdbc.queryForObject("INSERT INTO \"Team\" (name, foundation) VALUES ('Generated', current_date) RETURNING id", Long.class)).isGreaterThan(1),
                         () -> assertThat(jdbc.queryForObject("INSERT INTO \"Notification\" (message) VALUES ('Generated') RETURNING id", Long.class)).isGreaterThan(1),
                         () -> assertThat(jdbc.queryForObject("SELECT nextval('\"Match_id_seq\"')", Long.class)).isGreaterThan(101));
@@ -57,6 +61,10 @@ class DatabaseBootstrapTests {
                 "--spring.profiles.active=test", "--server.port=0", "--spring.datasource.url=" + url,
                 "--spring.datasource.username=" + user, "--spring.datasource.password=" + password,
                 "--logging.level.org.springframework.jdbc=INFO");
+    }
+
+    private static List<String> migrations(JdbcTemplate jdbc) {
+        return jdbc.queryForList("SELECT version || ':' || success FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank", String.class);
     }
 
     private static int foreignKeys(JdbcTemplate jdbc) {
