@@ -237,7 +237,7 @@ export const SeasonStandingsReport = () => {
           <DataTable
             data={standings}
             headers={tableHeaders}
-            renderRow={(item, index) => renderRow(item, index)}
+            renderRow={renderRow}
             loading={isLoading}
             emptyMessage="No se encontraron datos para la temporada seleccionada"
           />

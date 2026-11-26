@@ -19,6 +19,31 @@ interface BarChartComponentProps {
   xAxisLabel?: string;
 }
 
+interface AxisTickProps {
+  x: number;
+  y: number;
+  payload: { value: string | number };
+}
+
+const renderAxisTick = ({ x, y, payload }: AxisTickProps) => {
+  const label = String(payload.value);
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        textAnchor="end"
+        fill="#666"
+        fontSize={12}
+        transform="rotate(-35)"
+      >
+        {label.length > 15 ? `${label.slice(0, 15)}...` : label}
+      </text>
+    </g>
+  );
+};
+
 export const BarChartComponent = ({
   data,
   xKey,
@@ -27,32 +52,6 @@ export const BarChartComponent = ({
   yAxisLabel,
   xAxisLabel,
 }: BarChartComponentProps) => {
-  // Custom tick component to handle long labels with rotation
-  interface AxisTickProps {
-    x: number;
-    y: number;
-    payload: { value: string };
-  }
-
-  const CustomizedAxisTick = (props: AxisTickProps) => {
-    const { x, y, payload } = props;
-
-    return (
-      <g transform={`translate(${x},${y})`}>
-        <text
-          x={0}
-          y={0}
-          dy={16}
-          textAnchor="end"
-          fill="#666"
-          fontSize={12}
-          transform="rotate(-35)"
-        >
-          {payload.value.length > 15 ? `${payload.value.substring(0, 15)}...` : payload.value}
-        </text>
-      </g>
-    );
-  };
 
   // Custom tooltip in Spanish
   interface TooltipProps {
@@ -90,7 +89,7 @@ export const BarChartComponent = ({
         />
         <XAxis
           dataKey={xKey}
-          tick={<CustomizedAxisTick />}
+          tick={renderAxisTick}
           tickLine={{ stroke: REPORT_COLORS.neutral.gray400 }}
           axisLine={{ stroke: REPORT_COLORS.neutral.gray400, strokeWidth: 1.5 }}
           interval={0}
