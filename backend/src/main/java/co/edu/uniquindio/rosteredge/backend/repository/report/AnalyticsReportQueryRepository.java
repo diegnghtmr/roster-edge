@@ -493,7 +493,7 @@ public class AnalyticsReportQueryRepository {
                    cm.gender_id,
                    tg.name AS gender_name,
                    COUNT(DISTINCT cm.match_id) AS matches_count,
-                   (COUNT(DISTINCT cm.match_id)::numeric / NULLIF(total.total_matches, 0))::double precision AS participation_percentage
+                   (COUNT(DISTINCT cm.match_id)::numeric / NULLIF(total.total_matches, 0) * 100)::double precision AS participation_percentage
             FROM club_matches cm
             JOIN "Club" c ON c.id = cm.club_id
             JOIN "Season" s ON s.id = cm.season_id
