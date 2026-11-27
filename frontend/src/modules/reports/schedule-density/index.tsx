@@ -271,8 +271,6 @@ export const ScheduleDensityReport = () => {
     );
   };
 
-  const teamNameForExport = density[0]?.teamName;
-
   return (
     <div className="flex flex-col gap-6 pb-6">
       <InternalHeader
@@ -320,9 +318,8 @@ export const ScheduleDensityReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/ScheduleDensityPDF')
-              .then(({ ScheduleDensityPDF }) => <ScheduleDensityPDF data={density} teamName={teamNameForExport} />)}
-            fileName={`densidad-calendario-${teamNameForExport || 'reporte'}`}
+            report="schedule-density"
+            filters={appliedFilters}
             disabled={density.length === 0}
           />
         </div>

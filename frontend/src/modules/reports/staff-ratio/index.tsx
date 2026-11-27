@@ -162,9 +162,8 @@ export const StaffRatioReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/StaffRatioPDF')
-              .then(({ StaffRatioPDF }) => <StaffRatioPDF data={ratios} />)}
-            fileName={`ratio-personal-${new Date().toISOString().split('T')[0]}`}
+            report="staff-ratio"
+            filters={appliedFilters}
             disabled={ratios.length === 0}
           />
         </div>

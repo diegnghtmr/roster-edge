@@ -220,9 +220,8 @@ export const CategoryParticipationReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/CategoryParticipationPDF')
-              .then(({ CategoryParticipationPDF }) => <CategoryParticipationPDF data={participation} />)}
-            fileName={`participacion-categoria-${new Date().toISOString().split('T')[0]}`}
+            report="category-participation"
+            filters={appliedFilters}
             disabled={participation.length === 0}
           />
         </div>

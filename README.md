@@ -31,7 +31,8 @@ A scheduled fixture belongs on the calendar, but it should not count in the stan
 - **Match scheduling.** Choose the event, venue, start and end times, and home and away teams in one form.
 - **Result entry.** Record or correct a final score without reopening the scheduling form.
 - **Season reporting.** Review standings, scoring, and schedule density without counting unplayed fixtures as 0–0 draws.
-- **Payment reports.** Compare payments by method or subscription plan and export reports as PDFs.
+- **Payment reports.** Compare payments by method or subscription plan.
+- **PDF exports.** Download any of the 12 club-scoped reports as a server-generated PDF.
 - **Club-scoped access.** Sign in with a roster account tied to your club; the API checks access independently of browser navigation.
 - **Spanish and English.** The app includes translations for both languages.
 
@@ -90,11 +91,11 @@ Open `http://127.0.0.1:5173`. To try the app without provisioning an account, [i
 
 ## Architecture
 
-The browser calls the Spring Boot API over HTTP/JSON; only the API connects to PostgreSQL. React Router guards and lazy-loads routes, so charts load with their reports and the PDF renderer loads on export. The API derives club scope from the roster session and commits match scheduling, team assignments, and the in-app notification in one transaction.
+The browser calls the Spring Boot API over HTTP; only the API connects to PostgreSQL. React Router guards and lazy-loads routes, so charts load with their reports. The API generates PDFs from the same club-scoped data as the JSON reports; the browser only downloads the file. The API also commits match scheduling, team assignments, and the in-app notification in one transaction.
 
 ```mermaid
 flowchart LR
-    SPA["Club workspace (React SPA)"] -->|"HTTP / JSON"| API["Club-scoped REST API (Spring Boot)"]
+    SPA["Club workspace (React SPA)"] -->|"HTTP / JSON and PDF"| API["Club-scoped REST API (Spring Boot)"]
     API -->|"JDBC / SQL"| DB["PostgreSQL (Flyway migrations)"]
 ```
 
@@ -103,7 +104,7 @@ flowchart LR
 | Layer | Technology |
 | --- | --- |
 | Web app | React 19, TypeScript, Vite, React Router, TanStack Query |
-| Reports and exports | Recharts, React PDF |
+| Reports and exports | Recharts (charts), OpenPDF (API downloads) |
 | API | Java 21, Spring Boot 3.5, Spring Data JDBC |
 | Database | PostgreSQL 17, Flyway |
 | Testing | JUnit with PostgreSQL, Vitest and Testing Library, Playwright and Chromium |
@@ -123,7 +124,7 @@ Backend tests cover empty schemas, restarts, authorization, rollback, and report
 
 ## Documentation
 
-- [API, staff roles, and club scoping](docs/api.md) — session lifecycle, key routes, and match result rules.
+- [API, staff roles, and club scoping](docs/api.md) — session lifecycle, report downloads, and match result rules.
 - [Configuration](docs/configuration.md) — environment variables, built frontend preview, and CORS.
 - [Database and demo data](docs/database.md) — Flyway, disposable fixtures, and a result-entry walkthrough.
 - [Packaged browser smoke](docs/testing/README.md) — how to run the Chromium checks and capture screenshots.

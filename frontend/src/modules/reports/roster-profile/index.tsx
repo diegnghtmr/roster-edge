@@ -173,9 +173,8 @@ export const RosterProfileReport = () => {
         {/* Export Button */}
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/RosterProfilePDF')
-              .then(({ RosterProfilePDF }) => <RosterProfilePDF data={profiles} />)}
-            fileName={`perfil-plantilla-${new Date().toISOString().split('T')[0]}`}
+            report="roster-profile"
+            filters={appliedFilters}
             disabled={profiles.length === 0}
           />
         </div>

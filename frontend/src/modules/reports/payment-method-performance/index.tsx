@@ -198,9 +198,8 @@ export const PaymentMethodPerformanceReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/PaymentMethodPerformancePDF')
-              .then(({ PaymentMethodPerformancePDF }) => <PaymentMethodPerformancePDF data={performance} />)}
-            fileName="reporte-metodos-pago"
+            report="payment-method-performance"
+            filters={appliedFilters}
             disabled={performance.length === 0}
           />
         </div>

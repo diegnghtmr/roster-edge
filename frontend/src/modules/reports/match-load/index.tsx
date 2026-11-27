@@ -178,9 +178,8 @@ export const MatchLoadReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/MatchLoadPDF')
-              .then(({ MatchLoadPDF }) => <MatchLoadPDF data={matchLoad} seasonName={matchLoad[0]?.seasonName} />)}
-            fileName={`carga-partidos-${matchLoad[0]?.seasonName || 'reporte'}`}
+            report="match-load"
+            filters={appliedFilters}
             disabled={matchLoad.length === 0}
           />
         </div>
