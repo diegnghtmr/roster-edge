@@ -166,9 +166,8 @@ export const PointsProgressReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/PointsProgressPDF')
-              .then(({ PointsProgressPDF }) => <PointsProgressPDF data={progress} teamName={progress[0]?.teamName} />)}
-            fileName={`progreso-puntos-${progress[0]?.teamName || 'reporte'}`}
+            report="points-progress"
+            filters={appliedFilters}
             disabled={progress.length === 0}
           />
         </div>

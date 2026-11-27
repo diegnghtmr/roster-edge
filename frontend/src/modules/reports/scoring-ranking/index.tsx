@@ -202,9 +202,8 @@ export const ScoringRankingReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/ScoringRankingPDF')
-              .then(({ ScoringRankingPDF }) => <ScoringRankingPDF data={rankings} seasonName={rankings[0]?.seasonName} />)}
-            fileName={`ranking-goleadores-${rankings[0]?.seasonName || 'reporte'}`}
+            report="scoring-ranking"
+            filters={appliedFilters}
             disabled={rankings.length === 0}
           />
         </div>

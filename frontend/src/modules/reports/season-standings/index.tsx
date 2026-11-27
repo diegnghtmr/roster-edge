@@ -184,9 +184,8 @@ export const SeasonStandingsReport = () => {
         {/* Export Button */}
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/SeasonStandingsPDF')
-              .then(({ SeasonStandingsPDF }) => <SeasonStandingsPDF data={standings} seasonName={standings[0]?.seasonName} />)}
-            fileName={`tabla-posiciones-${standings[0]?.seasonName || 'reporte'}`}
+            report="season-standings"
+            filters={appliedFilters}
             disabled={standings.length === 0}
           />
         </div>

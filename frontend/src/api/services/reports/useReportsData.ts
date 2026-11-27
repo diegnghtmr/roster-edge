@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchGet } from '@/api/endPoints/fetchGet';
+import { fetchGet, fetchGetResponse } from '@/api/endPoints/fetchGet';
 import type {
   TeamRosterProfileResponse,
   RosterProfileReportFilter,
@@ -27,9 +27,7 @@ import type {
   SubscriptionPlanReportFilter,
 } from '@/interface/IReports';
 
-// Helper function to build query params
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const buildQueryParams = (filters: any): string => {
+const buildQueryParams = (filters: object): string => {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -38,6 +36,9 @@ const buildQueryParams = (filters: any): string => {
   });
   return params.toString();
 };
+
+export const fetchReportPdf = (report: string, filters: object) =>
+  fetchGetResponse({ resource: ['analytics', 'reports', report, 'pdf'], params: buildQueryParams(filters) });
 
 // ============================================
 // Roster Profile Report Hook

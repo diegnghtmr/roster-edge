@@ -178,7 +178,7 @@ public class AnalyticsReportQueryRepository {
             FROM "Event" e
             JOIN "Season" s ON s.id = e.season_id
             JOIN "Club" c ON c.id = s.club_id
-            LEFT JOIN "Venue" v ON v.id = e.venue_id
+            LEFT JOIN "Venue" v ON v.id = e.venue_id AND (:clubId IS NULL OR v.club_id = :clubId)
             LEFT JOIN "City" city ON city.id = v.city_id
             WHERE e.active = true
               AND s.active = true
@@ -257,7 +257,7 @@ public class AnalyticsReportQueryRepository {
             JOIN "Club" c ON c.id = t.club_id
             JOIN participations p ON p.team_id = t.id
             JOIN "Season" s ON s.id = p.season_id
-            WHERE (:clubId IS NULL OR c.id = :clubId)
+            WHERE (:clubId IS NULL OR (c.id = :clubId AND s.club_id = :clubId))
               AND (:seasonId IS NULL OR s.id = :seasonId)
               AND (:teamId IS NULL OR t.id = :teamId)
             GROUP BY s.id, s.name, t.id, t.name, c.id, c.name
@@ -300,7 +300,7 @@ public class AnalyticsReportQueryRepository {
             JOIN "Season" s ON s.id = tm.season_id
             JOIN "Team" t ON t.id = tm.team_id
             JOIN "Club" c ON c.id = t.club_id
-            WHERE (:clubId IS NULL OR c.id = :clubId)
+            WHERE (:clubId IS NULL OR (c.id = :clubId AND s.club_id = :clubId))
               AND (:seasonId IS NULL OR s.id = :seasonId)
             GROUP BY s.id, s.name, t.id, t.name, c.id, c.name
             HAVING (:minMatches IS NULL OR COUNT(tm.match_id) >= :minMatches)
@@ -397,6 +397,7 @@ public class AnalyticsReportQueryRepository {
 
     public List<TeamPointsProgressResponse> findPointsProgress(PointsProgressReportFilter filter) {
         MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("clubId", filter.getClubId(), Types.BIGINT)
             .addValue("seasonId", filter.getSeasonId(), Types.BIGINT)
             .addValue("teamId", filter.getTeamId(), Types.BIGINT);
 
@@ -419,7 +420,8 @@ public class AnalyticsReportQueryRepository {
             JOIN "Season" s ON s.id = tp.season_id
             JOIN "Team" t ON t.id = tp.team_id
             LEFT JOIN "Matchday" md ON md.id = tp.matchday_id
-            WHERE (:seasonId IS NULL OR season_id = :seasonId)
+            WHERE (:clubId IS NULL OR (t.club_id = :clubId AND s.club_id = :clubId))
+              AND (:seasonId IS NULL OR season_id = :seasonId)
               AND (:teamId IS NULL OR team_id = :teamId)
             ORDER BY season_id, team_id, match_date, match_id
             """;
@@ -498,7 +500,7 @@ public class AnalyticsReportQueryRepository {
             LEFT JOIN "TeamCategory" tc ON tc.id = cm.category_id
             LEFT JOIN "TeamGender" tg ON tg.id = cm.gender_id
             JOIN total ON total.season_id = cm.season_id AND total.club_id = cm.club_id
-            WHERE (:clubId IS NULL OR cm.club_id = :clubId)
+            WHERE (:clubId IS NULL OR (cm.club_id = :clubId AND s.club_id = :clubId))
               AND (:seasonId IS NULL OR cm.season_id = :seasonId)
               AND (:categoryId IS NULL OR cm.category_id = :categoryId)
               AND (:genderId IS NULL OR cm.gender_id = :genderId)
@@ -553,7 +555,7 @@ public class AnalyticsReportQueryRepository {
             JOIN "Season" s ON s.id = tr.season_id
             JOIN "Team" t ON t.id = tr.team_id
             JOIN "Club" c ON c.id = t.club_id
-            WHERE (:clubId IS NULL OR c.id = :clubId)
+            WHERE (:clubId IS NULL OR (c.id = :clubId AND s.club_id = :clubId))
               AND (:seasonId IS NULL OR s.id = :seasonId)
             GROUP BY s.id, s.name, t.id, t.name, c.id, c.name
             ORDER BY s.start_date DESC, points DESC, goal_difference DESC, goals_for DESC, t.id
@@ -638,7 +640,8 @@ public class AnalyticsReportQueryRepository {
                    EXTRACT(EPOCH FROM (COALESCE(enriched.end_time, enriched.start_time) - enriched.start_time)) / 60 AS duration_minutes
             FROM enriched
             JOIN "Season" s ON s.id = enriched.season_id
-            WHERE (:seasonId IS NULL OR enriched.season_id = :seasonId)
+            WHERE s.club_id = :clubId
+              AND (:seasonId IS NULL OR enriched.season_id = :seasonId)
               AND (:teamId IS NULL OR enriched.team_id = :teamId)
               AND (:fromDate IS NULL OR enriched.match_date >= :fromDate)
               AND (:toDate IS NULL OR enriched.match_date <= :toDate)
@@ -720,7 +723,7 @@ public class AnalyticsReportQueryRepository {
             JOIN "Club" c ON c.id = t.club_id
             LEFT JOIN player_metrics pm ON pm.team_id = mm.team_id
             LEFT JOIN staff_metrics sm ON sm.team_id = mm.team_id
-            WHERE (:clubId IS NULL OR c.id = :clubId)
+            WHERE (:clubId IS NULL OR (c.id = :clubId AND s.club_id = :clubId))
               AND (:seasonId IS NULL OR s.id = :seasonId)
             """;
 

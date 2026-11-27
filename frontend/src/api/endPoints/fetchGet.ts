@@ -5,7 +5,7 @@ interface IParamsType {
   params?: Record<string, string> | URLSearchParams | string;
 }
 
-export const fetchGet = async ({ resource, params }: IParamsType) => {
+const request = async <T>({ resource, params }: IParamsType, read: (response: Response) => T) => {
   const searchParams = new URLSearchParams(params);
   const cookies = localStorage.getItem('token');
 
@@ -51,8 +51,7 @@ export const fetchGet = async ({ resource, params }: IParamsType) => {
       throw new Error(`Error del servidor: ${response.status}`);
     }
 
-    // Parse the JSON response
-    return await response.json();
+    return await read(response);
   } catch (error) {
     // Handle network errors
     if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -62,3 +61,7 @@ export const fetchGet = async ({ resource, params }: IParamsType) => {
     throw error;
   }
 };
+
+export const fetchGet = (params: IParamsType) => request(params, (response) => response.json());
+
+export const fetchGetResponse = (params: IParamsType) => request(params, (response) => response);

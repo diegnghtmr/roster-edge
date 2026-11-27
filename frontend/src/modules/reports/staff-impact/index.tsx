@@ -174,9 +174,8 @@ export const StaffImpactReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/StaffImpactPDF')
-              .then(({ StaffImpactPDF }) => <StaffImpactPDF data={impact} />)}
-            fileName={`impacto-personal-${new Date().toISOString().split('T')[0]}`}
+            report="staff-impact"
+            filters={appliedFilters}
             disabled={teams.length === 0}
           />
         </div>

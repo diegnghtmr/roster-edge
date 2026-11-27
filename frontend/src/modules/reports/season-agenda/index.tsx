@@ -178,9 +178,8 @@ export const SeasonAgendaReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/SeasonAgendaPDF')
-              .then(({ SeasonAgendaPDF }) => <SeasonAgendaPDF data={agenda} seasonName={agenda[0]?.seasonName} />)}
-            fileName={`agenda-temporada-${agenda[0]?.seasonName || 'reporte'}`}
+            report="season-agenda"
+            filters={appliedFilters}
             disabled={agenda.length === 0}
           />
         </div>

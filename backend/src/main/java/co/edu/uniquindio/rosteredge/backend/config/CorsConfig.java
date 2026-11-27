@@ -39,7 +39,7 @@ public class CorsConfig {
         config.setAllowedHeaders(Arrays.asList("*"));
         
         // Headers exposed to frontend
-        config.setExposedHeaders(Arrays.asList("Content-Type", "Authorization"));
+        config.setExposedHeaders(Arrays.asList("Content-Type", "Authorization", "Content-Disposition"));
         
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

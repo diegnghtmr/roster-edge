@@ -216,9 +216,8 @@ export const SubscriptionPlanPerformanceReport = () => {
 
         <div className="flex justify-end">
           <ExportButton
-            loadDocument={() => import('@/components/reports/pdf/SubscriptionPlanPerformancePDF')
-              .then(({ SubscriptionPlanPerformancePDF }) => <SubscriptionPlanPerformancePDF data={plans} />)}
-            fileName="reporte-planes-suscripcion"
+            report="subscription-plan-performance"
+            filters={appliedFilters}
             disabled={plans.length === 0}
           />
         </div>

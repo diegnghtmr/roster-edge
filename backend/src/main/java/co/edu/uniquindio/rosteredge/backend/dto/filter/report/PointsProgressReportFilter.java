@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class PointsProgressReportFilter {
 
+    private Long clubId;
     private Long seasonId;
     private Long teamId;
 }

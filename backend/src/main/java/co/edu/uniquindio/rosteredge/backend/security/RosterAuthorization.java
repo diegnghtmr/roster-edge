@@ -80,8 +80,7 @@ public final class RosterAuthorization extends RequestBodyAdviceAdapter implemen
         if ((read && path.equals("/roster/me/")) || (verb.equals("POST") && path.equals("/roster/logout/"))) {
             return true;
         }
-        if (read && path.startsWith(REPORT_PREFIX) && path.endsWith("/")
-                && REPORTS.contains(path.substring(REPORT_PREFIX.length(), path.length() - 1))) {
+        if (read && isReportRead(path)) {
             requireClubBinding(method);
             return true;
         }
@@ -118,6 +117,15 @@ public final class RosterAuthorization extends RequestBodyAdviceAdapter implemen
         }
         request.setAttribute(ROUTE, new Route(resource, id, read && id == null));
         return true;
+    }
+
+    private static boolean isReportRead(String path) {
+        if (!path.startsWith(REPORT_PREFIX) || !path.endsWith("/")) {
+            return false;
+        }
+        String route = path.substring(REPORT_PREFIX.length());
+        String suffix = route.endsWith("/pdf/") ? "/pdf/" : "/";
+        return route.length() > suffix.length() && REPORTS.contains(route.substring(0, route.length() - suffix.length()));
     }
 
     private static void requireClubBinding(HandlerMethod method) {
