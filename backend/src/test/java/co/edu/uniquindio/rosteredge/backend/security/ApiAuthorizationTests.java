@@ -190,6 +190,11 @@ class ApiAuthorizationTests {
 
         String report = "/analytics/reports/" + slug + "/";
         String pdf = report + "pdf/";
+        if (slug.equals("category-participation")) {
+            mvc.perform(get(report).header("Authorization", bearer()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data[0].participationPercentage").value(100.0));
+        }
         mvc.perform(get(pdf)).andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(jsonPath("$.errorCode").value("UNAUTHORIZED"));
@@ -209,6 +214,10 @@ class ApiAuthorizationTests {
             }
             if (slug.equals("payment-method-performance") || slug.equals("subscription-plan-performance")) {
                 assertThat(text.replace('\u00a0', ' ')).containsPattern("\\$\\s*90\\b").doesNotContainPattern("\\$\\s*500\\b");
+            }
+            if (slug.equals("category-participation")) {
+                // The only local category played every local match: 100 %, not 1 %.
+                assertThat(text).containsPattern("\\b100[.,]0\\s?%").doesNotContainPattern("(?<![\\d.,])1[.,]0\\s?%");
             }
         }
         var foreignFilter = switch (slug) {
