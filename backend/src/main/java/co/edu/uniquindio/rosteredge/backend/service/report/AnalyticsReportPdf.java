@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +26,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.BLUE;
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.GREEN;
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.ORANGE;
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.RED;
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.bars;
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.lines;
+import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfChart.pie;
 import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfLayout.columns;
 import static co.edu.uniquindio.rosteredge.backend.service.report.ReportPdfLayout.row;
 
@@ -41,10 +49,11 @@ public class AnalyticsReportPdf {
             pdf.summary(row("Total de Jugadores", sum(teams, TeamRosterProfileResponse::getTotalPlayers)),
                     row("Jugadores Activos", sum(teams, TeamRosterProfileResponse::getActivePlayers)),
                     row("Edad Promedio", (teams.isEmpty() ? "0" : fixed(avg(teams, TeamRosterProfileResponse::getAverageAge), 1)) + " años"));
-            pdf.table("Jugadores por Equipo (Top 10)", columns("Equipo", "Jugadores"), teams.stream().limit(10)
-                    .map(t -> row(t.getTeamName(), n(t.getTotalPlayers()))).toList());
+            var players = teams.stream().limit(10).map(t -> row(t.getTeamName(), n(t.getTotalPlayers()))).toList();
+            pdf.table("Jugadores por Equipo (Top 10)", columns("Equipo", "Jugadores"), players, bars(180, chartRows(players)));
             if (!states.isEmpty()) {
-                pdf.table("Distribución por Estado Físico", columns("Estado", "Jugadores"), aggregateRows(states, 10));
+                var distribution = aggregateRows(states, 10);
+                pdf.table("Distribución por Estado Físico", columns("Estado", "Jugadores"), distribution, bars(160, chartRows(distribution)));
             }
             for (var team : teams) {
                 pdf.table(label(team.getTeamName(), "-") + " - " + label(team.getClubName(), "-"), columns("Indicador", "Valor"), List.of(
@@ -66,7 +75,9 @@ public class AnalyticsReportPdf {
                 "Temporada: ", "Calendario de Eventos"), pdf -> {
             pdf.summary(row("Eventos Próximos", upcoming), row("Eventos Pasados", past),
                     row("Próximo Evento", next.map(e -> "En " + n(e.getDaysToEvent()) + " días").orElse("Sin eventos")));
-            pdf.table("Distribución de Eventos", columns("Estado", "Eventos"), List.of(row("Próximos", upcoming), row("Pasados", past)));
+            var distribution = List.of(row("Próximos", upcoming), row("Pasados", past));
+            pdf.table("Distribución de Eventos", columns("Estado", "Eventos"), distribution,
+                    events.isEmpty() ? null : bars(140, chartRows(distribution)));
             pdf.table("Calendario Completo", columns("Evento", "Fecha", "Días hasta", "Fase", "Sede", "Ciudad"), events.stream()
                     .map(e -> row(e.getEventName(), e.getEventDate(), n(e.getDaysToEvent()), e.getPhase(), e.getVenueName(), e.getCityName())).toList());
         });
@@ -78,8 +89,8 @@ public class AnalyticsReportPdf {
         return ReportPdfLayout.render("Carga de Partidos", subtitle(teams, TeamMatchLoadResponse::getSeasonName,
                 "Temporada: ", "Distribución Local vs Visitante"), pdf -> {
             pdf.summary(row("Partidos de Local", home), row("Partidos de Visitante", away), row("Total de Partidos", home + away));
-            pdf.table("Carga de Partidos por Equipo (Top 10)", columns("Equipo", "Partidos"), teams.stream().limit(10)
-                    .map(t -> row(t.getTeamName(), n(t.getTotalMatches()))).toList());
+            var load = teams.stream().limit(10).map(t -> row(t.getTeamName(), n(t.getTotalMatches()))).toList();
+            pdf.table("Carga de Partidos por Equipo (Top 10)", columns("Equipo", "Partidos"), load, bars(180, chartRows(load)));
             pdf.table("Detalle Completo", columns("Equipo", "Club", "Local", "Visitante", "Total", "% Local"), teams.stream()
                     .map(t -> row(t.getTeamName(), t.getClubName(), n(t.getHomeMatches()), n(t.getAwayMatches()), n(t.getTotalMatches()),
                             percent(ratio(n(t.getHomeMatches()), n(t.getTotalMatches())) * 100))).toList());
@@ -93,8 +104,8 @@ public class AnalyticsReportPdf {
             pdf.summary(row("Total de Goles", sum(teams, ScoringRankingResponse::getGoalsFor)),
                     row("Promedio Goles/Partido", fixed(avg(teams, ScoringRankingResponse::getGoalsPerMatch), 2)),
                     row("Equipo Más Goleador", top == null ? "-" : top.getTeamName() + ": " + n(top.getGoalsFor())));
-            pdf.table("Top 10 Equipos Goleadores", columns("Equipo", "Goles"), teams.stream().limit(10)
-                    .map(t -> row(t.getTeamName(), n(t.getGoalsFor()))).toList());
+            var ranking = teams.stream().limit(10).map(t -> row(t.getTeamName(), n(t.getGoalsFor()))).toList();
+            pdf.table("Top 10 Equipos Goleadores", columns("Equipo", "Goles"), ranking, bars(180, chartRows(ranking)));
             pdf.table("Estadísticas Completas", columns("Equipo", "PJ", "GF", "GC", "DG", "GF/PJ", "GC/PJ"), teams.stream()
                     .map(t -> row(t.getTeamName(), n(t.getMatchesPlayed()), n(t.getGoalsFor()), n(t.getGoalsAgainst()),
                             n(t.getGoalDifference()), fixed(t.getGoalsPerMatch(), 2), fixed(t.getGoalsAgainstPerMatch(), 2))).toList());
@@ -108,10 +119,12 @@ public class AnalyticsReportPdf {
         return ReportPdfLayout.render("Ratio Personal-Jugadores", "Proporción de staff técnico por jugador", pdf -> {
             pdf.summary(row("Personal Total", sum(teams, TeamStaffRatioResponse::getStaff)), row("Jugadores Total", sum(teams, TeamStaffRatioResponse::getPlayers)),
                     row("Ratio Promedio", fixed(avg(teams, TeamStaffRatioResponse::getStaffToPlayerRatio), 2)));
-            pdf.table("Personal vs Jugadores (Top 10)", columns("Equipo", "Personal", "Jugadores"), teams.stream().limit(10)
-                    .map(t -> row(t.getTeamName(), n(t.getStaff()), n(t.getPlayers()))).toList());
+            var byTeam = teams.stream().limit(10).map(t -> row(t.getTeamName(), n(t.getStaff()), n(t.getPlayers()))).toList();
+            pdf.table("Personal vs Jugadores (Top 10)", columns("Equipo", "Personal", "Jugadores"), byTeam,
+                    bars(180, chartRows(byTeam), new ReportPdfChart.Series("Personal", RED), new ReportPdfChart.Series("Jugadores", BLUE)));
             if (!roles.isEmpty()) {
-                pdf.table("Distribución por Rol", columns("Rol", "Personal"), aggregateRows(roles, roles.size()));
+                var distribution = aggregateRows(roles, roles.size());
+                pdf.table("Distribución por Rol", columns("Rol", "Personal"), distribution, pie(160, chartRows(distribution)));
             }
             pdf.table("Detalle Completo", columns("Equipo", "Personal", "Jugadores", "Ratio", "Antigüedad"), teams.stream()
                     .map(t -> row(t.getTeamName(), n(t.getStaff()), n(t.getPlayers()), optional(t.getStaffToPlayerRatio(), 2, "-", ""),
@@ -126,8 +139,9 @@ public class AnalyticsReportPdf {
             pdf.summary(row("Puntos Totales", total), row("Partidos Jugados", matches.size()),
                     row("Promedio por Partido", fixed(ratio(total, matches.size()), 2)));
             pdf.note("Los puntos se acumulan jornada tras jornada.");
-            pdf.table("Evolución de Puntos Acumulados", columns("Jornada", "Puntos acumulados"), matches.stream()
-                    .map(m -> row(matchday(m), n(m.getCumulativePoints()))).toList());
+            var progress = matches.stream().map(m -> row(matchday(m), n(m.getCumulativePoints()))).toList();
+            pdf.table("Evolución de Puntos Acumulados", columns("Jornada", "Puntos acumulados"), progress,
+                    lines(180, chartRows(progress), "Jornadas", new ReportPdfChart.Series("Puntos acumulados", RED)));
             pdf.table("Detalle por Jornada", columns("Jornada", "Fecha", "GF", "GC", "DG", "Pts Ganados", "Pts Acumulados"), matches.stream()
                     .map(m -> row(matchday(m), m.getMatchDate(), n(m.getGoalsFor()), n(m.getGoalsAgainst()), n(m.getGoalDifference()),
                             n(m.getPointsEarned()), n(m.getCumulativePoints()))).toList());
@@ -144,8 +158,10 @@ public class AnalyticsReportPdf {
         return ReportPdfLayout.render("Participación por Categoría", "Análisis de participación por categoría y género", pdf -> {
             pdf.summary(row("Total de Partidos", sum(participation, CategoryParticipationResponse::getMatchesCount)),
                     row("Categorías", categories.size()), row("Géneros", genders.size()));
-            pdf.table("Partidos por Categoría", columns("Categoría", "Partidos"), aggregateRows(categories, categories.size()));
-            pdf.table("Distribución por Género", columns("Género", "Partidos"), aggregateRows(genders, genders.size()));
+            var byCategory = aggregateRows(categories, categories.size());
+            var byGender = aggregateRows(genders, genders.size());
+            pdf.table("Partidos por Categoría", columns("Categoría", "Partidos"), byCategory, bars(160, chartRows(byCategory)));
+            pdf.table("Distribución por Género", columns("Género", "Partidos"), byGender, pie(140, chartRows(byGender)));
             pdf.table("Detalle Completo", columns("Club", "Categoría", "Género", "Partidos", "% Participación"), participation.stream()
                     .map(r -> row(r.getClubName(), r.getCategoryName(), r.getGenderName(), n(r.getMatchesCount()), percent(r.getParticipationPercentage()))).toList());
         });
@@ -157,8 +173,8 @@ public class AnalyticsReportPdf {
                 "Temporada: ", "Reporte de Temporada"), pdf -> {
             pdf.summary(row("Equipos en Competencia", teams.size()), row("Promedio de Puntos", teams.isEmpty() ? "0" : fixed(avg(teams, SeasonStandingResponse::getPoints), 1)),
                     row("Máximo Goleador", top == null ? "-" : top.getTeamName() + ": " + n(top.getGoalsFor()) + " goles"));
-            pdf.table("Distribución de Puntos (Top 10)", columns("Equipo", "Puntos"), teams.stream().limit(10)
-                    .map(t -> row(t.getTeamName(), n(t.getPoints()))).toList());
+            var standings = teams.stream().limit(10).map(t -> row(t.getTeamName(), n(t.getPoints()))).toList();
+            pdf.table("Distribución de Puntos (Top 10)", columns("Equipo", "Puntos"), standings, bars(140, chartRows(standings)));
             pdf.table("Clasificación Completa", columns("Pos", "Equipo", "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"), teams.stream()
                     .map(t -> row(t.getRankingPosition(), t.getTeamName(), n(t.getPlayed()), n(t.getWins()), n(t.getDraws()), n(t.getLosses()),
                             n(t.getGoalsFor()), n(t.getGoalsAgainst()), n(t.getGoalDifference()), n(t.getPoints()))).toList());
@@ -172,8 +188,15 @@ public class AnalyticsReportPdf {
                 "Equipo: ", "Análisis de Congestion de Partidos"), pdf -> {
             pdf.summary(row("Partidos con Poco Descanso", lowRest), row("Descanso Promedio", fixed(avg(matches, ScheduleDensityResponse::getRestDays), 1) + " días"),
                     row("Densidad Máxima", max + " partidos"));
-            pdf.table("Evolución del Descanso y Densidad", columns("Fecha", "Días de Descanso", "Últimos 7d", "Próximos 7d"), matches.stream()
-                    .map(m -> row(m.getMatchDate(), n(m.getRestDays()), n(m.getMatchesLastSevenDays()), n(m.getMatchesNextSevenDays()))).toList());
+            var density = matches.stream().map(m -> row(m.getMatchDate(), n(m.getRestDays()),
+                    n(m.getMatchesLastSevenDays()), n(m.getMatchesNextSevenDays()))).toList();
+            var samples = new ArrayList<ReportPdfChart.Sample>(density.size());
+            for (int i = 0; i < density.size(); i++) {
+                samples.add(sample(density.get(i), "P" + (i + 1)));
+            }
+            pdf.table("Evolución del Descanso y Densidad", columns("Fecha", "Días de Descanso", "Últimos 7d", "Próximos 7d"), density,
+                    lines(160, samples, null, new ReportPdfChart.Series("Días de Descanso", GREEN),
+                            new ReportPdfChart.Series("Últimos 7d", RED), new ReportPdfChart.Series("Próximos 7d", ORANGE)));
             pdf.table("Detalle Completo", columns("Fecha", "Días Descanso", "Últimos 7d", "Próximos 7d", "Duración (min)", "Alerta"), matches.stream()
                     .map(m -> row(m.getMatchDate(), n(m.getRestDays()), n(m.getMatchesLastSevenDays()), n(m.getMatchesNextSevenDays()),
                             n(m.getMatchDurationMinutes()), Boolean.TRUE.equals(m.getBelowRestThreshold()) ? "Sí" : "No")).toList());
@@ -186,8 +209,11 @@ public class AnalyticsReportPdf {
             pdf.summary(row("Correlación Ratio-Victorias", optional(data.getRatioWinRateCorrelation(), 3, "N/A", "")),
                     row("Correlación Ratio-Puntos", optional(data.getRatioPointsCorrelation(), 3, "N/A", "")),
                     row("Ratio Staff Promedio", optional(data.getAverageStaffRatio(), 2, "N/A", "")));
-            pdf.table("Ratio Staff vs % Victorias (Top 10)", columns("Equipo", "Ratio Staff/Jugador", "% Victorias"), teams.stream().limit(10)
-                    .map(t -> row(t.getTeamName(), fixed(t.getStaffToPlayerRatio(), 2), percent(decimal(t.getWinRate()) * 100))).toList());
+            var impact = teams.stream().limit(10).map(t -> row(t.getTeamName(), decimal(t.getStaffToPlayerRatio()),
+                    decimal(t.getWinRate()) * 100)).toList();
+            pdf.table("Ratio Staff vs % Victorias (Top 10)", columns("Equipo", "Ratio Staff/Jugador", "% Victorias"), impact.stream()
+                            .map(r -> row(r[0], fixed((Number) r[1], 2), percent((Number) r[2]))).toList(),
+                    bars(180, chartRows(impact), new ReportPdfChart.Series("Ratio Staff/Jugador", RED), new ReportPdfChart.Series("% Victorias", GREEN)));
             pdf.table("Detalle Completo", columns("Equipo", "Ratio S/J", "% Victorias", "Pts/PJ", "DG", "PJ"), teams.stream()
                     .map(t -> row(t.getTeamName(), optional(t.getStaffToPlayerRatio(), 2, "-", ""), optional(decimal(t.getWinRate()) * 100, 1, "-", "%"),
                             optional(t.getPointsPerMatch(), 2, "-", ""), n(t.getGoalDifference()), n(t.getMatchesPlayed()))).toList());
@@ -201,12 +227,14 @@ public class AnalyticsReportPdf {
         String leader = top == null ? "-" : label(top.getPaymentMethodName(), "-") + " (" + percent(top.getRevenueSharePercentage()) + ")";
         return ReportPdfLayout.landscape("Rendimiento por Metodo de Pago", top == null ? "Resumen de comportamientos por metodo de pago" : "Top: " + leader, pdf -> {
             pdf.summary(row("Ingresos netos", currency(revenue)), row("Pagos procesados", payments), row("Ticket promedio", currency(divideMoney(revenue, payments))));
-            pdf.table("Ingresos netos por metodo", columns("Metodo", "Ingresos netos"), methods.stream()
-                    .map(m -> row(m.getPaymentMethodName(), currency(m.getNetRevenue()))).toList());
+            var byMethod = methods.stream().map(m -> row(m.getPaymentMethodName(), m.getNetRevenue())).toList();
+            pdf.table("Ingresos netos por metodo", columns("Metodo", "Ingresos netos"), byMethod.stream()
+                    .map(r -> row(r[0], currency((BigDecimal) r[1]))).toList(), bars(200, chartRows(byMethod, "Metodo")));
             var shares = methods.stream().filter(m -> decimal(m.getRevenueSharePercentage()) > 0)
-                    .map(m -> row(m.getPaymentMethodName(), percent(m.getRevenueSharePercentage()))).toList();
+                    .map(m -> row(m.getPaymentMethodName(), m.getRevenueSharePercentage())).toList();
             if (!shares.isEmpty()) {
-                pdf.table("Participacion en ingresos", columns("Metodo", "% Revenue"), shares);
+                pdf.table("Participacion en ingresos", columns("Metodo", "% Revenue"), shares.stream()
+                        .map(r -> row(r[0], percent((Number) r[1]))).toList(), pie(180, chartRows(shares, "Metodo")));
             }
             pdf.table("Detalle completo", columns("Metodo", "Pagos", "Clientes", "Planes", "Ingresos netos", "Ticket", "% Revenue", "% Descuento", "Ultimo pago"), methods.stream()
                     .map(m -> row(m.getPaymentMethodName(), n(m.getTotalPayments()), n(m.getUniqueCustomers()), n(m.getPlansCovered()), currency(m.getNetRevenue()),
@@ -230,10 +258,11 @@ public class AnalyticsReportPdf {
         return ReportPdfLayout.landscape("Salud de Planes de Suscripcion",
                 "Promedio por plan: " + currency(divideMoney(revenue, plans.size())) + " | Pagos registrados: " + payments, pdf -> {
             pdf.summary(row("Suscripciones activas", active), row("Retencion global", percent(ratio(active, total) * 100)), row("Ingresos netos", currency(revenue)));
-            pdf.table("Ingresos por plan", columns("Plan", "Ingresos netos"), plans.stream()
-                    .map(p -> row(p.getPlanName(), currency(p.getNetRevenue()))).toList());
+            var byPlan = plans.stream().map(p -> row(p.getPlanName(), p.getNetRevenue())).toList();
+            pdf.table("Ingresos por plan", columns("Plan", "Ingresos netos"), byPlan.stream()
+                    .map(r -> row(r[0], currency((BigDecimal) r[1]))).toList(), bars(200, chartRows(byPlan, "Plan")));
             if (!statuses.isEmpty()) {
-                pdf.table("Distribucion de estados", columns("Estado", "Suscripciones"), statuses);
+                pdf.table("Distribucion de estados", columns("Estado", "Suscripciones"), statuses, pie(180, chartRows(statuses)));
             }
             pdf.table("Detalle completo", columns("Plan", "Precio", "Suscripciones", "Activas", "Trial", "Suspendidas", "Inactivas", "Prox renov", "Churn rec", "Pagos", "Ingresos netos", "ARPU", "Retencion"), plans.stream()
                     .map(p -> row(p.getPlanName(), currency(p.getPlanPrice()), n(p.getTotalSubscriptions()), n(p.getActiveSubscriptions()), n(p.getTrialSubscriptions()),
@@ -243,6 +272,22 @@ public class AnalyticsReportPdf {
                     row("Renovaciones proximas", sum(plans, SubscriptionPlanPerformanceResponse::getUpcomingRenewals)),
                     row("Churn reciente", sum(plans, SubscriptionPlanPerformanceResponse::getChurnedRecently)), row("Trials activas", trial)));
         });
+    }
+
+    private static List<ReportPdfChart.Sample> chartRows(List<Object[]> rows) {
+        return chartRows(rows, "Sin nombre");
+    }
+
+    private static List<ReportPdfChart.Sample> chartRows(List<Object[]> rows, String fallback) {
+        return rows.stream().map(r -> sample(r, fallback)).toList();
+    }
+
+    private static ReportPdfChart.Sample sample(Object[] row, String fallback) {
+        double[] values = new double[row.length - 1];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = decimal((Number) row[i + 1]);
+        }
+        return new ReportPdfChart.Sample(label(row[0] == null ? null : row[0].toString(), fallback), values);
     }
 
     private static Object matchday(TeamPointsProgressResponse match) {

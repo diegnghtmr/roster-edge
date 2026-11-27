@@ -84,6 +84,13 @@ final class ReportPdfLayout {
     }
 
     void table(String title, String[] headers, Iterable<Object[]> rows) {
+        table(title, headers, rows, null);
+    }
+
+    void table(String title, String[] headers, Iterable<Object[]> rows, ReportPdfChart chart) {
+        if (chart != null) {
+            addChart(title, chart);
+        }
         float[] widths = new float[headers.length];
         Arrays.fill(widths, 1);
         if (widths.length > 2) {
@@ -91,16 +98,18 @@ final class ReportPdfLayout {
         }
         var table = new PdfPTable(widths);
         table.setWidthPercentage(100);
-        table.setSpacingBefore(10);
+        table.setSpacingBefore(chart == null ? 10 : 0);
         table.setSpacingAfter(4);
         table.setSplitLate(false);
-        var section = cell(title, font(12, true, BRAND), Color.WHITE);
-        section.setColspan(headers.length);
-        table.addCell(section);
+        if (chart == null) {
+            var section = cell(title, font(12, true, BRAND), Color.WHITE);
+            section.setColspan(headers.length);
+            table.addCell(section);
+        }
         for (String header : headers) {
             table.addCell(cell(header, font(9, true, Color.WHITE), INK));
         }
-        table.setHeaderRows(2);
+        table.setHeaderRows(chart == null ? 2 : 1);
         int row = 0;
         for (Object[] values : rows) {
             if (values.length != headers.length) {
@@ -121,6 +130,29 @@ final class ReportPdfLayout {
             table.addCell(empty);
         }
         document.add(table);
+    }
+
+    private void addChart(String title, ReportPdfChart chart) {
+        // Keep the chart and its title on the same page without repeating the plot in table headers.
+        var block = new PdfPTable(1);
+        block.setWidthPercentage(100);
+        block.setSpacingBefore(10);
+        block.setKeepTogether(true);
+        block.addCell(cell(title, font(12, true, BRAND), Color.WHITE));
+        var plot = new PdfPCell();
+        plot.setBorder(Rectangle.NO_BORDER);
+        plot.setFixedHeight(chart.height());
+        plot.setCellEvent((cell, box, layers) -> {
+            var canvas = layers[PdfPTable.TEXTCANVAS];
+            canvas.saveState();
+            try {
+                chart.drawing().paint(canvas, box, FONT);
+            } finally {
+                canvas.restoreState();
+            }
+        });
+        block.addCell(plot);
+        document.add(block);
     }
 
     static String[] columns(String... labels) {
