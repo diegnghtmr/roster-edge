@@ -1,19 +1,26 @@
 package co.edu.uniquindio.rosteredge.backend.security;
 
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -147,6 +154,113 @@ class ApiAuthorizationTests {
                 default -> throw new AssertionError(report);
             }
         }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "roster-profile, Perfil de Plantilla, Resumen General, Local XI, Foreign XI",
+            "season-agenda, Agenda de Temporada, Calendario Completo, Evento local, Evento ajeno",
+            "match-load, Carga de Partidos, Detalle Completo, Local XI, Foreign XI",
+            "scoring-ranking, Ranking de Goleadores, Estadísticas Completas, Local XI, Foreign XI",
+            "staff-ratio, Ratio Personal-Jugadores, Detalle Completo, Local XI, Foreign XI",
+            "points-progress, Progreso de Puntos, Detalle por Jornada, Local XI, Foreign XI",
+            "category-participation, Participación por Categoría, Detalle Completo, Local Club, Foreign Club",
+            "season-standings, Tabla de Posiciones, Clasificación Completa, Local XI, Foreign XI",
+            "schedule-density, Densidad del Calendario, Detalle Completo, Local XI, Foreign XI",
+            "staff-impact, Impacto del Personal, Detalle Completo, Local XI, Foreign XI",
+            "payment-method-performance, Rendimiento por Metodo de Pago, Detalle completo, Tarjeta local, Tarjeta ajena",
+            "subscription-plan-performance, Salud de Planes de Suscripcion, Detalle completo, Plan local, Plan ajeno"
+    })
+    void pdfExportsUseTheSamePrincipalScopeAsReportData(String slug, String title, String section,
+                                                       String local, String foreign) throws Exception {
+        long localEvent = event(club, "Evento local");
+        long foreignEvent = event(foreignClub, "Evento ajeno");
+        long foreignSeason = id("UPDATE \"Season\" SET name = 'Temporada ajena' WHERE club_id = ? RETURNING id", foreignClub);
+        long foreignVenue = id("""
+                INSERT INTO "Venue" (club_id, name, email, phone, foundation)
+                VALUES (?, 'Sede ajena', 'venue@example.invalid', '0', current_date) RETURNING id
+                """, foreignClub);
+        jdbc.update("UPDATE \"Event\" SET venue_id = ? WHERE id = ?", foreignVenue, localEvent);
+        pdfResults(match(localEvent), ownTeam, awayTeam(club), 3);
+        pdfResults(match(foreignEvent), foreignTeam, awayTeam(foreignClub), 8);
+        // A legacy assignment linked a local team to a fixture owned by the foreign season.
+        pdfResults(match(foreignEvent), ownTeam, awayTeam(club), 777);
+        pdfPayment(club, "local", 90);
+        long foreignPlan = pdfPayment(foreignClub, "ajeno", 500);
+
+        String report = "/analytics/reports/" + slug + "/";
+        String pdf = report + "pdf/";
+        mvc.perform(get(pdf)).andExpect(status().isUnauthorized())
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.errorCode").value("UNAUTHORIZED"));
+        for (var request : List.of(get(pdf), get(pdf).param("clubId", Long.toString(foreignClub)))) {
+            var bytes = mvc.perform(request.header("Authorization", bearer()).header("Origin", "http://localhost:5173"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                    .andExpect(header().string("Content-Disposition", "attachment; filename=\"" + slug + ".pdf\""))
+                    .andExpect(header().string("Cache-Control", "no-store"))
+                    .andExpect(header().string("Access-Control-Expose-Headers", containsString("Content-Disposition")))
+                    .andReturn().getResponse().getContentAsByteArray();
+            String text = pdfText(bytes);
+            assertThat(text).contains(title, section, local, "Generado el")
+                    .doesNotContain(foreign, "Temporada ajena", "Sede ajena", "777");
+            if (slug.equals("season-agenda") || slug.equals("points-progress") || slug.equals("schedule-density")) {
+                assertThat(text).contains(jdbc.queryForObject("SELECT (current_date + 1)::text", String.class));
+            }
+            if (slug.equals("payment-method-performance") || slug.equals("subscription-plan-performance")) {
+                assertThat(text.replace('\u00a0', ' ')).containsPattern("\\$\\s*90\\b").doesNotContainPattern("\\$\\s*500\\b");
+            }
+        }
+        var foreignFilter = switch (slug) {
+            case "roster-profile", "staff-ratio" -> new String[]{"teamId", Long.toString(foreignTeam)};
+            case "payment-method-performance", "subscription-plan-performance" -> new String[]{"planId", Long.toString(foreignPlan)};
+            default -> new String[]{"seasonId", Long.toString(foreignSeason)};
+        };
+        var empty = mvc.perform(get(pdf).param(foreignFilter[0], foreignFilter[1]).header("Authorization", bearer()))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andReturn().getResponse().getContentAsByteArray();
+        assertThat(pdfText(empty)).contains(title, "Sin datos").doesNotContain(local, foreign, "Temporada ajena", "Sede ajena");
+
+        // PDF requests are read-only; JSON still returns the scoped local data.
+        var json = mvc.perform(get(report).header("Authorization", bearer()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        assertThat(json).contains(local).doesNotContain(foreign, "Temporada ajena", "Sede ajena", "\"goalsFor\":777");
+    }
+
+    private static String pdfText(byte[] bytes) throws Exception {
+        var reader = new PdfReader(bytes);
+        try {
+            var extractor = new PdfTextExtractor(reader);
+            var text = new StringBuilder();
+            for (int page = 1; page <= reader.getNumberOfPages(); page++) {
+                text.append(extractor.getTextFromPage(page)).append('\n');
+            }
+            return text.toString();
+        } finally {
+            reader.close();
+        }
+    }
+
+    private void pdfResults(long match, long home, long away, int score) {
+        jdbc.update("INSERT INTO \"MatchHomeTeam\" (match_id, team_id, score) VALUES (?, ?, ?)", match, home, score);
+        jdbc.update("INSERT INTO \"MatchAwayTeam\" (match_id, team_id, score) VALUES (?, ?, 1)", match, away);
+        jdbc.update("""
+                INSERT INTO "MatchResult" (match_id, home_team_id, away_team_id, home_score, away_score)
+                VALUES (?, ?, ?, ?, 1)
+                """, match, home, away, score);
+    }
+
+    private long pdfPayment(long owner, String label, int amount) {
+        long plan = id("INSERT INTO \"Plan\" (name, price) VALUES (?, ?) RETURNING id", "Plan " + label, amount);
+        long method = id("INSERT INTO \"PaymentMethod\" (name) VALUES (?) RETURNING id", "Tarjeta " + label);
+        long subscription = subscription(plan);
+        long roster = owner == club
+                ? id("UPDATE \"Roster\" SET subscription_id = ? WHERE club_id = ? RETURNING id", subscription, owner)
+                : id("INSERT INTO \"Roster\" (name, email, password_hash, club_id, subscription_id) VALUES ('Foreign', 'foreign@example.invalid', 'unused', ?, ?) RETURNING id", owner, subscription);
+        jdbc.update("INSERT INTO \"Payment\" (payment_method_id, plan_id, roster_id, amount) VALUES (?, ?, ?, ?)", method, plan, roster, amount);
+        return plan;
     }
 
     @Test
